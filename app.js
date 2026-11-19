@@ -1080,6 +1080,9 @@ epochs = 300`;
       } else if (lessonIdx === 4) {
         buildNetwork([3, 6, 4, 2]);
         targetCamDist = 680;
+      } else if (lessonIdx === 5) {
+        switchMode('test');
+        return;
       }
       triggerLiveForwardPass(); // Light up animation in all guides
     });
@@ -1141,10 +1144,10 @@ epochs = 300`;
   }
 
   const btnSwitchToTest = document.getElementById('btnSwitchToTest');
-  if (btnSwitchToTest && tabTest) {
+  if (btnSwitchToTest) {
     btnSwitchToTest.addEventListener('click', (e) => {
       e.stopPropagation();
-      tabTest.click();
+      switchMode('test');
     });
   }
 
@@ -1570,10 +1573,9 @@ epochs = 300`;
     });
   }
 
-  // Settings Modal: Share Simulator Direct Link & Native Share Sheet
+  // Settings Modal: Share Simulator Direct Link
   const btnSettingsShareLink = document.getElementById('btnSettingsShareLink');
   const settingsShareCopyText = document.getElementById('settingsShareCopyText');
-  const btnSettingsShareSheet = document.getElementById('btnSettingsShareSheet');
 
   if (btnSettingsShareLink) {
     attachTap(btnSettingsShareLink, async () => {
@@ -1588,40 +1590,11 @@ epochs = 300`;
     });
   }
 
-  if (btnSettingsShareSheet) {
-    attachTap(btnSettingsShareSheet, async () => {
-      const shareData = {
-        title: 'SynapseLab: 3D Visualization Simulator for Students',
-        text: 'Interactive 3D neural network simulator with live code studio!',
-        url: 'https://synapselab.devs.li'
-      };
-      if (navigator.share) {
-        try { await navigator.share(shareData); } catch (err) {}
-      } else if (btnSettingsShareLink) {
-        btnSettingsShareLink.click();
-      }
-    });
-  }
-
-  // Settings Modal: Developer Email & Issue Reporting
-  const btnCopyDevEmail = document.getElementById('btnCopyDevEmail');
+  // Settings Modal: Email Feedback & Reporting
   const btnSendIssueEmail = document.getElementById('btnSendIssueEmail');
   const issueSubjectInput = document.getElementById('issueSubjectInput');
   const issueBodyInput = document.getElementById('issueBodyInput');
   const DEV_EMAIL = 'Purohitunofficialbhagyesh@gmail.com';
-
-  if (btnCopyDevEmail) {
-    attachTap(btnCopyDevEmail, async () => {
-      try {
-        await navigator.clipboard.writeText(DEV_EMAIL);
-        btnCopyDevEmail.textContent = 'Copied!';
-        setTimeout(() => { btnCopyDevEmail.textContent = 'Copy'; }, 1800);
-      } catch (err) {
-        btnCopyDevEmail.textContent = 'Copied!';
-        setTimeout(() => { btnCopyDevEmail.textContent = 'Copy'; }, 1800);
-      }
-    });
-  }
 
   if (btnSendIssueEmail) {
     attachTap(btnSendIssueEmail, () => {
@@ -1630,15 +1603,6 @@ epochs = 300`;
       const userText = `Hi Bhagyesh,\n\nI am reporting an issue / sharing feedback on SynapseLab:\n\n${userNotes}\n\n---\nPlatform: https://synapselab.devs.li\nUser-Agent: ${navigator.userAgent}`;
       const mailtoUrl = `mailto:${DEV_EMAIL}?subject=${encodeURIComponent(topic)}&body=${encodeURIComponent(userText)}`;
       window.location.href = mailtoUrl;
-    });
-  }
-
-  // Settings Modal: Coffee Support Trigger
-  const btnSettingsOpenCoffee = document.getElementById('btnSettingsOpenCoffee');
-  if (btnSettingsOpenCoffee) {
-    attachTap(btnSettingsOpenCoffee, () => {
-      if (settingsModal) settingsModal.classList.remove('active');
-      if (coffeeModal) coffeeModal.classList.add('active');
     });
   }
 

@@ -78,23 +78,15 @@
         </div>
       </a>
 
-      <!-- Mode Switcher: Guide Mode vs Test Mode (Sliding Pill) -->
+      <!-- Mode Switcher: Guide vs Test (Compact Sleek Pill, Zero Symbols) -->
       <div class="mode-segmented" id="modeSegmented" data-active="guide" role="tablist" aria-label="Learning Mode">
         <div class="slider-pill"></div>
         <button class="mode-tab active" id="tabGuide" type="button" role="tab" aria-selected="true">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-          </svg>
-          <span>Guide Mode</span>
+          <span>Guide</span>
         </button>
 
         <button class="mode-tab" id="tabTest" type="button" role="tab" aria-selected="false">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="16 18 22 12 16 6"/>
-            <polyline points="8 6 2 12 8 18"/>
-          </svg>
-          <span>Test Mode</span>
+          <span>Test</span>
         </button>
       </div>
 
@@ -142,7 +134,7 @@
       <div class="lesson-list">
         <!-- Lesson 1 -->
         <article class="lesson-card active" data-lesson="0">
-          <div class="lesson-tag">LESSON 01 &bull; ANATOMY & LAYERS</div>
+          <div class="lesson-tag">LESSON 01 - ANATOMY &amp; LAYERS</div>
           <h3 class="lesson-title">What is an Artificial Neural Network?</h3>
           <p class="lesson-desc">
             An artificial neural network (ANN) organizes compute into distinct layers of neurons (nodes) connected sequentially from input to output:
@@ -164,7 +156,7 @@
 
         <!-- Lesson 2 -->
         <article class="lesson-card" data-lesson="1">
-          <div class="lesson-tag">LESSON 02 &bull; SYNAPSES & WEIGHTS</div>
+          <div class="lesson-tag">LESSON 02 - SYNAPSES &amp; WEIGHTS</div>
           <h3 class="lesson-title">Synaptic Filaments and Numeric Weights</h3>
           <p class="lesson-desc">
             The white luminous filaments connecting neurons represent <strong>synapses</strong>. Each synapse carries an adjustable mathematical scalar called a <strong>weight (w)</strong>:
@@ -181,7 +173,7 @@
 
         <!-- Lesson 3 -->
         <article class="lesson-card" data-lesson="2">
-          <div class="lesson-tag">LESSON 03 &bull; THE NEURON & RELU</div>
+          <div class="lesson-tag">LESSON 03 - THE NEURON &amp; RELU</div>
           <h3 class="lesson-title">Weighted Summation and Non-Linear Activation</h3>
           <p class="lesson-desc">
             Inside each artificial neuron dot, two fundamental mathematical steps occur before passing output to subsequent layers:
@@ -197,7 +189,7 @@
 
         <!-- Lesson 4 -->
         <article class="lesson-card" data-lesson="3">
-          <div class="lesson-tag">LESSON 04 &bull; DEEP LEARNING</div>
+          <div class="lesson-tag">LESSON 04 - DEEP LEARNING</div>
           <h3 class="lesson-title">Hierarchical Abstraction in Deep Networks</h3>
           <p class="lesson-desc">
             A network is considered <strong>Deep</strong> when it contains two or more hidden layers. Depth enables hierarchical representation learning:
@@ -214,7 +206,7 @@
 
         <!-- Lesson 5 -->
         <article class="lesson-card" data-lesson="4">
-          <div class="lesson-tag">LESSON 05 &bull; TRAINING & GRADIENT DESCENT</div>
+          <div class="lesson-tag">LESSON 05 - TRAINING &amp; GRADIENT DESCENT</div>
           <h3 class="lesson-title">Loss Functions and Backpropagation</h3>
           <p class="lesson-desc">
             Neural networks do not guess; they optimize parameters iteratively through calculus:
@@ -231,13 +223,13 @@
 
         <!-- Lesson 6: Transition to Code -->
         <article class="lesson-card cta-card" data-lesson="5">
-          <div class="lesson-tag">LESSON 06 &bull; CODE LAB</div>
+          <div class="lesson-tag">LESSON 06 - CODE LAB</div>
           <h3 class="lesson-title">Ready to Build Your Own Architecture?</h3>
           <p class="lesson-desc">
             You now understand layers, synapses, weights, activations, and backpropagation. Switch over to <strong>Test Mode</strong> to edit <code>network_threads.py</code> directly: customize layer dimensions, tune learning rates, and run forward passes live!
           </p>
           <button class="lesson-action primary-action" id="btnSwitchToTest" type="button">
-            <span>Switch to Test Mode (Code Lab) &rarr;</span>
+            <span>Switch to Test Mode (Code Lab)</span>
           </button>
         </article>
       </div>
@@ -398,8 +390,7 @@ epochs = 300</textarea>
        ========================================================================= -->
   <footer class="bottom-bar">
     <div class="bottom-left">
-      <span id="footerStats">SynapseLab &bull; 3D Visualization Simulator for Students</span>
-      <button class="legal-link open-legal-trigger" id="btnOpenPrivacy" type="button">Privacy Policy &amp; Terms</button>
+      <span id="footerStats">SynapseLab - 3D Visualization Simulator for Students</span>
     </div>
 
     <div class="bottom-right">
@@ -492,29 +483,18 @@ epochs = 300</textarea>
           </div>
 
           <div class="settings-issue-box">
-            <div class="issue-developer-info">
-              <span class="issue-label">Developer:</span>
-              <span class="issue-email-value" id="developerEmail">Purohitunofficialbhagyesh@gmail.com</span>
-              <button type="button" class="btn-micro" id="btnCopyDevEmail" title="Copy developer email">Copy</button>
-            </div>
-
             <div class="issue-form-group">
               <input type="text" id="issueSubjectInput" class="issue-input" placeholder="Topic (e.g. Mobile Layout Glitch, Feature Request)" value="SynapseLab Feedback">
-              <textarea id="issueBodyInput" class="issue-textarea" rows="2" placeholder="Describe the issue, device type, or ideas..."></textarea>
+              <textarea id="issueBodyInput" class="issue-textarea" rows="3" placeholder="Describe the issue, device type, or ideas..."></textarea>
             </div>
 
-            <div class="settings-btn-row">
-              <button type="button" class="btn btn-report-warning" id="btnSendIssueEmail" style="flex:1; justify-content:center;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                  <polyline points="22,6 12,13 2,6"/>
-                </svg>
-                <span>Send Report via Email</span>
-              </button>
-              <a href="https://github.com/PurohitBhagyesh/synapselab/issues" target="_blank" rel="noopener noreferrer" class="btn" style="flex:1; justify-content:center;">
-                <span>GitHub Issues &rarr;</span>
-              </a>
-            </div>
+            <button type="button" class="btn btn-report-warning" id="btnSendIssueEmail" style="width:100%; justify-content:center; gap:8px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <span>Send Feedback via Email</span>
+            </button>
           </div>
         </div>
 
@@ -552,47 +532,15 @@ epochs = 300</textarea>
         <div class="settings-section">
           <div class="settings-section-header">
             <strong>Share Simulator</strong>
-            <span class="settings-hint">Direct link or system sheet</span>
+            <span class="settings-hint">Direct link</span>
           </div>
 
-          <div class="settings-btn-row">
-            <button type="button" class="btn" id="btnSettingsShareLink" style="flex:1; justify-content:center;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
-              </svg>
-              <span id="settingsShareCopyText">Copy Link</span>
-            </button>
-            <button type="button" class="btn" id="btnSettingsShareSheet" style="flex:1; justify-content:center;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="18" cy="5" r="3"/>
-                <circle cx="6" cy="12" r="3"/>
-                <circle cx="18" cy="19" r="3"/>
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-              </svg>
-              <span>Share Sheet</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="settings-divider"></div>
-
-        <!-- Voluntary Support -->
-        <div class="settings-section">
-          <div class="settings-section-header">
-            <strong>Support Research</strong>
-            <span class="settings-hint">Voluntary UPI / Student Tip</span>
-          </div>
-          <button type="button" class="btn" id="btnSettingsOpenCoffee" style="width:100%; justify-content:center; gap:8px;">
+          <button type="button" class="btn" id="btnSettingsShareLink" style="width:100%; justify-content:center; gap:8px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
-              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
-              <line x1="6" y1="1" x2="6" y2="4"/>
-              <line x1="10" y1="1" x2="10" y2="4"/>
-              <line x1="14" y1="1" x2="14" y2="4"/>
+              <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
             </svg>
-            <span>Buy me a Coffee (UPI / FamApp / GPay)</span>
+            <span id="settingsShareCopyText">Copy Direct Link</span>
           </button>
         </div>
 
@@ -602,7 +550,7 @@ epochs = 300</textarea>
         <div class="settings-section">
           <div class="settings-section-header">
             <strong>Legal &amp; Policy</strong>
-            <span class="settings-hint">Zero Tracking &bull; MIT License</span>
+            <span class="settings-hint">Zero Tracking - MIT License</span>
           </div>
           <button type="button" class="btn open-legal-trigger" id="btnSettingsOpenLegal" style="width:100%; justify-content:center;">
             <span>View Privacy Policy &amp; Terms of Service</span>
@@ -618,10 +566,6 @@ epochs = 300</textarea>
       <div class="modal-header">
         <h3 class="modal-title" id="coffeeModalTitle">Support Developer</h3>
         <button class="modal-close-btn" id="btnCloseCoffee" type="button" aria-label="Close modal">&times;</button>
-      </div>
-
-      <div class="snack-qr-pad">
-        <img id="snackQrImg" src="" alt="UPI Payment QR Code" width="124" height="124">
       </div>
 
       <div class="snack-upi-copy" id="snackUpiCopyBtn" title="Click to copy UPI ID">
