@@ -1,0 +1,46 @@
+================================================================================
+          NEURAL NETWORK PROJECT - COMPLETE GUIDE & INSTRUCTIONS
+================================================================================
+
+1. WHAT ARE THE CONNECTING "THREADS"?
+--------------------------------------------------------------------------------
+In a neural network, the "threads" (or lines) connecting neurons from one layer
+to the next represent SYNAPSES or WEIGHTS ($W$). 
+- Each thread carries an optical/numerical signal from a neuron in layer L to a
+  neuron in layer L+1.
+- In 3D networks, these threads fan out organically as curved 3D Bezier splines
+  (like fiber-optic axons or silk threads), carrying animated signal wave pulses.
+
+
+2. FILES IN THIS FOLDER
+--------------------------------------------------------------------------------
+- 3d_neural_universe.html       : Full-screen 3D Neural Network Universe matching the
+                                  viral reference design: curved fiber filaments, 
+                                  hero column (HL 4 with 27 neurons), floating HUD cards,
+                                  3D perspective grid floor, and 360-degree orbit camera.
+- live_thread_designer.html     : 2D live code editor with hover/touch inspection
+                                  showing start dots, midway waypoint dots, end dots, and W.
+- visualize_network.html        : Interactive 2D web app with animated signal pulses.
+- neural_network_threads.png    : High-resolution publication diagram of the network.
+- plot_network.py               : Python Matplotlib script that draws the threads.
+- architecture_design.md        : Complete blueprint with layer topologies & math.
+- train_nn.py                   : Trains the neural network using scikit-learn.
+- predict_nn.py                 : Runs predictions using the trained model.
+- neural_network_from_scratch.py: From-scratch pure NumPy neural network code.
+- guide.txt                     : This reference guide.
+
+
+3. HOW TO LAUNCH THE 3D UNIVERSE ON MAC
+--------------------------------------------------------------------------------
+Simply double-click:
+  `3d_neural_universe.html`
+
+Or run in Terminal:
+  cd ~/Desktop/neural_network_project
+  open 3d_neural_universe.html
+
+CONTROLS:
+- Click and drag: Orbit 360° around the network in 3D
+- Mouse wheel / pinch: Zoom in and out
+- Sliders: Control Wave Speed, Thread Density, and Fiber Spread
+================================================================================

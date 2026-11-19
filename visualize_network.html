@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; }
+    canvas { display: block; width: 100%; height: 280px; }
+  </style>
+</head>
+<body class="bg-transparent text-[var(--foreground)] antialiased p-0 m-0 select-none">
+  <div class="py-2 space-y-2">
+    <!-- Controls Bar -->
+    <div class="flex flex-wrap items-center justify-between gap-3 px-2 py-1.5 rounded-lg bg-[var(--card)] border border-[var(--card-border)] text-xs">
+      <div class="flex items-center gap-4">
+        <label class="flex items-center gap-2 text-[var(--muted-foreground)]">
+          Hours:
+          <input id="hoursInput" type="range" min="1" max="15" step="0.5" value="7" class="accent-sky-400 w-20 cursor-pointer" />
+          <span id="hoursVal" class="font-mono font-semibold text-[var(--foreground)]">7.0h</span>
+        </label>
+        <label class="flex items-center gap-2 text-[var(--muted-foreground)]">
+          Tests:
+          <input id="testsInput" type="range" min="0" max="8" step="1" value="3" class="accent-amber-400 w-16 cursor-pointer" />
+          <span id="testsVal" class="font-mono font-semibold text-[var(--foreground)]">3</span>
+        </label>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button id="pulseBtn" class="px-2.5 py-1 rounded bg-sky-500/20 hover:bg-sky-500/30 text-sky-400 font-medium text-xs transition border border-sky-500/30">
+          ⚡ Pulse Synapses
+        </button>
+        <div class="flex items-center gap-1.5">
+          <span class="text-[var(--muted-foreground)]">Predicted:</span>
+          <span id="scoreDisplay" class="font-mono font-bold text-emerald-400 text-sm">82.4</span>
+          <span class="text-[var(--muted-foreground)] text-[10px]">/ 100</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas Container -->
+    <div class="relative w-full rounded-lg overflow-hidden border border-[var(--card-border)] bg-slate-950">
+      <canvas id="nnCanvas"></canvas>
+      <div class="absolute bottom-1.5 left-2 text-[10px] text-slate-500 flex gap-3 pointer-events-none">
+        <span><span class="inline-block w-2 h-2 rounded-full bg-sky-400 mr-1"></span>Input (2)</span>
+        <span><span class="inline-block w-2 h-2 rounded-full bg-blue-400 mr-1"></span>Hidden 1 (8)</span>
+        <span><span class="inline-block w-2 h-2 rounded-full bg-purple-400 mr-1"></span>Hidden 2 (4)</span>
+        <span><span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-1"></span>Output (1)</span>
+        <span class="text-slate-600">| 52 Interconnected Threads</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('nnCanvas');
+    const ctx = canvas.getContext('2d');
+    const hoursInput = document.getElementById('hoursInput');
+    const testsInput = document.getElementById('testsInput');
+    const hoursVal = document.getElementById('hoursVal');
+    const testsVal = document.getElementById('testsVal');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const pulseBtn = document.getElementById('pulseBtn');
+
+    const layerSizes = [2, 8, 4, 1];
+    let nodes = [];
+    let threads = [];
+    let pulses = [];
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = 280 * dpr;
+      ctx.scale(dpr, dpr);
+      buildNetwork(rect.width, 280);
+    }
+
+    function buildNetwork(w, h) {
+      nodes = [];
+      threads = [];
+      const numLayers = layerSizes.length;
+      const hPadding = 45;
+      const vPadding = 25;
+      const colStep = (w - hPadding * 2) / (numLayers - 1);
+
+      layerSizes.forEach((count, lIdx) => {
+        const x = hPadding + lIdx * colStep;
+        const colNodes = [];
+        const availableHeight = h - vPadding * 2;
+        const rowStep = availableHeight / (count + 1);
+
+        for (let i = 0; i < count; i++) {
+          const y = vPadding + (i + 1) * rowStep;
+          colNodes.push({ x, y, layer: lIdx, index: i, val: 0.5 });
+        }
+        nodes.push(colNodes);
+      });
+
+      // Build 52 connecting threads
+      for (let l = 0; l < numLayers - 1; l++) {
+        const srcLayer = nodes[l];
+        const dstLayer = nodes[l + 1];
+        srcLayer.forEach(src => {
+          dstLayer.forEach(dst => {
+            const weight = (Math.sin(src.x * 11 + dst.y * 7) * 0.8 + Math.cos(src.y * 3) * 0.2);
+            threads.push({
+              src, dst,
+              weight,
+              color: weight >= 0 ? 'rgba(56, 189, 248, ' : 'rgba(251, 146, 60, ',
+              alpha: Math.abs(weight) * 0.35 + 0.15
+            });
+          });
+        });
+      }
+    }
+
+    function spawnPulses() {
+      threads.forEach((t) => {
+        pulses.push({
+          thread: t,
+          progress: 0,
+          speed: 0.015 + Math.random() * 0.015,
+          color: t.weight >= 0 ? '#38bdf8' : '#fb923c'
+        });
+      });
+    }
+
+    function updatePrediction() {
+      const h = parseFloat(hoursInput.value);
+      const t = parseInt(testsInput.value);
+      hoursVal.textContent = h.toFixed(1) + 'h';
+      testsVal.textContent = t;
+
+      // Simulated non-linear neural prediction
+      const base = 42 + (h * 4.6) + (t * 2.2) - (h > 10 ? (h - 10) * 1.5 : 0);
+      const score = Math.max(0, Math.min(99.4, base));
+      scoreDisplay.textContent = score.toFixed(1);
+
+      // Trigger wave of pulses
+      spawnPulses();
+    }
+
+    hoursInput.addEventListener('input', updatePrediction);
+    testsInput.addEventListener('input', updatePrediction);
+    pulseBtn.addEventListener('click', spawnPulses);
+
+    window.addEventListener('resize', resize);
+    resize();
+    spawnPulses();
+
+    // Animation Loop
+    function animate() {
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, 280);
+
+      // 1. Draw Threads
+      threads.forEach(t => {
+        ctx.beginPath();
+        ctx.moveTo(t.src.x, t.src.y);
+        ctx.lineTo(t.dst.x, t.dst.y);
+        ctx.strokeStyle = t.color + t.alpha + ')';
+        ctx.lineWidth = Math.abs(t.weight) * 1.8 + 0.5;
+        ctx.stroke();
+      });
+
+      // 2. Animate Pulses along threads
+      for (let i = pulses.length - 1; i >= 0; i--) {
+        const p = pulses[i];
+        p.progress += p.speed;
+        if (p.progress >= 1) {
+          pulses.splice(i, 1);
+          continue;
+        }
+        const px = p.thread.src.x + (p.thread.dst.x - p.thread.src.x) * p.progress;
+        const py = p.thread.src.y + (p.thread.dst.y - p.thread.src.y) * p.progress;
+
+        ctx.beginPath();
+        ctx.arc(px, py, 2.2, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 6;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      // 3. Draw Neurons
+      const layerColors = ['#38bdf8', '#60a5fa', '#c084fc', '#34d399'];
+      nodes.forEach((col, lIdx) => {
+        const colColor = layerColors[lIdx];
+        col.forEach((n, nIdx) => {
+          // Glow
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, 9, 0, Math.PI * 2);
+          ctx.fillStyle = colColor + '33';
+          ctx.fill();
+
+          // Solid node
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, 5, 0, Math.PI * 2);
+          ctx.fillStyle = colColor;
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1.2;
+          ctx.fill();
+          ctx.stroke();
+
+          // Labels for Input & Output
+          if (lIdx === 0) {
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '9px monospace';
+            ctx.textAlign = 'right';
+            ctx.fillText(nIdx === 0 ? 'Hours' : 'Tests', n.x - 12, n.y + 3);
+          } else if (lIdx === layerSizes.length - 1) {
+            ctx.fillStyle = '#34d399';
+            ctx.font = 'bold 10px monospace';
+            ctx.textAlign = 'left';
+            ctx.fillText('Score', n.x + 12, n.y + 3);
+          }
+        });
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>

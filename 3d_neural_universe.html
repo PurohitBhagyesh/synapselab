@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Neural Universe - Curved Synaptic Filaments</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background-color: #070b14;
+      color: #e2e8f0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+    #canvas3d {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+    #canvas3d:active { cursor: grabbing; }
+
+    /* Top HUD */
+    .top-bar {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .hud-card {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      backdrop-filter: blur(12px);
+      padding: 12px 18px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(56, 189, 248, 0.1);
+      pointer-events: auto;
+    }
+    .hud-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #38bdf8;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hud-subtitle {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    /* Control Panel Bottom Left */
+    .controls-panel {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10;
+      pointer-events: auto;
+    }
+    .ctrl-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+    }
+    .ctrl-row label {
+      width: 110px;
+      color: #94a3b8;
+    }
+    .ctrl-btn {
+      background: rgba(14, 165, 233, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #38bdf8;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ctrl-btn:hover {
+      background: rgba(14, 165, 233, 0.35);
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    }
+    .ctrl-slider {
+      accent-color: #38bdf8;
+      cursor: pointer;
+    }
+
+    /* Floating Stats Top Right */
+    .stats-card {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      text-align: right;
+      font-size: 11px;
+      color: #94a3b8;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .stats-badge {
+      font-size: 13px;
+      font-weight: bold;
+      color: #34d399;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Info HUD -->
+  <div class="top-bar">
+    <div class="hud-card">
+      <div class="hud-title">
+        <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#38bdf8; box-shadow:0 0 10px #38bdf8;"></span>
+        3D NEURAL NETWORK VISUALIZATION
+      </div>
+      <div class="hud-subtitle">
+        Curved Fiber-Optic Synaptic Filaments • 3D Horizon Grid • Optical Wave Propagation
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Stats -->
+  <div class="hud-card stats-card">
+    <div>Hero Layer: <span class="stats-badge" id="heroBadge">HL 4 (27 Neurons)</span></div>
+    <div>Synaptic Filaments: <span style="color:#38bdf8; font-weight:bold;" id="filamentCount">512</span></div>
+    <div>Perspective: <span style="color:#cbd5e1;">3D Orbit Mode</span></div>
+  </div>
+
+  <!-- Controls Panel -->
+  <div class="hud-card controls-panel">
+    <div class="ctrl-row">
+      <button class="ctrl-btn" id="autoRotateBtn">⟳ Auto-Rotate: ON</button>
+      <button class="ctrl-btn" id="resetCamBtn">Reset Camera</button>
+    </div>
+    <div class="ctrl-row">
+      <label>Wave Speed:</label>
+      <input type="range" id="speedSlider" min="0.2" max="3" step="0.1" value="1.5" class="ctrl-slider">
+    </div>
+    <div class="ctrl-row">
+      <label>Thread Density:</label>
+      <select id="densitySelect" style="background:#0f172a; color:#38bdf8; border:1px solid #334155; padding:3px 8px; border-radius:4px; font-family:inherit; font-size:11px;">
+        <option value="high" selected>Ultra Dense (Full Fibers)</option>
+        <option value="medium">Medium</option>
+        <option value="clean">Minimal Clean</option>
+      </select>
+    </div>
+    <div class="ctrl-row">
+      <label>Fiber Spread:</label>
+      <input type="range" id="spreadSlider" min="2" max="12" step="0.5" value="7" class="ctrl-slider">
+    </div>
+  </div>
+
+  <!-- 3D Canvas -->
+  <canvas id="canvas3d"></canvas>
+
+  <script>
+    const canvas = document.getElementById('canvas3d');
+    const ctx = canvas.getContext('2d');
+
+    const autoRotateBtn = document.getElementById('autoRotateBtn');
+    const resetCamBtn = document.getElementById('resetCamBtn');
+    const speedSlider = document.getElementById('speedSlider');
+    const densitySelect = document.getElementById('densitySelect');
+    const spreadSlider = document.getElementById('spreadSlider');
+    const filamentCountEl = document.getElementById('filamentCount');
+
+    let autoRotate = true;
+    let waveSpeed = 1.5;
+    let fiberSpread = 7.0;
+
+    // 3D Camera coordinates
+    let yaw = -0.38;
+    let pitch = 0.26;
+    let camDist = 720;
+    let fov = 520;
+
+    let isDragging = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+
+    // Network layers based on the viral reference screenshot:
+    // Notice HL 4 has 27 neurons stacked vertically with curved incoming/outgoing lines!
+    const layerConfigs = [
+      { name: "Input (X)", neurons: 12, z: -300, act: "Linear" },
+      { name: "HL 2", neurons: 18, z: -150, act: "ReLU" },
+      { name: "HL 3", neurons: 22, z: 0, act: "ReLU" },
+      { name: "HL 4", neurons: 27, z: 150, act: "ReLU" }, // Hero column
+      { name: "Output (Y)", neurons: 8, z: 300, act: "Softmax" }
+    ];
+
+    let nodes = [];
+    let curvedThreads = [];
+    let pulseTime = 0;
+
+    function buildNetwork() {
+      nodes = [];
+      curvedThreads = [];
+      const density = densitySelect.value;
+      const stepFactor = density === 'high' ? 1 : (density === 'medium' ? 2 : 3);
+
+      layerConfigs.forEach((layer, lIdx) => {
+        const count = layer.neurons;
+        const totalHeight = 400;
+        const startY = -totalHeight / 2;
+        const stepY = totalHeight / (count - 1 || 1);
+
+        for (let i = 0; i < count; i++) {
+          const y = startY + i * stepY;
+          nodes.push({
+            x: 0, y, z: layer.z,
+            layerIdx: lIdx,
+            index: i,
+            layerName: layer.name,
+            total: count,
+            act: layer.act
+          });
+        }
+      });
+
+      // Generate curved 3D Bezier filaments
+      for (let l = 0; l < layerConfigs.length - 1; l++) {
+        const srcNodes = nodes.filter(n => n.layerIdx === l);
+        const dstNodes = nodes.filter(n => n.layerIdx === l + 1);
+
+        srcNodes.forEach((src, sIdx) => {
+          if (sIdx % stepFactor !== 0) return;
+          dstNodes.forEach((dst, dIdx) => {
+            if (dIdx % stepFactor !== 0) return;
+
+            const dz = dst.z - src.z;
+            const spreadX = ((sIdx - srcNodes.length / 2) + (dIdx - dstNodes.length / 2)) * fiberSpread;
+            const spreadY = (sIdx - dIdx) * 2.2;
+
+            const p1 = {
+              x: src.x + spreadX,
+              y: src.y + spreadY,
+              z: src.z + dz * 0.35
+            };
+            const p2 = {
+              x: dst.x + spreadX * 0.75,
+              y: dst.y - spreadY * 0.6,
+              z: src.z + dz * 0.65
+            };
+
+            const seed = Math.sin(sIdx * 23 + dIdx * 41);
+            curvedThreads.push({
+              src, dst,
+              p1, p2,
+              seed,
+              alpha: Math.min(0.4, 0.12 + Math.abs(seed) * 0.2)
+            });
+          });
+        });
+      }
+
+      filamentCountEl.textContent = curvedThreads.length;
+    }
+
+    // 3D Projection Math
+    function project(x, y, z, cx, cy) {
+      // Yaw
+      const cosY = Math.cos(yaw), sinY = Math.sin(yaw);
+      const x1 = x * cosY - z * sinY;
+      const z1 = z * cosY + x * sinY;
+
+      // Pitch
+      const cosP = Math.cos(pitch), sinP = Math.sin(pitch);
+      const y2 = y * cosP - z1 * sinP;
+      const z2 = z1 * cosP + y * sinP + camDist;
+
+      if (z2 <= 20) return null;
+
+      const scale = fov / z2;
+      return {
+        x: cx + x1 * scale,
+        y: cy + y2 * scale,
+        scale: scale,
+        depth: z2
+      };
+    }
+
+    function evalCubic(p0, p1, p2, p3, t) {
+      const it = 1 - t;
+      return it*it*it*p0 + 3*it*it*t*p1 + 3*it*t*t*p2 + t*t*t*p3;
+    }
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    // Controls
+    autoRotateBtn.addEventListener('click', () => {
+      autoRotate = !autoRotate;
+      autoRotateBtn.textContent = autoRotate ? "⟳ Auto-Rotate: ON" : "⟳ Auto-Rotate: OFF";
+    });
+
+    resetCamBtn.addEventListener('click', () => {
+      yaw = -0.38;
+      pitch = 0.26;
+      camDist = 720;
+    });
+
+    speedSlider.addEventListener('input', e => waveSpeed = parseFloat(e.target.value));
+    spreadSlider.addEventListener('input', e => {
+      fiberSpread = parseFloat(e.target.value);
+      buildNetwork();
+    });
+    densitySelect.addEventListener('change', buildNetwork);
+
+    // Mouse / Touch Interaction
+    canvas.addEventListener('mousedown', e => {
+      isDragging = true;
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+      autoRotate = false;
+      autoRotateBtn.textContent = "⟳ Auto-Rotate: OFF";
+    });
+
+    window.addEventListener('mouseup', () => isDragging = false);
+
+    canvas.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      const dx = e.clientX - lastMouseX;
+      const dy = e.clientY - lastMouseY;
+      yaw += dx * 0.007;
+      pitch = Math.max(-0.6, Math.min(0.9, pitch + dy * 0.007));
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+    });
+
+    canvas.addEventListener('wheel', e => {
+      e.preventDefault();
+      camDist = Math.max(250, Math.min(1300, camDist + e.deltaY * 0.7));
+    }, { passive: false });
+
+    // Touch
+    canvas.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        lastMouseX = e.touches[0].clientX;
+        lastMouseY = e.touches[0].clientY;
+        autoRotate = false;
+        autoRotateBtn.textContent = "⟳ Auto-Rotate: OFF";
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', e => {
+      if (!isDragging || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - lastMouseX;
+      const dy = e.touches[0].clientY - lastMouseY;
+      yaw += dx * 0.007;
+      pitch = Math.max(-0.6, Math.min(0.9, pitch + dy * 0.007));
+      lastMouseX = e.touches[0].clientX;
+      lastMouseY = e.touches[0].clientY;
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', () => isDragging = false);
+
+    // Perspective 3D Grid Floor
+    function drawGridFloor(cx, cy) {
+      const gridY = 240;
+      const size = 550;
+      const step = 65;
+
+      ctx.lineWidth = 0.9;
+      for (let z = -size; z <= size; z += step) {
+        const pA = project(-size, gridY, z, cx, cy);
+        const pB = project(size, gridY, z, cx, cy);
+        if (pA && pB) {
+          const depth = (pA.depth + pB.depth) / 2;
+          const alpha = Math.max(0, Math.min(0.28, 1 - depth / 1300));
+          ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+          ctx.beginPath();
+          ctx.moveTo(pA.x, pA.y);
+          ctx.lineTo(pB.x, pB.y);
+          ctx.stroke();
+        }
+      }
+      for (let x = -size; x <= size; x += step) {
+        const pA = project(x, gridY, -size, cx, cy);
+        const pB = project(x, gridY, size, cx, cy);
+        if (pA && pB) {
+          const depth = (pA.depth + pB.depth) / 2;
+          const alpha = Math.max(0, Math.min(0.28, 1 - depth / 1300));
+          ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+          ctx.beginPath();
+          ctx.moveTo(pA.x, pA.y);
+          ctx.lineTo(pB.x, pB.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Floating Glass Layer Headers (Matching the screenshot exactly)
+    function drawLayerHeaders(cx, cy) {
+      layerConfigs.forEach(cfg => {
+        const pTop = project(0, -235, cfg.z, cx, cy);
+        if (!pTop) return;
+
+        const w = 110 * pTop.scale * 1.5;
+        const h = 42 * pTop.scale * 1.5;
+        const x = pTop.x - w / 2;
+        const y = pTop.y - h;
+
+        // Semi-transparent blue card with cyan border
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.82)';
+        ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
+        ctx.lineWidth = 1.2;
+        ctx.strokeRect(x, y, w, h);
+
+        // Header text
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${Math.max(9, Math.round(12 * pTop.scale * 1.5))}px monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillText(cfg.name, pTop.x, y + 17 * pTop.scale * 1.5);
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = `${Math.max(8, Math.round(9.5 * pTop.scale * 1.5))}px monospace`;
+        ctx.fillText(`Neurons: ${cfg.neurons}`, pTop.x, y + 29 * pTop.scale * 1.5);
+        ctx.fillText(`Activation: ${cfg.act}`, pTop.x, y + 38 * pTop.scale * 1.5);
+      });
+    }
+
+    // Render loop
+    function render() {
+      if (autoRotate) yaw += 0.0025;
+      pulseTime += 0.02 * waveSpeed;
+
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2 + 20;
+
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+      // 1. Grid Floor
+      drawGridFloor(cx, cy);
+
+      // 2. Curved Filaments (Optical Threads)
+      curvedThreads.forEach(t => {
+        const segments = 12;
+        let prevP = project(t.src.x, t.src.y, t.src.z, cx, cy);
+        if (!prevP) return;
+
+        ctx.beginPath();
+        ctx.moveTo(prevP.x, prevP.y);
+
+        for (let i = 1; i <= segments; i++) {
+          const ratio = i / segments;
+          const x = evalCubic(t.src.x, t.p1.x, t.p2.x, t.dst.x, ratio);
+          const y = evalCubic(t.src.y, t.p1.y, t.p2.y, t.dst.y, ratio);
+          const z = evalCubic(t.src.z, t.p1.z, t.p2.z, t.dst.z, ratio);
+
+          const curP = project(x, y, z, cx, cy);
+          if (curP) ctx.lineTo(curP.x, curP.y);
+        }
+
+        ctx.strokeStyle = `rgba(224, 242, 254, ${t.alpha})`;
+        ctx.lineWidth = 0.85;
+        ctx.stroke();
+
+        // Animated Signal Wave Packet
+        const waveProgress = (pulseTime + Math.abs(t.seed) * 2.5) % 1;
+        const wx = evalCubic(t.src.x, t.p1.x, t.p2.x, t.dst.x, waveProgress);
+        const wy = evalCubic(t.src.y, t.p1.y, t.p2.y, t.dst.y, waveProgress);
+        const wz = evalCubic(t.src.z, t.p1.z, t.p2.z, t.dst.z, waveProgress);
+
+        const wp = project(wx, wy, wz, cx, cy);
+        if (wp) {
+          ctx.beginPath();
+          ctx.arc(wp.x, wp.y, 1.8 * wp.scale * 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#38bdf8';
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 8;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      });
+
+      // 3. Layer Headers
+      drawLayerHeaders(cx, cy);
+
+      // 4. Neurons (Nodes) - Depth Sorted
+      const projectedNodes = [];
+      nodes.forEach(n => {
+        const p = project(n.x, n.y, n.z, cx, cy);
+        if (p) projectedNodes.push({ node: n, p });
+      });
+
+      projectedNodes.sort((a, b) => b.p.depth - a.p.depth);
+
+      projectedNodes.forEach(({ node, p }) => {
+        const isHero = node.layerName === "HL 4";
+        const radius = (isHero ? 4.2 : 3.0) * p.scale * 1.6;
+
+        // Outer Glow
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, radius * 2.4, 0, Math.PI * 2);
+        ctx.fillStyle = isHero ? 'rgba(56, 189, 248, 0.4)' : 'rgba(255, 255, 255, 0.22)';
+        ctx.fill();
+
+        // Bright Core
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+
+        // Node Numbers for Hero Column
+        if (isHero && p.scale > 0.6) {
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = `${Math.max(7, Math.round(8.5 * p.scale))}px monospace`;
+          ctx.textAlign = 'left';
+          ctx.fillText(`N${node.index + 1}`, p.x + radius + 5, p.y + 3);
+        }
+      });
+
+      requestAnimationFrame(render);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    buildNetwork();
+    render();
+  </script>
+</body>
+</html>

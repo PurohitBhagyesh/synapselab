@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    canvas { display: block; width: 100%; height: 260px; cursor: crosshair; }
+  </style>
+</head>
+<body class="bg-transparent text-[var(--foreground)] antialiased p-0 m-0 select-none">
+  <div class="py-1 space-y-2">
+    <!-- Code Input Header -->
+    <div class="flex flex-wrap items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg bg-[var(--card)] border border-[var(--card-border)] text-xs">
+      <div class="flex items-center gap-2 flex-1 min-w-[240px]">
+        <span class="text-sky-400 font-bold flex items-center gap-1">
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          CODE:
+        </span>
+        <input id="codeInput" type="text" value="layers = [2, 8, 4, 1]" 
+               spellcheck="false"
+               class="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sky-300 font-mono text-xs focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400" />
+      </div>
+
+      <!-- Quick Preset Buttons -->
+      <div class="flex items-center gap-1 text-[11px]">
+        <span class="text-[var(--muted-foreground)] mr-1">Presets:</span>
+        <button class="preset-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700" data-cfg="[2, 4, 1]">[2,4,1]</button>
+        <button class="preset-btn px-2 py-0.5 rounded bg-sky-950 hover:bg-sky-900 text-sky-300 border border-sky-800" data-cfg="[2, 8, 4, 1]">[2,8,4,1]</button>
+        <button class="preset-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700" data-cfg="[3, 6, 6, 2]">[3,6,6,2]</button>
+        <button class="preset-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700" data-cfg="[1, 5, 5, 1]">[1,5,5,1]</button>
+      </div>
+    </div>
+
+    <!-- Canvas Container -->
+    <div class="relative w-full rounded-lg overflow-hidden border border-[var(--card-border)] bg-slate-950 shadow-inner">
+      <canvas id="nnCanvas"></canvas>
+
+      <!-- Overlay Tip -->
+      <div class="absolute top-2 right-2 text-[10px] text-slate-400 bg-slate-900/80 px-2 py-0.5 rounded border border-slate-800 pointer-events-none">
+        Hover or touch any thread to inspect
+      </div>
+    </div>
+
+    <!-- Live Thread Info HUD -->
+    <div id="threadHUD" class="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5 rounded-lg bg-[var(--card)] border border-[var(--card-border)] text-xs transition-all">
+      <div id="hudContent" class="flex items-center gap-3 w-full justify-between">
+        <span class="text-[var(--muted-foreground)] flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+          Ready. Touch or hover any thread to reveal start, midway & end points.
+        </span>
+        <span id="threadCountBadge" class="text-sky-400 font-mono font-bold text-[11px]">52 Threads</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('nnCanvas');
+    const ctx = canvas.getContext('2d');
+    const codeInput = document.getElementById('codeInput');
+    const hudContent = document.getElementById('hudContent');
+    const threadCountBadge = document.getElementById('threadCountBadge');
+    const presetBtns = document.querySelectorAll('.preset-btn');
+
+    let layerSizes = [2, 8, 4, 1];
+    let nodes = [];
+    let threads = [];
+    let hoveredThread = null;
+    let hoveredPoint = null;
+    let animPulse = 0;
+
+    function parseCode(text) {
+      const matches = text.match(/\d+/g);
+      if (!matches || matches.length < 2) return null;
+      const parsed = matches.map(n => Math.max(1, Math.min(12, parseInt(n, 10))));
+      return parsed.slice(0, 6); // Max 6 layers
+    }
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = 260 * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      buildNetwork(rect.width, 260);
+    }
+
+    function buildNetwork(w, h) {
+      nodes = [];
+      threads = [];
+      const numLayers = layerSizes.length;
+      const hPadding = 48;
+      const vPadding = 24;
+      const colStep = (w - hPadding * 2) / (numLayers - 1);
+
+      layerSizes.forEach((count, lIdx) => {
+        const x = hPadding + lIdx * colStep;
+        const colNodes = [];
+        const availableHeight = h - vPadding * 2;
+        const rowStep = availableHeight / (count + 1);
+
+        for (let i = 0; i < count; i++) {
+          const y = vPadding + (i + 1) * rowStep;
+          colNodes.push({
+            x, y,
+            layer: lIdx,
+            index: i,
+            label: lIdx === 0 ? `In_${i+1}` : (lIdx === numLayers - 1 ? `Out_${i+1}` : `H${lIdx}_${i+1}`)
+          });
+        }
+        nodes.push(colNodes);
+      });
+
+      // Build threads connecting every node in layer L to layer L+1
+      let count = 0;
+      for (let l = 0; l < numLayers - 1; l++) {
+        const srcLayer = nodes[l];
+        const dstLayer = nodes[l + 1];
+        srcLayer.forEach(src => {
+          dstLayer.forEach(dst => {
+            const seed = (src.x * 13 + src.y * 7 + dst.x * 5 + dst.y * 11) % 1000;
+            const weight = (Math.sin(seed) * 0.95).toFixed(3);
+            const midX = (src.x + dst.x) / 2;
+            const midY = (src.y + dst.y) / 2;
+            threads.push({
+              id: `syn_${l}_${src.index}_to_${dst.index}`,
+              src,
+              dst,
+              midX,
+              midY,
+              weight: parseFloat(weight),
+              color: weight >= 0 ? 'rgba(56, 189, 248,' : 'rgba(251, 146, 60,',
+              hex: weight >= 0 ? '#38bdf8' : '#fb923c'
+            });
+            count++;
+          });
+        });
+      }
+      threadCountBadge.textContent = `${count} Threads`;
+    }
+
+    // Distance from point (px, py) to line segment (x1, y1)-(x2, y2)
+    function distToSegment(px, py, x1, y1, x2, y2) {
+      const l2 = (x2 - x1)**2 + (y2 - y1)**2;
+      if (l2 === 0) return { dist: Math.hypot(px - x1, py - y1), t: 0, x: x1, y: y1 };
+      let t = ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / l2;
+      t = Math.max(0, Math.min(1, t));
+      const projX = x1 + t * (x2 - x1);
+      const projY = y1 + t * (y2 - y1);
+      return { dist: Math.hypot(px - projX, py - projY), t, x: projX, y: projY };
+    }
+
+    function checkHover(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const px = clientX - rect.x;
+      const py = clientY - rect.y;
+
+      let closest = null;
+      let minDist = 14; // hover tolerance in px
+      let pointOnLine = null;
+
+      threads.forEach(t => {
+        const res = distToSegment(px, py, t.src.x, t.src.y, t.dst.x, t.dst.y);
+        if (res.dist < minDist) {
+          minDist = res.dist;
+          closest = t;
+          pointOnLine = res;
+        }
+      });
+
+      if (closest !== hoveredThread) {
+        hoveredThread = closest;
+        hoveredPoint = pointOnLine;
+        updateHUD(closest);
+      } else if (closest) {
+        hoveredPoint = pointOnLine;
+      }
+    }
+
+    function updateHUD(t) {
+      if (!t) {
+        hudContent.innerHTML = `
+          <span class="text-[var(--muted-foreground)] flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+            Ready. Touch or hover any thread to reveal start, midway & end points.
+          </span>
+          <span class="text-sky-400 font-mono font-bold text-[11px]">${threads.length} Threads</span>
+        `;
+        return;
+      }
+
+      const sign = t.weight >= 0 ? '+' : '';
+      hudContent.innerHTML = `
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-amber-400 font-bold">● START:</span>
+          <span class="font-mono text-slate-200">${t.src.label} (${Math.round(t.src.x)}, ${Math.round(t.src.y)})</span>
+          <span class="text-slate-500">──►</span>
+          <span class="text-purple-400 font-bold">◆ MID:</span>
+          <span class="font-mono text-slate-200">(${Math.round(t.midX)}, ${Math.round(t.midY)})</span>
+          <span class="text-slate-500">──►</span>
+          <span class="text-emerald-400 font-bold">● END:</span>
+          <span class="font-mono text-slate-200">${t.dst.label} (${Math.round(t.dst.x)}, ${Math.round(t.dst.y)})</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-[var(--muted-foreground)]">Weight:</span>
+          <span class="font-mono font-bold ${t.weight >= 0 ? 'text-sky-400' : 'text-amber-400'}">${sign}${t.weight.toFixed(3)}</span>
+        </div>
+      `;
+    }
+
+    // Event Listeners for Interaction
+    canvas.addEventListener('mousemove', e => checkHover(e.clientX, e.clientY));
+    canvas.addEventListener('mouseleave', () => {
+      hoveredThread = null;
+      hoveredPoint = null;
+      updateHUD(null);
+    });
+
+    canvas.addEventListener('touchstart', e => {
+      if (e.touches.length > 0) {
+        checkHover(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', e => {
+      if (e.touches.length > 0) {
+        checkHover(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    // Live Code Change
+    function handleCodeInput() {
+      const parsed = parseCode(codeInput.value);
+      if (parsed) {
+        layerSizes = parsed;
+        resize();
+        updateHUD(null);
+      }
+    }
+
+    codeInput.addEventListener('input', handleCodeInput);
+
+    presetBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        codeInput.value = `layers = ${btn.dataset.cfg}`;
+        handleCodeInput();
+      });
+    });
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Render Loop
+    function animate() {
+      animPulse += 0.05;
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, 260);
+
+      // 1. Draw Threads
+      threads.forEach(t => {
+        const isHovered = (t === hoveredThread);
+        ctx.beginPath();
+        ctx.moveTo(t.src.x, t.src.y);
+        ctx.lineTo(t.dst.x, t.dst.y);
+
+        if (isHovered) {
+          ctx.strokeStyle = '#facc15'; // Neon gold highlight
+          ctx.lineWidth = 3.5;
+          ctx.shadowColor = '#facc15';
+          ctx.shadowBlur = 10;
+        } else {
+          ctx.strokeStyle = t.color + (Math.abs(t.weight) * 0.3 + 0.12) + ')';
+          ctx.lineWidth = Math.abs(t.weight) * 1.5 + 0.6;
+          ctx.shadowBlur = 0;
+        }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      });
+
+      // 2. Draw Hover Details (Start Dot, End Dot, Between Point)
+      if (hoveredThread) {
+        const t = hoveredThread;
+        const pulseR = 7 + Math.sin(animPulse * 2) * 2;
+
+        // START DOT (Amber Glow)
+        ctx.beginPath();
+        ctx.arc(t.src.x, t.src.y, pulseR + 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(251, 191, 36, 0.3)';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(t.src.x, t.src.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#fbbf24';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.fill();
+        ctx.stroke();
+
+        // END DOT (Emerald Glow)
+        ctx.beginPath();
+        ctx.arc(t.dst.x, t.dst.y, pulseR + 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(52, 211, 153, 0.3)';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(t.dst.x, t.dst.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#34d399';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.fill();
+        ctx.stroke();
+
+        // BETWEEN DOTS (Midpoint + Touch Point)
+        // Midpoint diamond/dot
+        ctx.beginPath();
+        ctx.arc(t.midX, t.midY, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#c084fc';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.fill();
+        ctx.stroke();
+
+        // If cursor has a projection point along thread
+        if (hoveredPoint) {
+          ctx.beginPath();
+          ctx.arc(hoveredPoint.x, hoveredPoint.y, 4, 0, Math.PI * 2);
+          ctx.fillStyle = '#facc15';
+          ctx.fill();
+        }
+      }
+
+      // 3. Draw All Neurons (Nodes)
+      const layerPalette = ['#38bdf8', '#818cf8', '#c084fc', '#34d399', '#f43f5e', '#fb923c'];
+      nodes.forEach((col, lIdx) => {
+        const color = layerPalette[lIdx % layerPalette.length];
+        col.forEach(n => {
+          // Node body
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, 4.5, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 1.5;
+          ctx.fill();
+          ctx.stroke();
+
+          // Labels
+          if (lIdx === 0 || lIdx === nodes.length - 1) {
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '9px monospace';
+            ctx.textAlign = lIdx === 0 ? 'right' : 'left';
+            const offsetX = lIdx === 0 ? -9 : 9;
+            ctx.fillText(n.label, n.x + offsetX, n.y + 3);
+          }
+        });
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
