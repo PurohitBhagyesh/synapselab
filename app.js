@@ -1467,6 +1467,19 @@ epochs = 300`;
     });
   }
 
+  const sliderLuminosity = document.getElementById('sliderLuminosity');
+  const valLuminosity = document.getElementById('valLuminosity');
+
+  if (sliderLuminosity && valLuminosity) {
+    sliderLuminosity.value = Math.round((settings.threadLuminosity || 0.55) * 100);
+    valLuminosity.textContent = Math.round((settings.threadLuminosity || 0.55) * 100) + '%';
+    sliderLuminosity.addEventListener('input', () => {
+      settings.threadLuminosity = parseFloat(sliderLuminosity.value) / 100;
+      valLuminosity.textContent = sliderLuminosity.value + '%';
+      saveSettings();
+    });
+  }
+
   if (toggleStars) {
     toggleStars.classList.toggle('active', settings.enableStarfield !== false);
     toggleStars.addEventListener('click', () => {
@@ -1486,6 +1499,8 @@ epochs = 300`;
       if (valZoomSens) valZoomSens.textContent = '1.0x';
       if (sliderOrbitSpeed) sliderOrbitSpeed.value = 1.0;
       if (valOrbitSpeed) valOrbitSpeed.textContent = '1.0x';
+      if (sliderLuminosity) sliderLuminosity.value = 55;
+      if (valLuminosity) valLuminosity.textContent = '55%';
       if (toggleStars) toggleStars.classList.add('active');
     });
   }
@@ -1523,9 +1538,11 @@ epochs = 300`;
     });
   }
 
-  // Settings Modal: Developer Email & Issue Reporting (One-Click Minimal Action)
+  // Settings Modal: Developer Email & Issue Reporting
   const btnCopyDevEmail = document.getElementById('btnCopyDevEmail');
   const btnSendIssueEmail = document.getElementById('btnSendIssueEmail');
+  const issueSubjectInput = document.getElementById('issueSubjectInput');
+  const issueBodyInput = document.getElementById('issueBodyInput');
   const DEV_EMAIL = 'Purohitunofficialbhagyesh@gmail.com';
 
   if (btnCopyDevEmail) {
@@ -1543,8 +1560,9 @@ epochs = 300`;
 
   if (btnSendIssueEmail) {
     attachTap(btnSendIssueEmail, () => {
-      const topic = 'SynapseLab Feedback / Issue Report';
-      const userText = 'Hi Bhagyesh,\n\nI am reporting an issue / sharing feedback on SynapseLab:\n\n[Describe issue here]\n\n---\nPlatform: https://synapselab.devs.li\nUser-Agent: ' + navigator.userAgent;
+      const topic = (issueSubjectInput && issueSubjectInput.value.trim()) || 'SynapseLab Feedback / Issue Report';
+      const userNotes = (issueBodyInput && issueBodyInput.value.trim()) || '[Describe issue here]';
+      const userText = `Hi Bhagyesh,\n\nI am reporting an issue / sharing feedback on SynapseLab:\n\n${userNotes}\n\n---\nPlatform: https://synapselab.devs.li\nUser-Agent: ${navigator.userAgent}`;
       const mailtoUrl = `mailto:${DEV_EMAIL}?subject=${encodeURIComponent(topic)}&body=${encodeURIComponent(userText)}`;
       window.location.href = mailtoUrl;
     });
