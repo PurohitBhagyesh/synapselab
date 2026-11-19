@@ -63,24 +63,29 @@ SynapseLab provides two distinct working environments tailored for learning:
 ## Core Features
 
 * **Hardware-Accelerated 3D Filaments**: Native cubic Bezier spline evaluation rendered in real-time perspective (`60-120 FPS`), with depth-sorted neurons, radiant halos, and an orientation floor grid.
-* **Mobile Bottom Mode Slider**: Floating bottom thumb-accessible switcher with hardware-accelerated sliding indicator for instant switching between Guide Mode and Test Mode.
-* **Interactive Light-Up Guides**: Selecting any curriculum lesson or clicking interactive actions illuminates the 3D network with real-time forward pass signal pulses.
-* **Fluid Touch Swipe & Inertial Momentum**: Natural deceleration physics when dragging or swiping the 3D network on touchscreens and desktop mice.
+* **macOS-Inspired Capsule Mode Switcher**: Centered in header on desktop and floating at bottom on mobile devices (`border-radius: 9999px`) with hardware-accelerated sliding white pill indicator.
+* **Touchscreen Gestures**: One-finger swipe to rotate with inertial deceleration, and two-finger pinch to zoom in and zoom out smoothly.
+* **Interactive Light-Up Guides**: Touching any curriculum lesson loads that architecture immediately and illuminates the 3D network with forward pass or backpropagation cascades.
+* **Compact Viewport Controls**: Sleek, non-intrusive floating control bar on mobile with essential tools (Auto-Orbit, Center View, Labels Toggle, Snapshot, Fullscreen) that never obstruct network layers.
+* **Focused Test Mode Toolbar**: Streamlined editor actions containing only Run and Simulate for focused student coding and live visual feedback.
 * **Dynamic Label Formatting**: Floating layer cards dynamically measure and pad text so titles and neuron counts always remain cleanly inside boxes.
 * **Hide Labels Toggle (`H`)**: One-click button in viewport toolbar to toggle text boxes and neuron labels on/off for a pure, cinematic view of 3D threads.
-* **Instant Hover Tooltips**: Instant dark-mode hover labels on all viewport controls (Auto Orbit, Zoom In, Zoom Out, Reset, Toggle Labels, Fullscreen).
+* **Instant Hover Tooltips**: Instant dark-mode hover labels on all viewport controls (Auto Orbit, Reset, Toggle Labels, Save Image, Fullscreen).
 * **Live Forward Pass & Signal Cascade**: Clicking **Run** (or pressing `Cmd/Ctrl + Enter`) triggers a multi-stage signal pulse across all layers, illuminating neurons sequentially from input to output.
 * **Automatic Mobile Landscape on Fullscreen**: Entering Fullscreen on smartphones automatically locks orientation to landscape for maximum visual immersion.
-* **Unified Settings Modal**: Sensitivity sliders (orbit, zoom, speed), starfield toggle, developer contact email (`Purohitunofficialbhagyesh@gmail.com`), direct sharing, UPI tip support, and combined privacy & terms.
-* **Zero Cookies Architecture**: 100% cookie-free execution, zero tracking pixels or analytics scripts, local device storage strictly for camera and starfield preferences.
+* **Streamlined Settings**: Single-purpose feedback modal with direct email composition (`Purohitunofficialbhagyesh@gmail.com`).
+* **Support Developer Modal**: Live UPI QR code generator (`Purohit2009@fam`) with instant payment links for FamApp, Google Pay, PhonePe, and Paytm.
+* **Zero Cookies Architecture**: 100% cookie-free execution, zero tracking pixels or analytics scripts.
 * **Pure Monochrome Design**: Built adhering strictly to modern standards: zero emojis, zero em dashes, zero purple gradients, high-contrast black and white styling (`#000000`, `#ffffff`).
 
 ---
 
-## Keyboard Shortcuts
+## Gestures & Keyboard Shortcuts
 
-| Shortcut | Action |
+| Gesture / Shortcut | Action |
 | :--- | :--- |
+| `1-Finger Drag` | Orbit / rotate 3D neural network with inertial momentum |
+| `2-Finger Pinch` | Zoom in and zoom out 3D perspective |
 | `Space` | Toggle auto-orbit camera rotation |
 | `R` | Reset 3D camera to default position and angle |
 | `H` | Toggle layer labels and neuron text on/off |

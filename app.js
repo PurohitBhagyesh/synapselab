@@ -452,9 +452,14 @@ epochs = ${config.epochs || 300}`;
     targetCamDist = Math.max(260, Math.min(1250, targetCamDist + e.deltaY * sens));
   }, { passive: false });
 
-  // Touch Support with Fluid Swipe Physics
+  // Touch Support with Fluid 1-Finger Orbit & 2-Finger Pinch Zoom
+  let touchStartDist = 0;
+  let touchStartCamDist = targetCamDist;
+  let isPinching = false;
+
   canvas.addEventListener('touchstart', e => {
     if (e.touches.length === 1) {
+      isPinching = false;
       isDragging = true;
       lastX = e.touches[0].clientX;
       lastY = e.touches[0].clientY;
@@ -467,16 +472,22 @@ epochs = ${config.epochs || 300}`;
       mouseScreenX = e.touches[0].clientX - rect.left;
       mouseScreenY = e.touches[0].clientY - rect.top;
       updateHoveredDot(mouseScreenX, mouseScreenY);
+    } else if (e.touches.length >= 2) {
+      isDragging = false;
+      isPinching = true;
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      touchStartDist = Math.hypot(dx, dy);
+      touchStartCamDist = targetCamDist;
     }
   }, { passive: true });
 
   canvas.addEventListener('touchmove', e => {
-    if (e.touches.length !== 1) return;
-    const rect = canvas.getBoundingClientRect();
-    mouseScreenX = e.touches[0].clientX - rect.left;
-    mouseScreenY = e.touches[0].clientY - rect.top;
+    if (e.touches.length === 1 && isDragging && !isPinching) {
+      const rect = canvas.getBoundingClientRect();
+      mouseScreenX = e.touches[0].clientX - rect.left;
+      mouseScreenY = e.touches[0].clientY - rect.top;
 
-    if (isDragging) {
       const sens = 0.007 * (settings.orbitSensitivity || 1.0);
       const dx = (e.touches[0].clientX - lastX) * sens;
       const dy = (e.touches[0].clientY - lastY) * sens;
@@ -486,12 +497,35 @@ epochs = ${config.epochs || 300}`;
       targetPitch = Math.max(-0.65, Math.min(0.85, targetPitch + dy));
       lastX = e.touches[0].clientX;
       lastY = e.touches[0].clientY;
+      updateHoveredDot(mouseScreenX, mouseScreenY);
+    } else if (e.touches.length >= 2 && isPinching) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const currentDist = Math.hypot(dx, dy);
+      if (touchStartDist > 0) {
+        const scale = touchStartDist / Math.max(10, currentDist);
+        targetCamDist = Math.max(260, Math.min(1250, touchStartCamDist * scale));
+      }
     }
-    updateHoveredDot(mouseScreenX, mouseScreenY);
   }, { passive: true });
 
-  canvas.addEventListener('touchend', () => {
+  canvas.addEventListener('touchend', e => {
+    if (e.touches.length === 0) {
+      isDragging = false;
+      isPinching = false;
+      touchStartDist = 0;
+    } else if (e.touches.length === 1) {
+      isPinching = false;
+      isDragging = true;
+      lastX = e.touches[0].clientX;
+      lastY = e.touches[0].clientY;
+    }
+  });
+
+  canvas.addEventListener('touchcancel', () => {
     isDragging = false;
+    isPinching = false;
+    touchStartDist = 0;
   });
 
   // Viewport Toolbar & Fullscreen Controls
@@ -1096,7 +1130,7 @@ epochs = ${config.epochs || 300}`;
   }
 
   // ---------------------------------------------------------------------------
-  // 6. GUIDE MODE INTERACTIVE LESSONS & CALL-TO-ACTIONS (Light-Up Animation)
+  // 6. GUIDE MODE INTERACTIVE LESSONS (Touch Lesson to Switch Architecture & Trigger Animation)
   // ---------------------------------------------------------------------------
   const lessonCards = document.querySelectorAll('.lesson-card');
   lessonCards.forEach((card) => {
@@ -1106,101 +1140,41 @@ epochs = ${config.epochs || 300}`;
 
       const lessonIdx = parseInt(card.dataset.lesson, 10);
       if (lessonIdx === 0) {
+        // Lesson 1: Anatomy & Layers (Standard 3-layer architecture)
         activeGuideConfig = { layers: [3, 6, 2], activation: 'relu', learningRate: 0.05, epochs: 200 };
         buildNetwork([3, 6, 2]);
         targetCamDist = 650;
+        triggerLiveForwardPass();
       } else if (lessonIdx === 1) {
+        // Lesson 2: Synapses & Weights (Excitatory & Inhibitory filaments)
         activeGuideConfig = { layers: [3, 8, 3], activation: 'relu', learningRate: 0.05, epochs: 250 };
         buildNetwork([3, 8, 3]);
         targetCamDist = 650;
+        triggerLiveForwardPass();
       } else if (lessonIdx === 2) {
+        // Lesson 3: The Neuron & ReLU (Activated Non-Linearity)
         activeGuideConfig = { layers: [2, 5, 2], activation: 'relu', learningRate: 0.05, epochs: 200 };
         buildNetwork([2, 5, 2]);
         targetCamDist = 620;
+        triggerLiveForwardPass();
       } else if (lessonIdx === 3) {
+        // Lesson 4: Deep Learning (Hierarchical 4-layer network)
         activeGuideConfig = { layers: [3, 8, 6, 2], activation: 'relu', learningRate: 0.03, epochs: 400 };
         buildNetwork([3, 8, 6, 2]);
         targetCamDist = 700;
+        triggerLiveForwardPass();
       } else if (lessonIdx === 4) {
+        // Lesson 5: Training & Gradient Descent (Backpropagation Simulation Cascade)
         activeGuideConfig = { layers: [3, 6, 4, 2], activation: 'relu', learningRate: 0.05, epochs: 300 };
         buildNetwork([3, 6, 4, 2]);
         targetCamDist = 680;
+        triggerSimulateTraining();
       } else if (lessonIdx === 5) {
+        // Lesson 6: Transition directly into Test Mode Code Lab
         switchMode('test');
-        return;
       }
-      triggerLiveForwardPass(); // Light up animation in all guides
     });
   });
-
-  const btnLesson1Starter = document.getElementById('btnLesson1Starter');
-  if (btnLesson1Starter) {
-    btnLesson1Starter.addEventListener('click', (e) => {
-      e.stopPropagation();
-      activeGuideConfig = { layers: [2, 2], activation: 'relu', learningRate: 0.05, epochs: 150 };
-      buildNetwork([2, 2]);
-      targetCamDist = 580;
-      triggerLiveForwardPass();
-    });
-  }
-
-  const btnLesson1Standard = document.getElementById('btnLesson1Standard');
-  if (btnLesson1Standard) {
-    btnLesson1Standard.addEventListener('click', (e) => {
-      e.stopPropagation();
-      activeGuideConfig = { layers: [3, 6, 2], activation: 'relu', learningRate: 0.05, epochs: 200 };
-      buildNetwork([3, 6, 2]);
-      targetCamDist = 650;
-      triggerLiveForwardPass();
-    });
-  }
-
-  const btnPulseGuide = document.getElementById('btnPulseGuide');
-  if (btnPulseGuide) {
-    btnPulseGuide.addEventListener('click', (e) => {
-      e.stopPropagation();
-      activeGuideConfig = { layers: [3, 8, 3], activation: 'relu', learningRate: 0.05, epochs: 250 };
-      triggerLiveForwardPass();
-    });
-  }
-
-  const btnLesson3Inspect = document.getElementById('btnLesson3Inspect');
-  if (btnLesson3Inspect) {
-    btnLesson3Inspect.addEventListener('click', (e) => {
-      e.stopPropagation();
-      activeGuideConfig = { layers: [2, 5, 2], activation: 'relu', learningRate: 0.05, epochs: 200 };
-      buildNetwork([2, 5, 2]);
-      triggerLiveForwardPass();
-    });
-  }
-
-  const btnLesson4Deep = document.getElementById('btnLesson4Deep');
-  if (btnLesson4Deep) {
-    btnLesson4Deep.addEventListener('click', (e) => {
-      e.stopPropagation();
-      activeGuideConfig = { layers: [3, 8, 6, 2], activation: 'relu', learningRate: 0.03, epochs: 400 };
-      buildNetwork([3, 8, 6, 2]);
-      triggerLiveForwardPass();
-    });
-  }
-
-  const btnLesson5Train = document.getElementById('btnLesson5Train');
-  if (btnLesson5Train) {
-    btnLesson5Train.addEventListener('click', (e) => {
-      e.stopPropagation();
-      activeGuideConfig = { layers: [3, 6, 4, 2], activation: 'relu', learningRate: 0.05, epochs: 300 };
-      buildNetwork([3, 6, 4, 2]);
-      triggerLiveForwardPass();
-    });
-  }
-
-  const btnSwitchToTest = document.getElementById('btnSwitchToTest');
-  if (btnSwitchToTest) {
-    btnSwitchToTest.addEventListener('click', (e) => {
-      e.stopPropagation();
-      switchMode('test');
-    });
-  }
 
   // ---------------------------------------------------------------------------
   // 7. TEST MODE LIVE CODING & SIMULATION (VS CODE INTERACTIVE EXPERIENCE)
@@ -1388,11 +1362,7 @@ epochs = ${config.epochs || 300}`;
     }
   }
 
-  const btnDownloadCodeTab = document.getElementById('btnDownloadCodeTab');
-  if (btnDownloadCodeTab) attachTap(btnDownloadCodeTab, downloadCodeFile);
 
-  const btnDownloadCode = document.getElementById('btnDownloadCode');
-  if (btnDownloadCode) attachTap(btnDownloadCode, downloadCodeFile);
 
   const btnSaveImage = document.getElementById('btnSaveImage');
   if (btnSaveImage) attachTap(btnSaveImage, downloadNetworkImage);
