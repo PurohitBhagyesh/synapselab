@@ -4,20 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="dark light">
-  <title>SynapseLab — Interactive 3D Neural Network Studio for Students</title>
+  <title>SynapseLab — Interactive Neural Network Lab for Students</title>
   <style>
     :root {
       color-scheme: dark;
       --bg: #070b14;
       --surface: #0f172a;
       --surface-alt: #1e293b;
-      --border: rgba(56, 189, 248, 0.2);
-      --border-strong: rgba(56, 189, 248, 0.4);
+      --border: rgba(56, 189, 248, 0.22);
+      --border-strong: rgba(56, 189, 248, 0.45);
       --accent: #38bdf8;
-      --accent-soft: rgba(56, 189, 248, 0.15);
+      --accent-soft: rgba(56, 189, 248, 0.12);
       --emerald: #34d399;
       --amber: #fbbf24;
-      --rose: #f43f5e;
       --text: #f8fafc;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
@@ -42,12 +41,11 @@
       flex-direction: column;
     }
 
-    /* Top Navigation Header */
+    /* Top Navigation */
     header {
       height: 52px;
-      background: rgba(15, 23, 42, 0.88);
+      background: rgba(15, 23, 42, 0.94);
       border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(16px);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -62,44 +60,37 @@
       gap: 10px;
       font-family: var(--font-mono);
       font-weight: 800;
-      font-size: 15px;
+      font-size: 14.5px;
       color: var(--accent);
       letter-spacing: 0.5px;
     }
 
     .brand-beacon {
-      width: 10px;
-      height: 10px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       background: var(--accent);
-      box-shadow: 0 0 12px var(--accent);
-      animation: pulse-beacon 2s infinite ease-in-out;
+      box-shadow: 0 0 10px var(--accent);
     }
 
-    @keyframes pulse-beacon {
-      0%, 100% { opacity: 0.9; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.8); }
-    }
-
-    .brand-tag {
+    .brand-badge {
       font-size: 10px;
       padding: 2px 7px;
       border-radius: 4px;
       background: var(--accent-soft);
-      border: 1px solid rgba(56, 189, 248, 0.35);
+      border: 1px solid var(--border);
       color: var(--accent);
       font-family: var(--font-mono);
       font-weight: 600;
-      text-transform: uppercase;
     }
 
-    /* Mobile Segmented Toggle (Visible only on mobile/narrow screens) */
+    /* Mobile Segmented Switcher */
     .mobile-tab-switch {
       display: none;
-      background: rgba(7, 11, 20, 0.7);
+      background: rgba(7, 11, 20, 0.8);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 3px;
+      border-radius: 6px;
+      padding: 2px;
     }
 
     .mobile-tab-btn {
@@ -107,13 +98,10 @@
       border: none;
       color: var(--text-muted);
       padding: 5px 12px;
-      border-radius: 6px;
+      border-radius: 4px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
       transition: all 0.15s ease;
     }
 
@@ -129,11 +117,11 @@
       gap: 8px;
     }
 
-    .btn-action {
+    .btn-header {
       background: var(--accent-soft);
       border: 1px solid var(--border-strong);
       color: var(--accent);
-      padding: 6px 14px;
+      padding: 6px 13px;
       border-radius: 6px;
       font-size: 12px;
       font-weight: 600;
@@ -141,29 +129,91 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.2s ease;
       font-family: var(--font-mono);
+      transition: all 0.15s ease;
     }
 
-    .btn-action:hover {
-      background: rgba(56, 189, 248, 0.25);
+    .btn-header:hover {
+      background: rgba(56, 189, 248, 0.22);
       border-color: var(--accent);
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
-      transform: translateY(-1px);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
     }
 
-    .btn-train {
-      background: rgba(52, 211, 153, 0.15);
+    .btn-header-emerald {
+      background: rgba(52, 211, 153, 0.14);
       border-color: rgba(52, 211, 153, 0.4);
       color: var(--emerald);
     }
-    .btn-train:hover {
+    .btn-header-emerald:hover {
       background: rgba(52, 211, 153, 0.25);
       border-color: var(--emerald);
-      box-shadow: 0 0 12px rgba(52, 211, 153, 0.35);
+      box-shadow: 0 0 10px rgba(52, 211, 153, 0.35);
     }
 
-    /* Main Split Workspace */
+    /* Guided Instruction Bar */
+    .instruction-bar {
+      background: #0a1120;
+      border-bottom: 1px solid var(--border);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12.5px;
+      flex-shrink: 0;
+      z-index: 40;
+    }
+
+    .instruction-text {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .step-pill {
+      background: var(--accent);
+      color: #000;
+      font-weight: 800;
+      font-size: 10.5px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.5px;
+    }
+
+    .instruction-desc {
+      color: var(--text-muted);
+    }
+    .instruction-desc strong {
+      color: var(--accent);
+    }
+
+    .instruction-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-step {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 11.5px;
+      padding: 4px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+    .btn-step:hover {
+      border-color: var(--accent);
+      background: var(--surface);
+    }
+
+    /* Main Workspace (Split Screen) */
     main {
       flex: 1;
       display: flex;
@@ -172,19 +222,18 @@
       width: 100%;
     }
 
-    /* Left Side: Student Code Studio */
-    .split-editor {
-      width: 440px;
+    /* Left Pane: Student Code */
+    .split-code {
+      width: 420px;
       background: var(--surface);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      z-index: 20;
       flex-shrink: 0;
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 20;
     }
 
-    .editor-top-bar {
+    .code-header {
       padding: 10px 14px;
       background: rgba(7, 11, 20, 0.6);
       border-bottom: 1px solid var(--border);
@@ -196,77 +245,40 @@
       color: var(--text-muted);
     }
 
-    .preset-chips {
-      display: flex;
-      gap: 4px;
-      overflow-x: auto;
-      padding: 8px 12px;
-      background: rgba(15, 23, 42, 0.4);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .preset-chip-btn {
-      background: var(--surface-alt);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--text-muted);
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-family: var(--font-mono);
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.15s ease;
-    }
-
-    .preset-chip-btn:hover {
-      color: var(--text);
-      border-color: var(--accent);
-    }
-
-    .preset-chip-btn.active {
-      background: var(--accent-soft);
-      border-color: var(--accent);
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    .editor-body {
+    .code-body {
       flex: 1;
       position: relative;
-      display: flex;
-      overflow: hidden;
     }
 
-    .code-input {
+    .code-textarea {
       width: 100%;
       height: 100%;
       background: transparent;
       color: #7dd3fc;
       border: none;
-      padding: 16px;
+      padding: 14px;
       font-family: var(--font-mono);
       font-size: 13.5px;
       line-height: 1.65;
       resize: none;
       outline: none;
       white-space: pre;
-      overflow-y: auto;
-      scrollbar-color: var(--surface-alt) transparent;
-      scrollbar-width: thin;
     }
 
-    .editor-footer {
+    .code-footer {
       padding: 10px 14px;
       border-top: 1px solid var(--border);
       background: rgba(7, 11, 20, 0.7);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
     }
 
-    /* Right Side: 3D Thread Visualizer */
-    .split-visualizer {
+    /* Right Pane: 3D Visualization */
+    .split-vis {
       flex: 1;
       position: relative;
       background: var(--bg);
@@ -283,105 +295,90 @@
     }
     #canvas3d:active { cursor: grabbing; }
 
-    /* Top Left Overlay Card */
-    .vis-hud-top {
-      position: absolute;
-      top: 14px;
-      left: 14px;
-      pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      z-index: 10;
-    }
-
-    .glass-hud {
-      background: rgba(15, 23, 42, 0.78);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(14px);
-      padding: 10px 14px;
-      border-radius: 8px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-      pointer-events: auto;
-    }
-
-    .hud-header {
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--accent);
-      letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-family: var(--font-mono);
-    }
-
-    .hud-metrics {
-      display: flex;
-      gap: 14px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .metric-val {
-      font-weight: 700;
-      color: #ffffff;
-    }
-
-    /* Floating Loss Monitor Box */
-    .loss-hud-box {
+    /* Interactive Zoom / Rotate On-Screen Controls */
+    .zoom-toolbar {
       position: absolute;
       top: 14px;
       right: 14px;
-      width: 200px;
-      background: rgba(15, 23, 42, 0.82);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(14px);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 30;
+    }
+
+    .tool-btn {
+      width: 36px;
+      height: 36px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border-strong);
+      color: var(--text);
       border-radius: 8px;
-      padding: 8px 12px;
-      z-index: 10;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      transition: all 0.15s ease;
       font-family: var(--font-mono);
-      font-size: 11px;
-      display: none;
-    }
-    .loss-hud-box.visible { display: block; }
-
-    #lossCanvas {
-      width: 100%;
-      height: 55px;
-      margin-top: 6px;
-      background: rgba(7, 11, 20, 0.7);
-      border-radius: 4px;
-      display: block;
     }
 
-    /* Hover Thread Telemetry Banner (Bottom Center of 3D pane) */
-    .thread-tooltip-banner {
+    .tool-btn:hover {
+      background: var(--surface-alt);
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    /* HUD Layer Card (Top Left) */
+    .vis-hud-card {
       position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.92);
-      border: 1px solid var(--accent);
-      backdrop-filter: blur(14px);
-      padding: 8px 16px;
-      border-radius: 20px;
+      top: 14px;
+      left: 14px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 8px;
       font-family: var(--font-mono);
       font-size: 11.5px;
-      display: none;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(56, 189, 248, 0.25);
-      z-index: 15;
-      white-space: nowrap;
       pointer-events: none;
+      z-index: 25;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
     }
 
-    /* =========================================================================
-       BUY ME A COFFEE / SUPPORT WIDGET (Bottom-Left Corner - From openlid)
-       ========================================================================= */
+    .vis-hud-card strong {
+      color: var(--accent);
+      display: block;
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+
+    .vis-hud-card span {
+      color: var(--text-muted);
+    }
+
+    /* Dot Detail Modal / Task Card */
+    .dot-task-popup {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      padding: 12px 18px;
+      display: none;
+      align-items: center;
+      gap: 14px;
+      z-index: 35;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      white-space: nowrap;
+    }
+
+    /* Buy Me a Coffee Widget (Bottom-Left - From openlid) */
     .snack-widget {
       position: fixed;
       bottom: 20px;
@@ -400,10 +397,10 @@
       padding: 8px 16px;
       border-radius: 999px;
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-      transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      transition: all 0.15s ease;
     }
 
     .snack-pill:hover {
@@ -430,15 +427,8 @@
       display: none;
       flex-direction: column;
       gap: 12px;
-      animation: snackPop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-
     .snack-card.active { display: flex; }
-
-    @keyframes snackPop {
-      from { opacity: 0; transform: translateY(8px) scale(0.97); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
 
     .snack-card-header {
       display: flex;
@@ -466,15 +456,6 @@
       font-size: 11px;
       color: var(--text-muted);
       cursor: pointer;
-      transition: border-color 0.15s, color 0.15s;
-    }
-
-    .snack-upi-copy:hover {
-      border-color: var(--accent);
-      color: var(--text);
-    }
-
-    .snack-upi-copy code {
       font-family: var(--font-mono);
     }
 
@@ -485,14 +466,6 @@
       line-height: 1;
       color: var(--text-muted);
       cursor: pointer;
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-
-    .snack-card-body {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
     }
 
     .snack-qr-wrapper {
@@ -509,21 +482,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      min-height: 140px;
       width: 140px;
+      height: 140px;
     }
 
     .snack-qr-pad img {
       display: block;
       max-width: 100%;
-      height: auto;
-    }
-
-    .snack-qr-caption {
-      font-size: 11px;
-      color: var(--text-muted);
-      text-align: center;
     }
 
     .snack-input-wrap {
@@ -539,7 +504,6 @@
     .currency-symbol {
       font-size: 15px;
       color: var(--text-muted);
-      font-weight: 500;
       margin-right: 6px;
     }
 
@@ -551,7 +515,6 @@
       color: var(--text);
       font-size: 14px;
       font-weight: 600;
-      width: 100%;
     }
 
     .snack-presets {
@@ -570,34 +533,11 @@
       border-radius: 6px;
       cursor: pointer;
       text-align: center;
-      transition: all 0.15s ease;
     }
-
-    .preset-chip:hover {
-      background-color: var(--surface);
-      border-color: var(--border-strong);
-      color: var(--text);
-    }
-
     .preset-chip.active {
       background-color: var(--accent-soft);
       border-color: var(--accent);
       color: var(--accent);
-    }
-
-    /* UPI Multi-App Grid */
-    .upi-chooser-section {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .upi-chooser-header {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     .upi-apps-grid {
@@ -610,7 +550,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       gap: 4px;
       padding: 8px 4px;
       background: var(--surface-alt);
@@ -620,13 +559,6 @@
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .upi-app-btn:hover {
-      background: var(--surface);
-      border-color: var(--accent);
-      transform: translateY(-1px);
     }
 
     .upi-app-badge {
@@ -641,28 +573,14 @@
       color: #fff;
     }
 
-    .fam-badge { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .amz-badge { background: linear-gradient(135deg, #232f3e, #131921); color: #ff9900; border: 1px solid rgba(255,153,0,0.4); }
-    .pe-badge { background: linear-gradient(135deg, #5f259f, #7c3aed); }
-    .gpay-badge { background: linear-gradient(135deg, #4285f4, #0f9d58); }
-    .paytm-badge { background: linear-gradient(135deg, #00b9f5, #002e6e); }
-    .wa-badge { background: linear-gradient(135deg, #25d366, #128c7e); }
+    .fam-badge { background: #d97706; }
+    .amz-badge { background: #232f3e; color: #ff9900; }
+    .pe-badge { background: #5f259f; }
+    .gpay-badge { background: #4285f4; }
+    .paytm-badge { background: #00b9f5; }
+    .wa-badge { background: #25d366; }
 
-    .no-upi-alert {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      background-color: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.35);
-      border-radius: 8px;
-      padding: 8px 10px;
-      font-size: 11px;
-      color: #ef4444;
-    }
-
-    /* =========================================================================
-       SHARE WIDGET (Bottom-Right Corner - From openlid)
-       ========================================================================= */
+    /* Share Widget (Bottom-Right - From openlid) */
     .share-widget {
       position: fixed;
       bottom: 20px;
@@ -681,21 +599,16 @@
       padding: 8px 16px;
       border-radius: 999px;
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-      transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      transition: all 0.15s ease;
     }
 
     .share-pill:hover {
       background-color: var(--surface-alt);
       border-color: var(--accent);
       transform: translateY(-1px);
-    }
-
-    .share-pill-icon {
-      color: var(--accent);
-      flex-shrink: 0;
     }
 
     .share-card {
@@ -710,40 +623,9 @@
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
       display: none;
       flex-direction: column;
-      gap: 12px;
-      animation: snackPop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      gap: 10px;
     }
-
     .share-card.active { display: flex; }
-
-    .share-card-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding-bottom: 10px;
-    }
-
-    .share-card-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .share-card-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-
-    .share-close-btn {
-      background: none;
-      border: none;
-      font-size: 20px;
-      color: var(--text-muted);
-      cursor: pointer;
-      line-height: 1;
-    }
 
     .share-line-item {
       display: flex;
@@ -757,82 +639,34 @@
       color: var(--text);
       cursor: pointer;
       text-align: left;
-      transition: all 0.15s ease;
     }
 
-    .share-line-item:hover {
-      background: var(--surface);
-      border-color: var(--accent);
-      transform: translateY(-1px);
-    }
-
-    .share-item-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      background: rgba(56, 189, 248, 0.15);
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .share-item-text {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .share-item-title {
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .share-item-desc {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .share-item-action {
-      font-size: 11px;
-      font-family: var(--font-mono);
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    /* Desktop Hover Trigger (Fine pointer) */
+    /* Desktop Hover Trigger */
     @media (hover: hover) and (pointer: fine) {
       .snack-widget:hover .snack-card { display: flex; }
       .share-widget:hover .share-card { display: flex; }
     }
 
-    /* =========================================================================
-       RESPONSIVE MOBILE BREAKPOINT (<= 768px)
-       ========================================================================= */
+    /* Mobile Responsive Breakpoint (<= 768px) */
     @media (max-width: 768px) {
       .mobile-tab-switch { display: inline-flex; }
       
-      main {
-        flex-direction: column;
-      }
+      main { flex-direction: column; }
 
-      .split-editor {
+      .split-code {
         width: 100%;
         height: 100%;
         border-right: none;
         display: flex;
       }
-
-      .split-visualizer {
+      .split-vis {
         width: 100%;
         height: 100%;
         display: none;
       }
 
-      /* When toggled to 3D visualizer on mobile */
-      main.mobile-show-vis .split-editor { display: none; }
-      main.mobile-show-vis .split-visualizer { display: flex; }
+      main.mobile-show-vis .split-code { display: none; }
+      main.mobile-show-vis .split-vis { display: flex; }
 
       .snack-widget {
         left: 12px;
@@ -842,153 +676,121 @@
         right: 12px;
         bottom: max(14px, env(safe-area-inset-bottom));
       }
-
-      .snack-card {
-        width: 300px;
-        bottom: 44px;
-        left: 0;
-      }
-      .share-card {
-        width: 275px;
-        bottom: 44px;
-        right: 0;
-      }
-
-      .snack-pill, .share-pill {
-        padding: 6px 12px;
-        font-size: 12px;
+      .snack-card, .share-card {
+        width: 285px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation Bar -->
+  <!-- Top Header -->
   <header>
     <div class="brand">
       <div class="brand-beacon"></div>
       <span>SYNAPSE<span style="color:#fff;">LAB</span></span>
-      <span class="brand-tag">Student Mode</span>
+      <span class="brand-badge">2 Layers &bull; 4 Dots</span>
     </div>
 
-    <!-- Mobile Switcher (Code vs 3D Threads) -->
+    <!-- Mobile Screen Switcher -->
     <div class="mobile-tab-switch">
-      <button class="mobile-tab-btn active" id="btnMobCode">
-        <span>💻</span> Code
-      </button>
-      <button class="mobile-tab-btn" id="btnMobVis">
-        <span>🌐</span> 3D Threads
-      </button>
+      <button class="mobile-tab-btn active" id="btnMobCode">Code</button>
+      <button class="mobile-tab-btn" id="btnMobVis">3D Threads</button>
     </div>
 
-    <!-- Header Actions -->
     <div class="header-actions">
-      <button class="btn-action" id="btnRebuild">
-        <span>⚡</span> Run Code
-      </button>
-      <button class="btn-action btn-train" id="btnTrain">
-        <span>▶</span> Train Live
-      </button>
+      <button class="btn-header" id="btnRunCode">Run Code</button>
+      <button class="btn-header btn-header-emerald" id="btnFireSignal">Fire Signals</button>
     </div>
   </header>
 
-  <!-- Main Split Screen Workspace -->
+  <!-- Guided Instruction Bar ("Follow the Instruction") -->
+  <div class="instruction-bar">
+    <div class="instruction-text">
+      <span class="step-pill" id="stepBadge">STEP 1 OF 3</span>
+      <span class="instruction-desc" id="stepInstruction">
+        Start here: Click or hover on any of the <strong>4 dots</strong> to inspect its specific task.
+      </span>
+    </div>
+    <div class="instruction-actions">
+      <button class="btn-step" id="btnNextStep">Next Task &rarr;</button>
+    </div>
+  </div>
+
+  <!-- Main Split Workspace -->
   <main id="mainWorkspace">
 
-    <!-- LEFT SCREEN: Student Code Editor -->
-    <section class="split-editor">
-      <div class="editor-top-bar">
+    <!-- LEFT PANE: Student Code Editor -->
+    <section class="split-code">
+      <div class="code-header">
         <span>student_network.py</span>
-        <span style="color:var(--emerald); font-weight:600;">● Active</span>
+        <span style="color:var(--emerald); font-weight:600;">Editable</span>
       </div>
 
-      <!-- Quick Preset Architectures -->
-      <div class="preset-chips">
-        <button class="preset-chip-btn active" data-cfg="[2, 4, 3, 1]">Beginner [2, 4, 3, 1]</button>
-        <button class="preset-chip-btn" data-cfg="[2, 3, 1]">Minimal [2, 3, 1]</button>
-        <button class="preset-chip-btn" data-cfg="[3, 5, 2]">Classifier [3, 5, 2]</button>
-        <button class="preset-chip-btn" data-cfg="[2, 6, 4, 1]">Exam Model [2, 6, 4, 1]</button>
-      </div>
-
-      <div class="editor-body">
-        <textarea class="code-input" id="studentCode" spellcheck="false">
+      <div class="code-body">
+        <textarea class="code-textarea" id="studentCode" spellcheck="false">
 # ==========================================================
-# 🧠 Student Neural Network Definition
+# 🧠 Student Neural Network: The 4-Dot Starter Network
 # ==========================================================
-# Scenario: Predict Student Final Exam Score (0 to 100)
-# Input Features: [Study Hours, Practice Tests]
+# 2 Layers with exactly 4 dots:
+# Layer 1 (Input):  2 dots [Study Hours, Practice Tests]
+# Layer 2 (Output): 2 dots [Pass Chance, Distinction Score]
 
-# 1. Define Network Layers
-# [2 Inputs] -> [4 Hidden Neurons] -> [3 Hidden Neurons] -> [1 Output]
-layers = [2, 4, 3, 1]
+layers = [2, 2]
 
-# 2. Hyperparameters
-activation = "relu"     # Non-linear activation function
-learning_rate = 0.05    # Gradient descent step size
-epochs = 200            # Training rounds
+# Hyperparameters
+activation = "relu"
+learning_rate = 0.05
 
-print(f"Neural Network initialized with {len(layers)} layers!")
-# Try changing layers to [2, 3, 1] or [3, 5, 2] above
-# and watch the 3D threads update smoothly in real time!
+print(f"Network initialized: {layers[0]} inputs -> {layers[1]} outputs")
+
+# TASK 3 INSTRUCTION:
+# To add a hidden layer with 3 dots, change layers above to:
+# layers = [2, 3, 2]
+# and click 'Run Code'!
 </textarea>
       </div>
 
-      <div class="editor-footer">
-        <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">
-          Auto-syncs on edit
-        </span>
-        <button class="btn-action" id="btnResetCode" style="font-size:11px; padding:4px 10px; background:transparent; border-color:var(--border); color:var(--text-muted);">
-          Reset Code
-        </button>
+      <div class="code-footer">
+        <span>2 Layers &bull; 4 Dots &bull; 4 Synapses</span>
+        <span style="color:var(--accent);">Auto-syncs on edit</span>
       </div>
     </section>
 
-    <!-- RIGHT SCREEN: Smooth 3D Thread Visualizer -->
-    <section class="split-visualizer">
+    <!-- RIGHT PANE: 3D Visualization -->
+    <section class="split-vis">
       <canvas id="canvas3d"></canvas>
 
-      <!-- 3D HUD (Top Left) -->
-      <div class="vis-hud-top">
-        <div class="glass-hud">
-          <div class="hud-header">
-            <span>●</span> 3D SYNAPTIC THREADS
-          </div>
-          <div class="hud-metrics">
-            <span>Layers: <span class="metric-val" id="visLayerCount">4</span></span>
-            <span>Total Neurons: <span class="metric-val" id="visNodeCount">10</span></span>
-            <span>Synaptic Threads: <span class="metric-val" id="visThreadCount">23</span></span>
-          </div>
-        </div>
+      <!-- Top Left HUD -->
+      <div class="vis-hud-card">
+        <strong>STARTER NETWORK (4 DOTS)</strong>
+        <span id="hudTopology">Layer 1: 2 Dots &bull; Layer 2: 2 Dots</span>
       </div>
 
-      <!-- Live Loss Chart HUD (Top Right) -->
-      <div class="loss-hud-box" id="lossHudBox">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="color:var(--text-muted);">TRAINING LOSS</span>
-          <span id="lossValDisplay" style="color:var(--emerald); font-weight:bold;">0.0124</span>
-        </div>
-        <canvas id="lossCanvas"></canvas>
+      <!-- Zoom, Unzoom, Rotate Toolbar -->
+      <div class="zoom-toolbar">
+        <button class="tool-btn" id="btnZoomIn" title="Zoom In">+</button>
+        <button class="tool-btn" id="btnZoomOut" title="Zoom Out">&minus;</button>
+        <button class="tool-btn" id="btnRotateToggle" title="Toggle Auto-Rotate">&#x21bb;</button>
+        <button class="tool-btn" id="btnResetView" title="Reset View" style="font-size:12px;">Reset</button>
       </div>
 
-      <!-- Thread Hover Telemetry Banner -->
-      <div class="thread-tooltip-banner" id="threadBanner">
-        <span style="color:var(--amber);" id="tbStart">● Start: In_1</span>
-        <span style="color:var(--text-dim);">──►</span>
-        <span style="color:#c084fc;" id="tbMid">◆ Midpoint</span>
-        <span style="color:var(--text-dim);">──►</span>
-        <span style="color:var(--emerald);" id="tbEnd">● End: H1_2</span>
-        <span style="color:var(--accent); font-weight:bold; margin-left:8px;" id="tbWeight">W: +0.654</span>
+      <!-- Dot Task Popup / Floating Information -->
+      <div class="dot-task-popup" id="dotTaskPopup">
+        <span style="color:var(--amber);" id="popupDotTitle">Dot: Input 1</span>
+        <span style="color:var(--text-dim);">|</span>
+        <span style="color:#ffffff;" id="popupDotTask">Task: Reads Study Hours</span>
+        <span style="color:var(--text-dim);">|</span>
+        <span style="color:var(--accent);" id="popupDotCalc">Formula: x1</span>
       </div>
     </section>
 
   </main>
 
-  <!-- =========================================================================
-       BUY ME A COFFEE / SUPPORT WIDGET (Bottom-Left Corner - From openlid)
-       ========================================================================= -->
+  <!-- Buy Me a Coffee Widget (From openlid) -->
   <div class="snack-widget" id="snackWidget">
     <button class="snack-pill" id="snackPillBtn" aria-label="Buy me a Coffee" aria-expanded="false">
-      <svg class="snack-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg class="snack-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
         <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
         <line x1="6" y1="1" x2="6" y2="4"/>
@@ -1004,13 +806,9 @@ print(f"Neural Network initialized with {len(layers)} layers!")
           <h3 class="snack-title">Support Developer</h3>
           <button class="snack-upi-copy" id="snackUpiCopyBtn" type="button" title="Click to copy UPI ID">
             <code id="snackUpiText">Purohit2009@fam</code>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-            </svg>
           </button>
         </div>
-        <button class="snack-close-btn" id="snackCloseBtn" type="button" aria-label="Close snack popup">&times;</button>
+        <button class="snack-close-btn" id="snackCloseBtn" type="button">&times;</button>
       </div>
 
       <div class="snack-card-body">
@@ -1018,12 +816,12 @@ print(f"Neural Network initialized with {len(layers)} layers!")
           <div class="snack-qr-pad">
             <img id="snackQrImg" src="" alt="UPI QR Code" width="124" height="124">
           </div>
-          <span class="snack-qr-caption">Scan with GPay, PhonePe, Paytm, or FamApp</span>
+          <span style="font-size:11px; color:var(--text-muted); text-align:center;">Scan with GPay, PhonePe, or Paytm</span>
         </div>
 
         <div class="snack-input-wrap">
           <span class="currency-symbol">&#8377;</span>
-          <input type="number" id="snackAmountInput" min="1" max="100000" placeholder="Enter amount" value="50">
+          <input type="number" id="snackAmountInput" min="1" value="50">
         </div>
 
         <div class="snack-presets" id="snackPresets">
@@ -1033,52 +831,40 @@ print(f"Neural Network initialized with {len(layers)} layers!")
           <button type="button" class="preset-chip" data-amt="200">&#8377;200</button>
         </div>
 
-        <!-- 1-Click Installed UPI App Buttons -->
-        <div class="upi-chooser-section">
-          <div class="upi-chooser-header">
-            <span>Pay with installed UPI app:</span>
-          </div>
-          <div class="upi-apps-grid">
-            <button type="button" class="upi-app-btn" data-scheme="famapp" data-name="FamApp" title="Pay with FamApp">
-              <span class="upi-app-badge fam-badge">Fam</span>
-              <span>FamApp</span>
-            </button>
-            <button type="button" class="upi-app-btn" data-scheme="amazonpay" data-name="Amazon Pay" title="Pay with Amazon">
-              <span class="upi-app-badge amz-badge">a</span>
-              <span>Amazon</span>
-            </button>
-            <button type="button" class="upi-app-btn" data-scheme="phonepe" data-name="PhonePe" title="Pay with PhonePe">
-              <span class="upi-app-badge pe-badge">Pe</span>
-              <span>PhonePe</span>
-            </button>
-            <button type="button" class="upi-app-btn" data-scheme="gpay" data-name="Google Pay" title="Pay with Google Pay">
-              <span class="upi-app-badge gpay-badge">G</span>
-              <span>GPay</span>
-            </button>
-            <button type="button" class="upi-app-btn" data-scheme="paytm" data-name="Paytm" title="Pay with Paytm">
-              <span class="upi-app-badge paytm-badge">Pay</span>
-              <span>Paytm</span>
-            </button>
-            <button type="button" class="upi-app-btn" data-scheme="whatsapp" data-name="WhatsApp" title="Pay with WhatsApp">
-              <span class="upi-app-badge wa-badge">WA</span>
-              <span>WhatsApp</span>
-            </button>
-          </div>
-        </div>
-
-        <div id="noUpiAlert" class="no-upi-alert" style="display:none;" role="alert">
-          <span id="noUpiDesc">Please scan the QR code above on your mobile phone.</span>
+        <div class="upi-apps-grid">
+          <button type="button" class="upi-app-btn" data-scheme="famapp">
+            <span class="upi-app-badge fam-badge">Fam</span>
+            <span>FamApp</span>
+          </button>
+          <button type="button" class="upi-app-btn" data-scheme="gpay">
+            <span class="upi-app-badge gpay-badge">G</span>
+            <span>GPay</span>
+          </button>
+          <button type="button" class="upi-app-btn" data-scheme="phonepe">
+            <span class="upi-app-badge pe-badge">Pe</span>
+            <span>PhonePe</span>
+          </button>
+          <button type="button" class="upi-app-btn" data-scheme="paytm">
+            <span class="upi-app-badge paytm-badge">Pay</span>
+            <span>Paytm</span>
+          </button>
+          <button type="button" class="upi-app-btn" data-scheme="amazonpay">
+            <span class="upi-app-badge amz-badge">a</span>
+            <span>Amazon</span>
+          </button>
+          <button type="button" class="upi-app-btn" data-scheme="whatsapp">
+            <span class="upi-app-badge wa-badge">WA</span>
+            <span>WhatsApp</span>
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- =========================================================================
-       SHARE WIDGET (Bottom-Right Corner - From openlid)
-       ========================================================================= -->
+  <!-- Share Widget (From openlid) -->
   <div class="share-widget" id="shareWidget">
     <button class="share-pill" id="sharePillBtn" aria-label="Share SynapseLab" aria-expanded="false">
-      <svg class="share-pill-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="18" cy="5" r="3"/>
         <circle cx="6" cy="12" r="3"/>
         <circle cx="18" cy="19" r="3"/>
@@ -1088,54 +874,24 @@ print(f"Neural Network initialized with {len(layers)} layers!")
       <span>Share</span>
     </button>
 
-    <div class="share-card" id="shareCard" role="dialog" aria-modal="false" aria-label="Share SynapseLab">
-      <div class="share-card-header">
-        <div>
-          <h3 class="share-card-title">Share SynapseLab</h3>
-          <p class="share-card-sub">Share with students, friends & classmates</p>
-        </div>
-        <button class="share-close-btn" id="shareCloseBtn" type="button" aria-label="Close share popup">&times;</button>
+    <div class="share-card" id="shareCard" role="dialog" aria-modal="false">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h4 style="font-size:14px; font-weight:700;">Share SynapseLab</h4>
+        <button class="snack-close-btn" id="shareCloseBtn">&times;</button>
       </div>
-
-      <div class="share-card-body" style="display:flex; flex-direction:column; gap:8px;">
-        <button type="button" class="share-line-item" id="btnShareCopy">
-          <div class="share-item-icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-            </svg>
-          </div>
-          <div class="share-item-text">
-            <span class="share-item-title">Copy Link</span>
-            <span class="share-item-desc">Interactive Student Lab</span>
-          </div>
-          <span class="share-item-action" id="shareCopyBadge">Copy</span>
-        </button>
-
-        <button type="button" class="share-line-item" id="btnNativeShare">
-          <div class="share-item-icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-              <polyline points="16 6 12 2 8 6"/>
-              <line x1="12" y1="2" x2="12" y2="15"/>
-            </svg>
-          </div>
-          <div class="share-item-text">
-            <span class="share-item-title">More Sharing Options</span>
-            <span class="share-item-desc">AirDrop, WhatsApp, Messages</span>
-          </div>
-          <span class="share-item-action">Share ↗</span>
-        </button>
-      </div>
+      <button type="button" class="share-line-item" id="btnShareCopy">
+        <span style="font-weight:600; font-size:13px;">Copy Link</span>
+        <span style="font-size:11px; color:var(--accent); margin-left:auto;" id="shareCopyBadge">Copy</span>
+      </button>
+      <button type="button" class="share-line-item" id="btnNativeShare">
+        <span style="font-weight:600; font-size:13px;">More Sharing Options &rarr;</span>
+      </button>
     </div>
   </div>
 
-  <!-- =========================================================================
-       CORE SCRIPT ENGINE: SMOOTH 3D THREADS + CODE STUDIO + WIDGETS
-       ========================================================================= -->
   <script>
     // -------------------------------------------------------------------------
-    // 1. MOBILE RESPONSIVE TOGGLE
+    // 1. MOBILE SWITCHER
     // -------------------------------------------------------------------------
     const mainWorkspace = document.getElementById('mainWorkspace');
     const btnMobCode = document.getElementById('btnMobCode');
@@ -1155,59 +911,121 @@ print(f"Neural Network initialized with {len(layers)} layers!")
     });
 
     // -------------------------------------------------------------------------
-    // 2. SMOOTH 3D THREAD ENGINE (Beginner Friendly Small Layers by Default!)
+    // 2. GUIDED INSTRUCTIONS (Follow the Instruction)
+    // -------------------------------------------------------------------------
+    const stepBadge = document.getElementById('stepBadge');
+    const stepInstruction = document.getElementById('stepInstruction');
+    const btnNextStep = document.getElementById('btnNextStep');
+
+    let currentStep = 1;
+    const steps = [
+      {
+        badge: "STEP 1 OF 3",
+        text: "Start here: Click or hover on any of the <strong>4 dots</strong> to inspect its specific task.",
+        actionText: "Next Task &rarr;"
+      },
+      {
+        badge: "STEP 2 OF 3",
+        text: "Click <strong>'Fire Signals'</strong> in the top header to watch pulses travel across all 4 connecting threads.",
+        actionText: "Next Task &rarr;"
+      },
+      {
+        badge: "STEP 3 OF 3",
+        text: "In the code editor on the left, change <code>layers = [2, 2]</code> to <code>layers = [2, 3, 2]</code> to add a 3-dot hidden layer!",
+        actionText: "Restart &orarr;"
+      }
+    ];
+
+    function updateStepUI() {
+      const s = steps[currentStep - 1];
+      stepBadge.textContent = s.badge;
+      stepInstruction.innerHTML = s.text;
+      btnNextStep.innerHTML = s.actionText;
+    }
+
+    btnNextStep.addEventListener('click', () => {
+      currentStep = (currentStep % steps.length) + 1;
+      updateStepUI();
+      if (currentStep === 2) {
+        fireWavePulses();
+      }
+    });
+
+    // -------------------------------------------------------------------------
+    // 3. 3D VISUALIZATION ENGINE (Starts with 2 layers & 4 dots only!)
     // -------------------------------------------------------------------------
     const canvas = document.getElementById('canvas3d');
     const ctx = canvas.getContext('2d');
+    const hudTopology = document.getElementById('hudTopology');
 
-    // Smooth Camera State with Lerping
-    let targetYaw = -0.36;
-    let targetPitch = 0.24;
-    let currentYaw = -0.36;
-    let currentPitch = 0.24;
-    let camDist = 680;
-    let targetCamDist = 680;
-    let fov = 480;
-
-    let autoRotate = true;
+    // Smooth Camera State
+    let targetYaw = -0.32;
+    let targetPitch = 0.22;
+    let currentYaw = -0.32;
+    let currentPitch = 0.22;
+    let camDist = 620;
+    let targetCamDist = 620;
+    let fov = 460;
+    let autoRotate = false; // Starts paused so students can focus on the 4 dots
     let wavePulseTime = 0;
     let isDragging = false;
     let lastX = 0, lastY = 0;
 
-    // Small, beginner-friendly layer definition: [2, 4, 3, 1]
-    let layerSizes = [2, 4, 3, 1];
+    // The core 4-dot starter network: 2 layers, 2 nodes each = 4 dots total!
+    let layerSizes = [2, 2];
     let nodes = [];
     let threads = [];
-    let hoveredThread = null;
+    let hoveredNode = null;
 
-    function buildArchitecture(sizes) {
+    // Specific Tasks for the dots
+    const defaultDotTasks = [
+      { name: "Input 1", task: "Reads Study Hours", formula: "x1 = 6.5h" },
+      { name: "Input 2", task: "Reads Practice Tests", formula: "x2 = 2 tests" },
+      { name: "Output 1", task: "Pass Probability", formula: "y1 = 88.5%" },
+      { name: "Output 2", task: "Distinction Score", formula: "y2 = 74.0%" }
+    ];
+
+    function buildNetwork(sizes) {
       layerSizes = sizes;
       nodes = [];
       threads = [];
 
       const numLayers = layerSizes.length;
-      const totalDepth = 480;
+      const totalDepth = 420;
       const zStep = totalDepth / (numLayers - 1 || 1);
+
+      let globalNodeIdx = 0;
 
       layerSizes.forEach((count, lIdx) => {
         const z = -totalDepth / 2 + lIdx * zStep;
-        const totalH = Math.min(320, count * 55);
+        const totalH = Math.min(260, count * 70);
         const startY = -totalH / 2;
         const stepY = count > 1 ? totalH / (count - 1) : 0;
 
         for (let i = 0; i < count; i++) {
+          let taskInfo = { name: `Dot ${globalNodeIdx + 1}`, task: "Intermediate Signal", formula: "f(w*x+b)" };
+          if (lIdx === 0 && i < 2) {
+            taskInfo = defaultDotTasks[i];
+          } else if (lIdx === numLayers - 1 && i < 2) {
+            taskInfo = defaultDotTasks[2 + i];
+          }
+
           nodes.push({
             x: 0,
             y: count === 1 ? 0 : startY + i * stepY,
             z: z,
             layerIdx: lIdx,
             nodeIdx: i,
-            label: lIdx === 0 ? (i === 0 ? "Hours" : "Tests") : (lIdx === numLayers - 1 ? "Score" : `H${lIdx}_${i+1}`)
+            globalIdx: globalNodeIdx,
+            name: taskInfo.name,
+            task: taskInfo.task,
+            formula: taskInfo.formula
           });
+          globalNodeIdx++;
         }
       });
 
-      // Construct Smooth Curved Filaments (Synaptic Threads)
+      // Construct connecting threads
       for (let l = 0; l < numLayers - 1; l++) {
         const srcNodes = nodes.filter(n => n.layerIdx === l);
         const dstNodes = nodes.filter(n => n.layerIdx === l + 1);
@@ -1215,36 +1033,24 @@ print(f"Neural Network initialized with {len(layers)} layers!")
         srcNodes.forEach((src, sIdx) => {
           dstNodes.forEach((dst, dIdx) => {
             const dz = dst.z - src.z;
-            const spreadX = ((sIdx - srcNodes.length / 2) + (dIdx - dstNodes.length / 2)) * 7.5;
-            const spreadY = (sIdx - dIdx) * 2.2;
+            const spreadX = ((sIdx - srcNodes.length / 2) + (dIdx - dstNodes.length / 2)) * 8.0;
+            const spreadY = (sIdx - dIdx) * 2.5;
 
             const p1 = { x: src.x + spreadX, y: src.y + spreadY, z: src.z + dz * 0.35 };
             const p2 = { x: dst.x + spreadX * 0.75, y: dst.y - spreadY * 0.5, z: src.z + dz * 0.65 };
 
-            // Deterministic weight for demonstration
-            const seed = Math.sin(sIdx * 17 + dIdx * 31);
-            const weight = (seed * 0.85).toFixed(3);
-
             threads.push({
-              src, dst,
-              p1, p2,
-              seed,
-              weight: parseFloat(weight),
-              midX: (src.x + dst.x) / 2,
-              midY: (src.y + dst.y) / 2,
-              midZ: (src.z + dst.z) / 2
+              src, dst, p1, p2,
+              seed: Math.sin(sIdx * 19 + dIdx * 37),
+              weight: (sIdx === dIdx ? 0.82 : -0.45)
             });
           });
         });
       }
 
-      // Update Telemetry
-      document.getElementById('visLayerCount').textContent = layerSizes.length;
-      document.getElementById('visNodeCount').textContent = nodes.length;
-      document.getElementById('visThreadCount').textContent = threads.length;
+      hudTopology.textContent = layerSizes.map((c, i) => `L${i+1}: ${c} Dots`).join(" &bull; ") + ` (${nodes.length} Dots Total)`;
     }
 
-    // 3D Perspective Projection Math
     function project3D(x, y, z, cx, cy) {
       const cosY = Math.cos(currentYaw), sinY = Math.sin(currentYaw);
       const x1 = x * cosY - z * sinY;
@@ -1273,71 +1079,88 @@ print(f"Neural Network initialized with {len(layers)} layers!")
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    // Mouse & Touch Orbit Controls with Inertial Smoothing
+    // -------------------------------------------------------------------------
+    // ZOOM, UNZOOM & ROTATE CONTROLS
+    // -------------------------------------------------------------------------
+    const btnZoomIn = document.getElementById('btnZoomIn');
+    const btnZoomOut = document.getElementById('btnZoomOut');
+    const btnRotateToggle = document.getElementById('btnRotateToggle');
+    const btnResetView = document.getElementById('btnResetView');
+
+    btnZoomIn.addEventListener('click', () => {
+      targetCamDist = Math.max(300, targetCamDist - 100);
+    });
+
+    btnZoomOut.addEventListener('click', () => {
+      targetCamDist = Math.min(1100, targetCamDist + 100);
+    });
+
+    btnRotateToggle.addEventListener('click', () => {
+      autoRotate = !autoRotate;
+      btnRotateToggle.style.color = autoRotate ? 'var(--accent)' : 'var(--text)';
+      btnRotateToggle.style.borderColor = autoRotate ? 'var(--accent)' : 'var(--border-strong)';
+    });
+
+    btnResetView.addEventListener('click', () => {
+      targetYaw = -0.32;
+      targetPitch = 0.22;
+      targetCamDist = 620;
+      autoRotate = false;
+      btnRotateToggle.style.color = 'var(--text)';
+      btnRotateToggle.style.borderColor = 'var(--border-strong)';
+    });
+
+    // Touch & Mouse Drag Rotation
     canvas.addEventListener('mousedown', e => {
       isDragging = true;
       lastX = e.clientX;
       lastY = e.clientY;
-      autoRotate = false;
     });
 
     window.addEventListener('mouseup', () => isDragging = false);
 
     canvas.addEventListener('mousemove', e => {
       if (isDragging) {
-        const dx = e.clientX - lastX;
-        const dy = e.clientY - lastY;
-        targetYaw += dx * 0.007;
-        targetPitch = Math.max(-0.6, Math.min(0.85, targetPitch + dy * 0.007));
+        targetYaw += (e.clientX - lastX) * 0.007;
+        targetPitch = Math.max(-0.6, Math.min(0.85, targetPitch + (e.clientY - lastY) * 0.007));
         lastX = e.clientX;
         lastY = e.clientY;
       }
-      checkThreadHover(e.clientX, e.clientY);
+      checkNodeHover(e.clientX, e.clientY);
     });
-
-    // Touch Support
-    canvas.addEventListener('touchstart', e => {
-      if (e.touches.length === 1) {
-        isDragging = true;
-        lastX = e.touches[0].clientX;
-        lastY = e.touches[0].clientY;
-        autoRotate = false;
-      }
-    }, { passive: true });
-
-    canvas.addEventListener('touchmove', e => {
-      if (!isDragging || e.touches.length !== 1) return;
-      const dx = e.touches[0].clientX - lastX;
-      const dy = e.touches[0].clientY - lastY;
-      targetYaw += dx * 0.007;
-      targetPitch = Math.max(-0.6, Math.min(0.85, targetPitch + dy * 0.007));
-      lastX = e.touches[0].clientX;
-      lastY = e.touches[0].clientY;
-      checkThreadHover(e.touches[0].clientX, e.touches[0].clientY);
-    }, { passive: true });
-
-    canvas.addEventListener('touchend', () => isDragging = false);
 
     canvas.addEventListener('wheel', e => {
       e.preventDefault();
       targetCamDist = Math.max(300, Math.min(1100, targetCamDist + e.deltaY * 0.6));
     }, { passive: false });
 
-    // Distance to 2D projected line segment for hover
-    function distToSeg(px, py, x1, y1, x2, y2) {
-      const l2 = (x2 - x1)**2 + (y2 - y1)**2;
-      if (l2 === 0) return Math.hypot(px - x1, py - y1);
-      let t = Math.max(0, Math.min(1, ((px - x1)*(x2 - x1) + (py - y1)*(y2 - y1)) / l2));
-      return Math.hypot(px - (x1 + t*(x2 - x1)), py - (y1 + t*(y2 - y1)));
-    }
+    // Touch events for mobile
+    canvas.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        lastX = e.touches[0].clientX;
+        lastY = e.touches[0].clientY;
+      }
+    }, { passive: true });
 
-    const threadBanner = document.getElementById('threadBanner');
-    const tbStart = document.getElementById('tbStart');
-    const tbMid = document.getElementById('tbMid');
-    const tbEnd = document.getElementById('tbEnd');
-    const tbWeight = document.getElementById('tbWeight');
+    canvas.addEventListener('touchmove', e => {
+      if (!isDragging || e.touches.length !== 1) return;
+      targetYaw += (e.touches[0].clientX - lastX) * 0.007;
+      targetPitch = Math.max(-0.6, Math.min(0.85, targetPitch + (e.touches[0].clientY - lastY) * 0.007));
+      lastX = e.touches[0].clientX;
+      lastY = e.touches[0].clientY;
+      checkNodeHover(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
 
-    function checkThreadHover(clientX, clientY) {
+    canvas.addEventListener('touchend', () => isDragging = false);
+
+    // Node Hover & Task Reveal
+    const dotTaskPopup = document.getElementById('dotTaskPopup');
+    const popupDotTitle = document.getElementById('popupDotTitle');
+    const popupDotTask = document.getElementById('popupDotTask');
+    const popupDotCalc = document.getElementById('popupDotCalc');
+
+    function checkNodeHover(clientX, clientY) {
       const rect = canvas.getBoundingClientRect();
       const px = clientX - rect.x;
       const py = clientY - rect.y;
@@ -1345,37 +1168,36 @@ print(f"Neural Network initialized with {len(layers)} layers!")
       const cy = rect.height / 2;
 
       let closest = null;
-      let minD = 12;
+      let minD = 22;
 
-      threads.forEach(t => {
-        const pA = project3D(t.src.x, t.src.y, t.src.z, cx, cy);
-        const pB = project3D(t.dst.x, t.dst.y, t.dst.z, cx, cy);
-        if (pA && pB) {
-          const d = distToSeg(px, py, pA.x, pA.y, pB.x, pB.y);
+      nodes.forEach(n => {
+        const p = project3D(n.x, n.y, n.z, cx, cy);
+        if (p) {
+          const d = Math.hypot(px - p.x, py - p.y);
           if (d < minD) {
             minD = d;
-            closest = t;
+            closest = n;
           }
         }
       });
 
-      hoveredThread = closest;
+      hoveredNode = closest;
       if (closest) {
-        tbStart.textContent = `● Start: ${closest.src.label}`;
-        tbMid.textContent = `◆ Waypoint`;
-        tbEnd.textContent = `● End: ${closest.dst.label}`;
-        tbWeight.textContent = `W: ${closest.weight >= 0 ? '+' : ''}${closest.weight}`;
-        tbWeight.style.color = closest.weight >= 0 ? 'var(--accent)' : 'var(--amber)';
-        threadBanner.style.display = 'flex';
+        popupDotTitle.textContent = closest.name;
+        popupDotTask.textContent = `Task: ${closest.task}`;
+        popupDotCalc.textContent = closest.formula;
+        dotTaskPopup.style.display = 'flex';
       } else {
-        threadBanner.style.display = 'none';
+        dotTaskPopup.style.display = 'none';
       }
     }
 
-    // Perspective 3D Grid Floor
+    // -------------------------------------------------------------------------
+    // 4. PERSPECTIVE 3D RENDER LOOP
+    // -------------------------------------------------------------------------
     function drawGridFloor(cx, cy) {
-      const gridY = 210;
-      const size = 420;
+      const gridY = 190;
+      const size = 380;
       const step = 60;
       ctx.lineWidth = 0.8;
 
@@ -1383,7 +1205,7 @@ print(f"Neural Network initialized with {len(layers)} layers!")
         const pA = project3D(-size, gridY, z, cx, cy);
         const pB = project3D(size, gridY, z, cx, cy);
         if (pA && pB) {
-          const alpha = Math.max(0, Math.min(0.22, 1 - (pA.depth + pB.depth) / 2200));
+          const alpha = Math.max(0, Math.min(0.2, 1 - (pA.depth + pB.depth) / 2200));
           ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
           ctx.beginPath();
           ctx.moveTo(pA.x, pA.y);
@@ -1395,7 +1217,7 @@ print(f"Neural Network initialized with {len(layers)} layers!")
         const pA = project3D(x, gridY, -size, cx, cy);
         const pB = project3D(x, gridY, size, cx, cy);
         if (pA && pB) {
-          const alpha = Math.max(0, Math.min(0.22, 1 - (pA.depth + pB.depth) / 2200));
+          const alpha = Math.max(0, Math.min(0.2, 1 - (pA.depth + pB.depth) / 2200));
           ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
           ctx.beginPath();
           ctx.moveTo(pA.x, pA.y);
@@ -1405,9 +1227,7 @@ print(f"Neural Network initialized with {len(layers)} layers!")
       }
     }
 
-    // Main 60 FPS Render Loop with Smooth Camera Lerp
     function renderLoop() {
-      // Smooth camera interpolation
       if (autoRotate) targetYaw += 0.002;
       currentYaw += (targetYaw - currentYaw) * 0.08;
       currentPitch += (targetPitch - currentPitch) * 0.08;
@@ -1420,12 +1240,11 @@ print(f"Neural Network initialized with {len(layers)} layers!")
 
       ctx.clearRect(0, 0, rect.width, rect.height);
 
-      // 1. Grid Floor
+      // Grid Floor
       drawGridFloor(cx, cy);
 
-      // 2. Smooth Curved Filaments (Synaptic Threads)
+      // Curved Connecting Threads
       threads.forEach(t => {
-        const isHovered = (t === hoveredThread);
         const segments = 12;
         let prevP = project3D(t.src.x, t.src.y, t.src.z, cx, cy);
         if (!prevP) return;
@@ -1442,74 +1261,34 @@ print(f"Neural Network initialized with {len(layers)} layers!")
           if (cp) ctx.lineTo(cp.x, cp.y);
         }
 
-        if (isHovered) {
-          ctx.strokeStyle = '#facc15';
-          ctx.lineWidth = 3.2;
-          ctx.shadowColor = '#facc15';
-          ctx.shadowBlur = 10;
-        } else {
-          ctx.strokeStyle = t.weight >= 0 
-            ? 'rgba(56, 189, 248, 0.32)' 
-            : 'rgba(251, 146, 60, 0.32)';
-          ctx.lineWidth = Math.abs(t.weight) * 1.5 + 0.8;
-          ctx.shadowBlur = 0;
-        }
+        ctx.strokeStyle = t.weight >= 0 ? 'rgba(56, 189, 248, 0.45)' : 'rgba(251, 146, 60, 0.4)';
+        ctx.lineWidth = 1.6;
         ctx.stroke();
-        ctx.shadowBlur = 0;
 
-        // Animated Signal Wave Packet gliding along the curve
+        // Wave Pulse
         const waveProg = (wavePulseTime + Math.abs(t.seed) * 2.2) % 1;
         const wx = evalCubic(t.src.x, t.p1.x, t.p2.x, t.dst.x, waveProg);
         const wy = evalCubic(t.src.y, t.p1.y, t.p2.y, t.dst.y, waveProg);
         const wz = evalCubic(t.src.z, t.p1.z, t.p2.z, t.dst.z, waveProg);
         const wp = project3D(wx, wy, wz, cx, cy);
 
-        if (wp && !isHovered) {
+        if (wp) {
           ctx.beginPath();
-          ctx.arc(wp.x, wp.y, 1.8 * wp.scale * 1.5, 0, Math.PI * 2);
+          ctx.arc(wp.x, wp.y, 2.2 * wp.scale * 1.5, 0, Math.PI * 2);
           ctx.fillStyle = t.weight >= 0 ? '#38bdf8' : '#fb923c';
           ctx.fill();
         }
-
-        // If hovered, render Start Dot, Midpoint Dot, and End Dot
-        if (isHovered) {
-          const sp = project3D(t.src.x, t.src.y, t.src.z, cx, cy);
-          const ep = project3D(t.dst.x, t.dst.y, t.dst.z, cx, cy);
-          const mp = project3D(t.midX, t.midY, t.midZ, cx, cy);
-
-          // Start Dot (Amber)
-          if (sp) {
-            ctx.beginPath();
-            ctx.arc(sp.x, sp.y, 7, 0, Math.PI * 2);
-            ctx.fillStyle = '#fbbf24';
-            ctx.fill();
-          }
-          // Mid Dot (Purple)
-          if (mp) {
-            ctx.beginPath();
-            ctx.arc(mp.x, mp.y, 6, 0, Math.PI * 2);
-            ctx.fillStyle = '#c084fc';
-            ctx.fill();
-          }
-          // End Dot (Emerald)
-          if (ep) {
-            ctx.beginPath();
-            ctx.arc(ep.x, ep.y, 7, 0, Math.PI * 2);
-            ctx.fillStyle = '#34d399';
-            ctx.fill();
-          }
-        }
       });
 
-      // 3. Floating Layer Indicator Cards
+      // Layer Header Banners
       layerSizes.forEach((count, lIdx) => {
-        const totalDepth = 480;
+        const totalDepth = 420;
         const z = -totalDepth / 2 + lIdx * (totalDepth / (layerSizes.length - 1 || 1));
-        const pTop = project3D(0, -180, z, cx, cy);
+        const pTop = project3D(0, -165, z, cx, cy);
         if (!pTop) return;
 
-        const w = 75 * pTop.scale * 1.5;
-        const h = 26 * pTop.scale * 1.5;
+        const w = 84 * pTop.scale * 1.5;
+        const h = 28 * pTop.scale * 1.5;
         const x = pTop.x - w / 2;
         const y = pTop.y - h;
 
@@ -1520,17 +1299,17 @@ print(f"Neural Network initialized with {len(layers)} layers!")
         ctx.strokeRect(x, y, w, h);
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = `bold ${Math.max(8, Math.round(10 * pTop.scale * 1.5))}px monospace`;
+        ctx.font = `bold ${Math.max(8, Math.round(10.5 * pTop.scale * 1.5))}px monospace`;
         ctx.textAlign = 'center';
-        const name = lIdx === 0 ? "Input" : (lIdx === layerSizes.length - 1 ? "Output" : `Hidden ${lIdx}`);
-        ctx.fillText(name, pTop.x, y + 11 * pTop.scale * 1.5);
+        const layerName = lIdx === 0 ? "Input Layer" : (lIdx === layerSizes.length - 1 ? "Output Layer" : `Hidden ${lIdx}`);
+        ctx.fillText(layerName, pTop.x, y + 12 * pTop.scale * 1.5);
 
         ctx.fillStyle = '#38bdf8';
-        ctx.font = `${Math.max(7, Math.round(8 * pTop.scale * 1.5))}px monospace`;
-        ctx.fillText(`${count} Neurons`, pTop.x, y + 21 * pTop.scale * 1.5);
+        ctx.font = `${Math.max(7, Math.round(8.5 * pTop.scale * 1.5))}px monospace`;
+        ctx.fillText(`${count} Dots`, pTop.x, y + 23 * pTop.scale * 1.5);
       });
 
-      // 4. Depth-Sorted Glowing Neurons
+      // Depth Sorted Nodes with Visible Tasks Beside Every Dot!
       const projNodes = [];
       nodes.forEach(n => {
         const p = project3D(n.x, n.y, n.z, cx, cy);
@@ -1539,154 +1318,76 @@ print(f"Neural Network initialized with {len(layers)} layers!")
       projNodes.sort((a, b) => b.p.depth - a.p.depth);
 
       projNodes.forEach(({ node, p }) => {
+        const isHovered = (node === hoveredNode);
+        const radius = (isHovered ? 7.5 : 5.5) * p.scale * 1.5;
         const isInput = node.layerIdx === 0;
-        const isOutput = node.layerIdx === layerSizes.length - 1;
-        const radius = 4.2 * p.scale * 1.5;
 
         // Outer Glow
         ctx.beginPath();
         ctx.arc(p.x, p.y, radius * 2.2, 0, Math.PI * 2);
-        ctx.fillStyle = isInput ? 'rgba(56, 189, 248, 0.35)' : (isOutput ? 'rgba(52, 211, 153, 0.35)' : 'rgba(192, 132, 252, 0.35)');
+        ctx.fillStyle = isInput ? 'rgba(56, 189, 248, 0.35)' : 'rgba(52, 211, 153, 0.35)';
         ctx.fill();
 
-        // Solid Core
+        // Solid Dot Core
         ctx.beginPath();
         ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = isHovered ? '#fbbf24' : '#ffffff';
+        ctx.strokeStyle = isInput ? '#38bdf8' : '#34d399';
+        ctx.lineWidth = 1.8;
         ctx.fill();
+        ctx.stroke();
 
-        // Node Label
-        ctx.fillStyle = '#cbd5e1';
-        ctx.font = `${Math.max(7, Math.round(8.5 * p.scale))}px monospace`;
+        // Persistent Task Label beside the Dot
+        ctx.font = `600 ${Math.max(8, Math.round(9.5 * p.scale))}px monospace`;
         ctx.textAlign = isInput ? 'right' : 'left';
-        const offX = isInput ? -radius - 6 : radius + 6;
-        ctx.fillText(node.label, p.x + offX, p.y + 3);
+        const offX = isInput ? -radius - 8 : radius + 8;
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(node.name, p.x + offX, p.y - 3);
+
+        ctx.fillStyle = isInput ? '#38bdf8' : '#34d399';
+        ctx.font = `${Math.max(7, Math.round(8.5 * p.scale))}px monospace`;
+        ctx.fillText(node.task, p.x + offX, p.y + 10);
       });
 
       requestAnimationFrame(renderLoop);
     }
 
     // -------------------------------------------------------------------------
-    // 3. STUDENT CODE STUDIO & AUTO-SYNC
+    // 5. CODE SYNC (Auto-rebuilds and updates instruction)
     // -------------------------------------------------------------------------
     const studentCode = document.getElementById('studentCode');
-    const btnRebuild = document.getElementById('btnRebuild');
-    const btnResetCode = document.getElementById('btnResetCode');
-    const presetChipBtns = document.querySelectorAll('.preset-chip-btn');
+    const btnRunCode = document.getElementById('btnRunCode');
+    const btnFireSignal = document.getElementById('btnFireSignal');
 
-    function syncCodeToNetwork() {
+    function syncCode() {
       const match = studentCode.value.match(/layers\s*=\s*\[(.*?)\]/);
       if (match && match[1]) {
         const parsed = match[1].split(',')
           .map(n => parseInt(n.trim(), 10))
-          .filter(n => !isNaN(n) && n > 0 && n <= 16);
+          .filter(n => !isNaN(n) && n > 0 && n <= 10);
 
         if (parsed.length >= 2) {
-          buildArchitecture(parsed);
-          presetChipBtns.forEach(b => {
-            b.classList.toggle('active', b.dataset.cfg === JSON.stringify(parsed));
-          });
+          buildNetwork(parsed);
+          // If user added hidden layer, advance step
+          if (parsed.length > 2 && currentStep === 3) {
+            stepBadge.textContent = "SUCCESS!";
+            stepInstruction.innerHTML = "Awesome! You created a deep neural network with <strong>" + nodes.length + " dots</strong> and <strong>" + threads.length + " synapses</strong>!";
+          }
         }
       }
     }
 
-    studentCode.addEventListener('input', syncCodeToNetwork);
-    btnRebuild.addEventListener('click', syncCodeToNetwork);
+    studentCode.addEventListener('input', syncCode);
+    btnRunCode.addEventListener('click', syncCode);
 
-    presetChipBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const cfg = JSON.parse(btn.dataset.cfg);
-        presetChipBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        studentCode.value = `# ==========================================================
-# 🧠 Student Neural Network Definition
-# ==========================================================
-
-layers = ${JSON.stringify(cfg)}
-activation = "relu"
-learning_rate = 0.05
-epochs = 200
-
-print(f"Network updated: {layers}")
-`;
-        syncCodeToNetwork();
-      });
-    });
-
-    btnResetCode.addEventListener('click', () => {
-      studentCode.value = `# ==========================================================
-# 🧠 Student Neural Network Definition
-# ==========================================================
-# Scenario: Predict Student Final Exam Score (0 to 100)
-# Input Features: [Study Hours, Practice Tests]
-
-layers = [2, 4, 3, 1]
-activation = "relu"
-learning_rate = 0.05
-epochs = 200
-
-print(f"Neural Network initialized with {len(layers)} layers!")
-`;
-      syncCodeToNetwork();
-    });
+    function fireWavePulses() {
+      wavePulseTime += 0.5;
+    }
+    btnFireSignal.addEventListener('click', fireWavePulses);
 
     // -------------------------------------------------------------------------
-    // 4. LIVE TRAINING SIMULATION & LOSS CURVE
-    // -------------------------------------------------------------------------
-    const btnTrain = document.getElementById('btnTrain');
-    const lossHudBox = document.getElementById('lossHudBox');
-    const lossCanvas = document.getElementById('lossCanvas');
-    const lossCtx = lossCanvas.getContext('2d');
-    const lossValDisplay = document.getElementById('lossValDisplay');
-
-    let isTraining = false;
-    let trainHistory = [];
-
-    btnTrain.addEventListener('click', () => {
-      if (isTraining) return;
-      isTraining = true;
-      lossHudBox.classList.add('visible');
-      trainHistory = [1.0];
-      let step = 0;
-      const maxSteps = 80;
-
-      // On mobile, switch to visualizer to see the training
-      if (window.innerWidth <= 768) {
-        btnMobVis.click();
-      }
-
-      const trainInterval = setInterval(() => {
-        step++;
-        const prev = trainHistory[trainHistory.length - 1];
-        const current = Math.max(0.008, prev * 0.93 + (Math.random() - 0.5) * 0.008);
-        trainHistory.push(current);
-
-        lossValDisplay.textContent = current.toFixed(4);
-
-        // Draw Loss Graph
-        lossCtx.clearRect(0, 0, lossCanvas.width, lossCanvas.height);
-        lossCtx.beginPath();
-        lossCtx.strokeStyle = '#34d399';
-        lossCtx.lineWidth = 1.6;
-
-        trainHistory.forEach((val, i) => {
-          const x = (i / maxSteps) * lossCanvas.width;
-          const y = (val / 1.0) * (lossCanvas.height - 6) + 3;
-          if (i === 0) lossCtx.moveTo(x, y);
-          else lossCtx.lineTo(x, y);
-        });
-        lossCtx.stroke();
-
-        if (step >= maxSteps) {
-          clearInterval(trainInterval);
-          isTraining = false;
-        }
-      }, 35);
-    });
-
-    // -------------------------------------------------------------------------
-    // 5. BUY ME A COFFEE / SUPPORT WIDGET (From openlid)
+    // 6. BUY ME A COFFEE (From openlid)
     // -------------------------------------------------------------------------
     const snackWidget = document.getElementById('snackWidget');
     const snackPillBtn = document.getElementById('snackPillBtn');
@@ -1703,18 +1404,18 @@ print(f"Neural Network initialized with {len(layers)} layers!")
 
     function updateSnackQr(amount) {
       const amt = Math.max(1, parseInt(amount, 10) || 50);
-      const upiUri = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`;
+      const uri = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`;
       if (snackQrImg) {
-        snackQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&format=svg&data=${encodeURIComponent(upiUri)}`;
+        snackQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&format=svg&data=${encodeURIComponent(uri)}`;
       }
     }
 
     if (snackPillBtn && snackCard) {
       snackPillBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const isActive = snackCard.classList.toggle('active');
-        snackPillBtn.setAttribute('aria-expanded', String(isActive));
-        if (isActive && snackAmountInput) updateSnackQr(snackAmountInput.value || 50);
+        const active = snackCard.classList.toggle('active');
+        snackPillBtn.setAttribute('aria-expanded', String(active));
+        if (active && snackAmountInput) updateSnackQr(snackAmountInput.value || 50);
       });
 
       if (snackCloseBtn) {
@@ -1761,43 +1462,23 @@ print(f"Neural Network initialized with {len(layers)} layers!")
           const orig = snackUpiText.textContent;
           snackUpiText.textContent = 'Copied!';
           setTimeout(() => snackUpiText.textContent = orig, 1500);
-        } catch (err) {
-          console.error(err);
-        }
+        } catch (err) {}
       });
     }
 
-    // Installed UPI Apps Click Handlers
     const upiAppButtons = document.querySelectorAll('.upi-app-btn');
-    const noUpiAlert = document.getElementById('noUpiAlert');
-    const noUpiDesc = document.getElementById('noUpiDesc');
-
     upiAppButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         const scheme = btn.dataset.scheme;
-        const appName = btn.dataset.name;
         const amt = Math.max(1, parseInt(snackAmountInput ? snackAmountInput.value : 50, 10) || 50);
         const query = `pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`;
-        let uri = '';
-
-        switch (scheme) {
-          case 'famapp': uri = `in.fampay.app://upi/pay?${query}`; break;
-          case 'amazonpay': uri = `amazonpay://upi/pay?${query}`; break;
-          case 'phonepe': uri = `phonepe://pay?${query}`; break;
-          case 'gpay': uri = `tez://upi/pay?${query}`; break;
-          case 'paytm': uri = `paytmmp://pay?${query}`; break;
-          case 'whatsapp': uri = `whatsapp://pay?${query}`; break;
-          default: uri = `upi://pay?${query}`; break;
-        }
-
-        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
-        if (!isMobile) {
-          if (noUpiAlert && noUpiDesc) {
-            noUpiDesc.textContent = `Please scan the QR code above with ${appName} or Google Pay on your phone.`;
-            noUpiAlert.style.display = 'flex';
-          }
-          return;
-        }
+        let uri = `upi://pay?${query}`;
+        if (scheme === 'famapp') uri = `in.fampay.app://upi/pay?${query}`;
+        else if (scheme === 'gpay') uri = `tez://upi/pay?${query}`;
+        else if (scheme === 'phonepe') uri = `phonepe://pay?${query}`;
+        else if (scheme === 'paytm') uri = `paytmmp://pay?${query}`;
+        else if (scheme === 'amazonpay') uri = `amazonpay://upi/pay?${query}`;
+        else if (scheme === 'whatsapp') uri = `whatsapp://pay?${query}`;
         window.location.href = uri;
       });
     });
@@ -1805,7 +1486,7 @@ print(f"Neural Network initialized with {len(layers)} layers!")
     updateSnackQr(50);
 
     // -------------------------------------------------------------------------
-    // 6. SHARE WIDGET (From openlid)
+    // 7. SHARE WIDGET (From openlid)
     // -------------------------------------------------------------------------
     const shareWidget = document.getElementById('shareWidget');
     const sharePillBtn = document.getElementById('sharePillBtn');
@@ -1818,8 +1499,8 @@ print(f"Neural Network initialized with {len(layers)} layers!")
     if (sharePillBtn && shareCard) {
       sharePillBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const isActive = shareCard.classList.toggle('active');
-        sharePillBtn.setAttribute('aria-expanded', String(isActive));
+        const active = shareCard.classList.toggle('active');
+        sharePillBtn.setAttribute('aria-expanded', String(active));
       });
 
       if (shareCloseBtn) {
@@ -1851,23 +1532,19 @@ print(f"Neural Network initialized with {len(layers)} layers!")
               shareCopyBadge.style.color = '';
             }, 1800);
           }
-        } catch (err) {
-          console.error(err);
-        }
+        } catch (err) {}
       });
     }
 
     if (btnNativeShare) {
       btnNativeShare.addEventListener('click', async () => {
         const shareData = {
-          title: 'SynapseLab — 3D Neural Network Studio for Students',
-          text: 'Check out this interactive 3D neural network visualizer and code studio!',
+          title: 'SynapseLab — Interactive 3D Neural Network Lab',
+          text: 'Learn neural networks step-by-step with 3D threads and interactive code!',
           url: window.location.href
         };
         if (navigator.share) {
-          try {
-            await navigator.share(shareData);
-          } catch (err) {}
+          try { await navigator.share(shareData); } catch (err) {}
         } else {
           try {
             await navigator.clipboard.writeText(shareData.url);
@@ -1882,7 +1559,7 @@ print(f"Neural Network initialized with {len(layers)} layers!")
     // -------------------------------------------------------------------------
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
-    buildArchitecture([2, 4, 3, 1]); // Beginner friendly small layers
+    buildNetwork([2, 2]); // Initial state: Exactly 2 layers with 4 dots!
     renderLoop();
   </script>
 </body>
