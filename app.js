@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------------------------------------------------------------------------
   // 2. MODE SWITCHER & WORKSPACE PANES
   // ---------------------------------------------------------------------------
+  let currentMode = 'guide';
   const tabGuide = document.getElementById('tabGuide');
   const tabTest = document.getElementById('tabTest');
   const paneGuide = document.getElementById('paneGuide');
@@ -1416,11 +1417,6 @@ epochs = 300`;
       }
     });
   }
-
-  // Settings Modal: Share Simulator Controls
-  const btnSettingsShareLink = document.getElementById('btnSettingsShareLink');
-  const settingsShareCopyText = document.getElementById('settingsShareCopyText');
-
 
   // Settings Modal: Share Simulator Direct Link
   const btnSettingsShareLink = document.getElementById('btnSettingsShareLink');
