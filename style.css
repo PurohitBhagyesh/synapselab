@@ -1,0 +1,814 @@
+/* ==========================================================================
+   SynapseLab Design System — Inspired by OpenLid (openlid.devs.li)
+   Strict Unslop: No purple gradients, high contrast, clean typography, 60 FPS
+   ========================================================================== */
+
+:root, [data-theme="dark"] {
+  --bg: #000000;
+  --surface: #0b0b0d;
+  --surface-alt: #151519;
+  --border: #232329;
+  --border-strong: #3a3a44;
+  --glass-rim: rgba(255, 255, 255, 0.12);
+  
+  --text: #ffffff;
+  --text-muted: #9a9aa6;
+  --text-dim: #666672;
+  
+  --accent: #ffffff;
+  --accent-soft: #1a1a20;
+  --accent-brand: #38bdf8;
+  --emerald: #34d399;
+  --amber: #fbbf24;
+  
+  --code-bg: #0a0a0c;
+  --code-border: #202026;
+  --nav-bg: rgba(0, 0, 0, 0.92);
+}
+
+[data-theme="light"] {
+  --bg: #f8f8fa;
+  --surface: #ffffff;
+  --surface-alt: #f2f2f5;
+  --border: #e4e4e9;
+  --border-strong: #c8c8d2;
+  --glass-rim: rgba(255, 255, 255, 0.9);
+  
+  --text: #09090b;
+  --text-muted: #5a5a66;
+  --text-dim: #8a8a96;
+  
+  --accent: #09090b;
+  --accent-soft: #ececf0;
+  --accent-brand: #0284c7;
+  --emerald: #10b981;
+  --amber: #f59e0b;
+  
+  --code-bg: #f4f4f7;
+  --code-border: #e4e4e9;
+  --nav-bg: rgba(248, 248, 250, 0.92);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  background-color: var(--bg);
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", sans-serif;
+  font-size: 14.5px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* OpenLid Sticky Navigation */
+.nav {
+  position: sticky;
+  top: 0;
+  background-color: var(--nav-bg);
+  border-bottom: 1px solid var(--border);
+  z-index: 1000;
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  flex-shrink: 0;
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 54px;
+  padding: 0 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.brand-icon {
+  color: var(--accent);
+}
+
+.brand-version {
+  font-size: 11px;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  color: var(--text-dim);
+  background: var(--surface-alt);
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+/* Nav Actions */
+.nav-end {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* OpenLid Theme Toggle */
+.theme-toggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.theme-icon {
+  color: var(--accent);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 15px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  font-family: inherit;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-alt);
+}
+
+/* Guided Instruction Bar */
+.instruction-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  flex-shrink: 0;
+  z-index: 50;
+}
+
+.instruction-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+}
+
+.step-badge {
+  background: var(--text);
+  color: var(--bg);
+  font-weight: 700;
+  font-size: 10.5px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: 0.5px;
+}
+
+.instruction-desc {
+  color: var(--text-muted);
+}
+.instruction-desc strong {
+  color: var(--text);
+}
+
+.btn-step {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+.btn-step:hover {
+  border-color: var(--border-strong);
+}
+
+/* Main Split Screen Workspace (OpenLid Monitor Style) */
+main {
+  flex: 1;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  padding: 12px 16px;
+  gap: 12px;
+}
+
+.monitor-pane {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 var(--glass-rim);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Left Pane: Student Code Editor */
+.code-pane {
+  width: 440px;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.pane-header {
+  height: 40px;
+  padding: 0 14px;
+  background: var(--surface-alt);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.traffic-dots {
+  display: flex;
+  gap: 6px;
+}
+.traffic-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.dot-red { background: #ff5f56; }
+.dot-yellow { background: #ffbd2e; }
+.dot-green { background: #27c93f; }
+
+.code-title {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.code-textarea {
+  flex: 1;
+  width: 100%;
+  background: var(--code-bg);
+  color: var(--text);
+  border: none;
+  padding: 16px;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 13.5px;
+  line-height: 1.65;
+  resize: none;
+  outline: none;
+  white-space: pre;
+  overflow-y: auto;
+}
+
+.pane-footer {
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-alt);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* Right Pane: Smooth 3D Canvas */
+.vis-pane {
+  flex: 1;
+  position: relative;
+  background: var(--bg);
+}
+
+#canvas3d {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  touch-action: none;
+}
+#canvas3d:active { cursor: grabbing; }
+
+/* On-Screen Zoom / Rotate Controls (OpenLid UI Style) */
+.zoom-controls {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 30;
+}
+
+.tool-btn {
+  width: 34px;
+  height: 34px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.15s ease;
+}
+
+.tool-btn:hover {
+  background: var(--surface-alt);
+  border-color: var(--border-strong);
+  color: var(--accent);
+}
+
+/* HUD Top Left */
+.vis-hud {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 11.5px;
+  pointer-events: none;
+  z-index: 25;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+.vis-hud strong {
+  display: block;
+  font-size: 12px;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.vis-hud span {
+  color: var(--text-muted);
+}
+
+/* Floating Task Card on Hover */
+.dot-task-card {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  padding: 10px 16px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  z-index: 35;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   OpenLid Floating Widgets: Buy Me a Coffee & Share
+   ========================================================================== */
+.snack-widget {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 9002;
+  font-family: inherit;
+}
+
+.snack-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.snack-pill:hover {
+  background-color: var(--surface-alt);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.snack-icon {
+  color: var(--amber);
+  flex-shrink: 0;
+}
+
+.snack-card {
+  position: absolute;
+  bottom: 48px;
+  left: 0;
+  width: 320px;
+  background-color: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  animation: snackPop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.snack-card.active { display: flex; }
+
+@keyframes snackPop {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.snack-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+
+.snack-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.snack-upi-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+}
+
+.snack-upi-copy:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.snack-close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.snack-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.snack-qr-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.snack-qr-pad {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  min-height: 140px;
+  width: 140px;
+}
+
+.snack-qr-pad img {
+  display: block;
+  max-width: 100%;
+}
+
+.snack-qr-caption {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.snack-input-wrap {
+  display: flex;
+  align-items: center;
+  background-color: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 12px;
+  height: 38px;
+}
+
+.currency-symbol {
+  font-size: 15px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-right: 6px;
+}
+
+#snackAmountInput {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  width: 100%;
+}
+
+.snack-presets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.preset-chip {
+  background-color: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 6px 0;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.preset-chip:hover {
+  background-color: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.preset-chip.active {
+  background-color: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+.upi-apps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.upi-app-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.upi-app-btn:hover {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.upi-app-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.fam-badge { background: #d97706; }
+.amz-badge { background: #232f3e; color: #ff9900; }
+.pe-badge { background: #5f259f; }
+.gpay-badge { background: #4285f4; }
+.paytm-badge { background: #00b9f5; }
+.wa-badge { background: #25d366; }
+
+/* Share Widget (Bottom-Right) */
+.share-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9002;
+  font-family: inherit;
+}
+
+.share-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  transition: all 0.15s ease;
+}
+
+.share-pill:hover {
+  background-color: var(--surface-alt);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.share-card {
+  position: absolute;
+  bottom: 48px;
+  right: 0;
+  width: 290px;
+  background-color: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+}
+.share-card.active { display: flex; }
+
+.share-line-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+.share-line-item:hover {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+/* Hover-to-open on desktop fine pointer devices */
+@media (hover: hover) and (pointer: fine) {
+  .snack-widget:hover .snack-card { display: flex; }
+  .share-widget:hover .share-card { display: flex; }
+}
+
+/* Mobile Responsive Breakpoint (<= 768px) */
+.mobile-nav-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-tab-switch {
+    display: inline-flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px;
+  }
+  
+  .mobile-tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .mobile-tab-btn.active {
+    background: var(--surface-alt);
+    color: var(--text);
+  }
+
+  main {
+    flex-direction: column;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .code-pane {
+    width: 100%;
+    height: 100%;
+    display: flex;
+  }
+
+  .vis-pane {
+    width: 100%;
+    height: 100%;
+    display: none;
+  }
+
+  main.show-vis .code-pane { display: none; }
+  main.show-vis .vis-pane { display: flex; }
+
+  .snack-widget {
+    left: 12px;
+    bottom: max(14px, env(safe-area-inset-bottom));
+  }
+  .share-widget {
+    right: 12px;
+    bottom: max(14px, env(safe-area-inset-bottom));
+  }
+  .snack-card, .share-card {
+    width: 290px;
+  }
+}
