@@ -16,7 +16,7 @@
   <meta property="og:url" content="https://synapselab.devs.li/">
   <meta property="og:title" content="SynapseLab - 3D Neural Network Simulator &amp; Code Studio for Students">
   <meta property="og:description" content="Free interactive 3D neural network visualizer and Python code studio for students. Explore synaptic filaments, forward pass propagation, backpropagation, and deep learning architectures in real-time.">
-  <meta property="og:image" content="https://synapselab.devs.li/neural_network_threads.png">
+  <meta property="og:image" content="https://synapselab.devs.li/banner.png">
   <meta property="og:site_name" content="SynapseLab">
   <meta name="google-site-verification" content="google5fefb455a4f252a7">
 
@@ -25,7 +25,7 @@
   <meta name="twitter:url" content="https://synapselab.devs.li/">
   <meta name="twitter:title" content="SynapseLab - 3D Neural Network Simulator &amp; Code Studio for Students">
   <meta name="twitter:description" content="Interactive 3D neural network visualizer and live Python code lab for students. Hardware-accelerated filaments, real-time forward pass, zero dependencies.">
-  <meta name="twitter:image" content="https://synapselab.devs.li/neural_network_threads.png">
+  <meta name="twitter:image" content="https://synapselab.devs.li/banner.png">
   <meta name="twitter:creator" content="@PurohitBhagyesh">
 
   <!-- Apple & PWA Meta -->
@@ -78,8 +78,9 @@
         </div>
       </a>
 
-      <!-- Mode Switcher: Guide Mode vs Test Mode -->
-      <div class="mode-segmented" role="tablist" aria-label="Learning Mode">
+      <!-- Mode Switcher: Guide Mode vs Test Mode (Sliding Pill) -->
+      <div class="mode-segmented" id="modeSegmented" data-active="guide" role="tablist" aria-label="Learning Mode">
+        <div class="slider-pill"></div>
         <button class="mode-tab active" id="tabGuide" type="button" role="tab" aria-selected="true">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
@@ -99,12 +100,13 @@
 
       <!-- Navigation Right Utilities -->
       <div class="nav-end">
-        <!-- Report Issue / Settings Button -->
-        <button class="nav-icon-btn" id="btnOpenSettings" type="button" aria-label="Report Issue and Feedback">
+        <!-- Settings Button -->
+        <button class="nav-icon-btn" id="btnOpenSettings" type="button" aria-label="Settings">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
           </svg>
-          <span>Report Issue</span>
+          <span>Settings</span>
         </button>
 
         <a href="https://github.com/PurohitBhagyesh" target="_blank" rel="noopener noreferrer" class="btn">
@@ -399,9 +401,7 @@ epochs = 300</textarea>
   <footer class="bottom-bar">
     <div class="bottom-left">
       <span id="footerStats">SynapseLab &bull; 3D Visualization Simulator for Students</span>
-      <button class="legal-link open-legal-trigger" id="btnOpenPrivacy" type="button">Privacy Policy</button>
-      <button class="legal-link open-legal-trigger" id="btnOpenTerms" type="button">Terms</button>
-      <button class="legal-link" id="btnOpenCookies" type="button">Cookies</button>
+      <button class="legal-link open-legal-trigger" id="btnOpenPrivacy" type="button">Privacy Policy &amp; Terms</button>
     </div>
 
     <div class="bottom-right">
@@ -419,50 +419,151 @@ epochs = 300</textarea>
   </footer>
 
   <!-- =========================================================================
-       4. CENTERED MODALS (Settings, Coffee, Share & Legal)
+       4. CENTERED MODALS (Settings, Coffee, Share & Combined Legal)
        ========================================================================= -->
 
-  <!-- SETTINGS / REPORT ISSUE MODAL (Minimal One-Click Design) -->
+  <!-- SETTINGS MODAL (Unified Sensitivity, Contact, Share & Legal) -->
   <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 class="modal-title" id="settingsModalTitle">Report an Issue / Support</h3>
+        <h3 class="modal-title" id="settingsModalTitle">Settings</h3>
         <button class="modal-close-btn" id="btnCloseSettings" type="button" aria-label="Close modal">&times;</button>
       </div>
 
-      <div class="settings-issue-box" style="margin-top: 4px;">
-        <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
-          Have a question, feedback, or found an issue? Report directly to the developer with one click.
-        </p>
+      <div class="settings-grid">
+        <!-- Sensitivity Options -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <strong>Camera &amp; Sensitivity</strong>
+            <span class="settings-hint">Orbit &amp; Zoom Controls</span>
+          </div>
 
-        <div class="issue-developer-info" style="margin-bottom: 16px;">
-          <span class="issue-label">Email:</span>
-          <span class="issue-email-value" id="developerEmail">Purohitunofficialbhagyesh@gmail.com</span>
-          <button type="button" class="btn-micro" id="btnCopyDevEmail" title="Copy developer email">Copy</button>
+          <div class="settings-control-group">
+            <div class="settings-control-header">
+              <span>Orbit Sensitivity</span>
+              <span class="settings-value-badge" id="valOrbitSens">1.0x</span>
+            </div>
+            <input type="range" class="settings-slider" id="sliderOrbitSens" min="0.3" max="2.5" step="0.1" value="1.0">
+          </div>
+
+          <div class="settings-control-group">
+            <div class="settings-control-header">
+              <span>Zoom Sensitivity</span>
+              <span class="settings-value-badge" id="valZoomSens">1.0x</span>
+            </div>
+            <input type="range" class="settings-slider" id="sliderZoomSens" min="0.3" max="2.5" step="0.1" value="1.0">
+          </div>
+
+          <div class="settings-control-group">
+            <div class="settings-control-header">
+              <span>Auto Orbit Speed</span>
+              <span class="settings-value-badge" id="valOrbitSpeed">1.0x</span>
+            </div>
+            <input type="range" class="settings-slider" id="sliderOrbitSpeed" min="0.2" max="3.0" step="0.1" value="1.0">
+          </div>
+
+          <div class="settings-toggle-row">
+            <div>
+              <strong style="font-size:12.5px; display:block;">Moving Starfield</strong>
+              <span style="font-size:11px; color:var(--text-muted);">3D cosmic stars in background</span>
+            </div>
+            <div class="toggle-switch active" id="toggleStars">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+
+          <button type="button" class="btn" id="btnResetSettings" style="margin-top:4px; font-size:11.5px;">Reset Sensitivity to Defaults</button>
         </div>
 
-        <div class="settings-btn-row">
-          <button type="button" class="btn btn-report-warning" id="btnSendIssueEmail" style="flex: 1; justify-content: center;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-              <polyline points="22,6 12,13 2,6"/>
-            </svg>
-            <span>Report an Issue (Email)</span>
-          </button>
-          <a href="https://github.com/PurohitBhagyesh/synapselab/issues/new" target="_blank" rel="noopener noreferrer" class="btn" style="flex: 1; justify-content: center;">
-            <span>GitHub Issues &rarr;</span>
-          </a>
+        <div class="settings-divider"></div>
+
+        <!-- Developer Email & Issue Reporting -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <strong>Developer Contact &amp; Feedback</strong>
+            <span class="settings-hint">Direct support and reports</span>
+          </div>
+
+          <div class="issue-developer-info" style="margin-bottom: 12px;">
+            <span class="issue-label">Email:</span>
+            <span class="issue-email-value" id="developerEmail">Purohitunofficialbhagyesh@gmail.com</span>
+            <button type="button" class="btn-micro" id="btnCopyDevEmail" title="Copy developer email">Copy</button>
+          </div>
+
+          <div class="settings-btn-row">
+            <button type="button" class="btn btn-report-warning" id="btnSendIssueEmail" style="flex:1; justify-content:center;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <span>Report via Email</span>
+            </button>
+            <a href="https://github.com/PurohitBhagyesh/synapselab/issues/new" target="_blank" rel="noopener noreferrer" class="btn" style="flex:1; justify-content:center;">
+              <span>GitHub Issues &rarr;</span>
+            </a>
+          </div>
         </div>
 
-        <div class="settings-divider" style="margin: 16px 0;"></div>
+        <div class="settings-divider"></div>
 
-        <div class="settings-btn-row">
-          <button type="button" class="btn" id="btnSettingsShareLink" style="width: 100%; justify-content: center;">
+        <!-- Share Options -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <strong>Share Simulator</strong>
+            <span class="settings-hint">Direct link or system sheet</span>
+          </div>
+
+          <div class="settings-btn-row">
+            <button type="button" class="btn" id="btnSettingsShareLink" style="flex:1; justify-content:center;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+              </svg>
+              <span id="settingsShareCopyText">Copy Link</span>
+            </button>
+            <button type="button" class="btn" id="btnSettingsShareSheet" style="flex:1; justify-content:center;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+              <span>Share Sheet</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-divider"></div>
+
+        <!-- Voluntary Support -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <strong>Support Research</strong>
+            <span class="settings-hint">Voluntary UPI / Student Tip</span>
+          </div>
+          <button type="button" class="btn" id="btnSettingsOpenCoffee" style="width:100%; justify-content:center; gap:8px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+              <line x1="6" y1="1" x2="6" y2="4"/>
+              <line x1="10" y1="1" x2="10" y2="4"/>
+              <line x1="14" y1="1" x2="14" y2="4"/>
             </svg>
-            <span id="settingsShareCopyText">Copy Simulator Link</span>
+            <span>Buy me a Coffee (UPI / FamApp / GPay)</span>
+          </button>
+        </div>
+
+        <div class="settings-divider"></div>
+
+        <!-- Combined Privacy Policy & Terms Link -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <strong>Legal &amp; Policy</strong>
+            <span class="settings-hint">Zero Tracking &bull; MIT License</span>
+          </div>
+          <button type="button" class="btn open-legal-trigger" id="btnSettingsOpenLegal" style="width:100%; justify-content:center;">
+            <span>View Privacy Policy &amp; Terms of Service</span>
           </button>
         </div>
       </div>
@@ -554,90 +655,42 @@ epochs = 300</textarea>
     </div>
   </div>
 
-  <!-- LEGAL, PRIVACY, DPDP & REFUND COMPLIANCE MODAL -->
+  <!-- COMBINED PRIVACY POLICY & TERMS MODAL -->
   <div class="modal-overlay" id="legalModal" role="dialog" aria-modal="true" aria-labelledby="legalModalTitle">
     <div class="modal-dialog wide-modal">
       <div class="modal-header">
-        <h3 class="modal-title" id="legalModalTitle">Privacy, Terms & Compliance</h3>
+        <h3 class="modal-title" id="legalModalTitle">Privacy Policy &amp; Terms of Service</h3>
         <button class="modal-close-btn" id="btnCloseLegal" type="button" aria-label="Close modal">&times;</button>
       </div>
 
       <div class="legal-content">
-        <h3>Privacy Policy</h3>
+        <h3>100% In-Browser Local Execution</h3>
         <p>
-          SynapseLab runs 100% locally in your client web browser. No student code, model weights, layer configurations, or personal data are ever collected, transmitted, or stored on remote servers or third-party services.
+          SynapseLab runs entirely inside your client browser via native Canvas 2D/3D mathematics. No student code, model configurations, hyperparameters, or personal telemetry are ever sent to remote servers or third-party platforms.
         </p>
 
-        <h3>Cookies & DPDP Act 2023 Compliance</h3>
+        <h3>Zero Cookies &amp; Data Minimization</h3>
         <p>
-          In full accordance with India's Digital Personal Data Protection (DPDP) Act 2023 and global privacy frameworks:
-        </p>
-        <ul>
-          <li>We do NOT use advertising trackers, fingerprinting scripts, or third-party analytical cookies.</li>
-          <li>Local browser storage (localStorage) is utilized exclusively to persist your interface configuration (camera sensitivity, auto-orbit rate, and starfield state).</li>
-          <li>You may clear this state at any time via your browser settings or by resetting simulator controls.</li>
-        </ul>
-
-        <h3>Terms & Conditions</h3>
-        <p>
-          SynapseLab is provided as an open, accessible scientific simulation environment for students, educators, and neural engineering practitioners. All visual outputs and code configurations created in the workspace belong entirely to the user.
+          SynapseLab does NOT use any cookies, tracking pixels, or third-party analytics scripts. Interface preferences (such as auto-orbit rate and 3D starfield) are saved strictly in your local device storage (localStorage) and never transmitted anywhere.
         </p>
 
-        <h3>Refund & Voluntary Support Policy</h3>
+        <h3>Terms of Use &amp; Open Access</h3>
         <p>
-          SynapseLab is free and open-source software. Direct financial contributions via "Buy me a Coffee" (UPI) are voluntary student/supporter tips to fund open research. They do not represent a commercial transaction for services and are non-refundable.
+          SynapseLab is provided freely under the open-source MIT License for students, educators, and researchers. Any neural network configurations or outputs created using the platform belong entirely to the user.
         </p>
 
-        <h3>Developer & Project Details</h3>
+        <h3>Developer Support &amp; Tips</h3>
         <p>
-          Maintained by Bhagyesh Purohit (GitHub: <a href="https://github.com/PurohitBhagyesh" target="_blank" rel="noopener noreferrer" style="color:#ffffff; text-decoration:underline;">@PurohitBhagyesh</a>). Built with native WebGL/Canvas mathematics for maximum student accessibility and performance.
+          Voluntary tips sent via "Buy me a Coffee" (UPI) directly support ongoing open-source development and maintenance. They are voluntary student tips and non-commercial in nature.
+        </p>
+
+        <h3>Contact &amp; Maintainer</h3>
+        <p>
+          Created and maintained by Bhagyesh Purohit (<a href="mailto:Purohitunofficialbhagyesh@gmail.com" style="color:#ffffff; text-decoration:underline;">Purohitunofficialbhagyesh@gmail.com</a> | GitHub: <a href="https://github.com/PurohitBhagyesh" target="_blank" rel="noopener noreferrer" style="color:#ffffff; text-decoration:underline;">@PurohitBhagyesh</a>).
         </p>
       </div>
     </div>
   </div>
-
-  <!-- AESTHETIC MODERN WEBSITE COOKIE & STORAGE PREFERENCES BANNER -->
-  <aside class="cookie-banner" id="cookieConsentBanner" role="region" aria-label="Cookie and Storage Preferences">
-    <div class="cookie-banner-header">
-      <div class="cookie-title-row">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M12 2a10 10 0 0 0-1.74 19.85A10 10 0 0 1 12 2z"/>
-          <path d="M8 9h.01M15 13h.01M10 15h.01"/>
-        </svg>
-        <strong>Cookie &amp; Storage Preferences</strong>
-      </div>
-      <p class="cookie-desc">
-        We use essential local storage to run WebGL simulation graphics and save your workspace state. No tracking or marketing scripts are used.
-      </p>
-    </div>
-
-    <!-- Toggle Options (OFF and ON) -->
-    <div class="cookie-toggles-grid">
-      <div class="cookie-toggle-item">
-        <div class="cookie-toggle-info">
-          <span class="cookie-toggle-name">Essential Graphics &amp; WebGL State</span>
-          <span class="cookie-toggle-sub">Required for 3D coordinate transformations and forward pass execution.</span>
-        </div>
-        <span class="cookie-locked-pill">Always Active</span>
-      </div>
-
-      <div class="cookie-toggle-item">
-        <div class="cookie-toggle-info">
-          <span class="cookie-toggle-name">Preference Persistence &amp; Cosmic Starfield</span>
-          <span class="cookie-toggle-sub">Remembers camera orbit sensitivity and 3D starfield animation.</span>
-        </div>
-        <div class="toggle-switch active" id="toggleCookieStorage" role="switch" aria-checked="true" tabindex="0">
-          <div class="toggle-thumb"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="cookie-banner-actions">
-      <button class="btn" id="btnRejectCookies" type="button">Reject Non-Essential</button>
-      <button class="btn primary" id="btnAcceptCookies" type="button">Accept All</button>
-    </div>
-  </aside>
 
   <script src="app.js"></script>
 </body>

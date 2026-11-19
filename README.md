@@ -28,6 +28,7 @@ synapselab/
 ├── index.html                   # Core web application (pure HTML5 & Canvas)
 ├── style.css                    # Monochrome dark-mode stylesheet (#000000, #ffffff)
 ├── app.js                       # 3D math projection engine & interactive editor
+├── banner.png                   # High-resolution social media card (1200x630, og:image)
 ├── network_threads.py           # Starter Python code for students
 ├── google5fefb455a4f252a7.html  # Google Search Console domain verification
 ├── robots.txt                   # Search crawler directives
@@ -62,15 +63,17 @@ SynapseLab provides two distinct working environments tailored for learning:
 ## Core Features
 
 * **Hardware-Accelerated 3D Filaments**: Native cubic Bezier spline evaluation rendered in real-time perspective (`60-120 FPS`), with depth-sorted neurons, radiant halos, and an orientation floor grid.
+* **Mobile Bottom Mode Slider**: Floating bottom thumb-accessible switcher with hardware-accelerated sliding indicator for instant switching between Guide Mode and Test Mode.
+* **Interactive Light-Up Guides**: Selecting any curriculum lesson or clicking interactive actions illuminates the 3D network with real-time forward pass signal pulses.
 * **Fluid Touch Swipe & Inertial Momentum**: Natural deceleration physics when dragging or swiping the 3D network on touchscreens and desktop mice.
 * **Dynamic Label Formatting**: Floating layer cards dynamically measure and pad text so titles and neuron counts always remain cleanly inside boxes.
 * **Hide Labels Toggle (`H`)**: One-click button in viewport toolbar to toggle text boxes and neuron labels on/off for a pure, cinematic view of 3D threads.
 * **Instant Hover Tooltips**: Instant dark-mode hover labels on all viewport controls (Auto Orbit, Zoom In, Zoom Out, Reset, Toggle Labels, Fullscreen).
 * **Live Forward Pass & Signal Cascade**: Clicking **Run** (or pressing `Cmd/Ctrl + Enter`) triggers a multi-stage signal pulse across all layers, illuminating neurons sequentially from input to output.
 * **Automatic Mobile Landscape on Fullscreen**: Entering Fullscreen on smartphones automatically locks orientation to landscape for maximum visual immersion.
-* **One-Click Issue Reporting**: Streamlined Settings dialog with direct email drafting to `Purohitunofficialbhagyesh@gmail.com` and GitHub Issues link.
-* **Pure Monochrome Design**: Built adhering strictly to modern standards: zero emojis, zero em dashes, zero purple gradients, zero pill buttons, high-contrast black and white styling (`#000000`, `#ffffff`).
-* **Compliance & DPDP Act 2023**: 100% in-browser client execution, zero tracking cookies, local storage strictly for UI preferences, and complete legal transparency.
+* **Unified Settings Modal**: Sensitivity sliders (orbit, zoom, speed), starfield toggle, developer contact email (`Purohitunofficialbhagyesh@gmail.com`), direct sharing, UPI tip support, and combined privacy & terms.
+* **Zero Cookies Architecture**: 100% cookie-free execution, zero tracking pixels or analytics scripts, local device storage strictly for camera and starfield preferences.
+* **Pure Monochrome Design**: Built adhering strictly to modern standards: zero emojis, zero em dashes, zero purple gradients, high-contrast black and white styling (`#000000`, `#ffffff`).
 
 ---
 

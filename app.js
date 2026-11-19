@@ -135,8 +135,13 @@ epochs = 300`;
     }
   }
 
+  const modeSegmented = document.getElementById('modeSegmented');
+
   function switchMode(mode) {
     currentMode = mode;
+    if (modeSegmented) {
+      modeSegmented.setAttribute('data-active', mode);
+    }
     if (mode === 'guide') {
       if (tabGuide) {
         tabGuide.classList.add('active');
@@ -149,6 +154,7 @@ epochs = 300`;
       if (paneGuide) paneGuide.classList.add('active');
       if (paneTest) paneTest.classList.remove('active');
       buildNetwork([3, 6, 2]);
+      triggerLiveForwardPass();
     } else {
       if (tabTest) {
         tabTest.classList.add('active');
@@ -374,7 +380,7 @@ epochs = 300`;
     mouseScreenY = e.clientY - rect.top;
 
     if (isDragging) {
-      const sens = 0.007;
+      const sens = 0.007 * (settings.orbitSensitivity || 1.0);
       const dx = (e.clientX - lastX) * sens;
       const dy = (e.clientY - lastY) * sens;
       velYaw = dx;
@@ -406,7 +412,7 @@ epochs = 300`;
 
   canvas.addEventListener('wheel', e => {
     e.preventDefault();
-    const sens = 0.6;
+    const sens = 0.6 * (settings.zoomSensitivity || 1.0);
     targetCamDist = Math.max(260, Math.min(1250, targetCamDist + e.deltaY * sens));
   }, { passive: false });
 
@@ -435,7 +441,7 @@ epochs = 300`;
     mouseScreenY = e.touches[0].clientY - rect.top;
 
     if (isDragging) {
-      const sens = 0.007;
+      const sens = 0.007 * (settings.orbitSensitivity || 1.0);
       const dx = (e.touches[0].clientX - lastX) * sens;
       const dy = (e.touches[0].clientY - lastY) * sens;
       velYaw = dx;
@@ -982,7 +988,7 @@ epochs = 300`;
         velYaw *= 0.92;
         velPitch *= 0.92;
       } else if (autoRotate) {
-        targetYaw += 0.0022;
+        targetYaw += 0.0022 * (settings.orbitSpeed || 1.0);
       }
     }
     currentYaw += (targetYaw - currentYaw) * 0.08;
@@ -1054,7 +1060,7 @@ epochs = 300`;
   }
 
   // ---------------------------------------------------------------------------
-  // 6. GUIDE MODE INTERACTIVE LESSONS & CALL-TO-ACTIONS
+  // 6. GUIDE MODE INTERACTIVE LESSONS & CALL-TO-ACTIONS (Light-Up Animation)
   // ---------------------------------------------------------------------------
   const lessonCards = document.querySelectorAll('.lesson-card');
   lessonCards.forEach((card) => {
@@ -1068,15 +1074,18 @@ epochs = 300`;
         targetCamDist = 650;
       } else if (lessonIdx === 1) {
         buildNetwork([3, 8, 3]);
-        wavePulseTime += 1.0;
+        targetCamDist = 650;
       } else if (lessonIdx === 2) {
         buildNetwork([2, 5, 2]);
+        targetCamDist = 620;
       } else if (lessonIdx === 3) {
         buildNetwork([3, 8, 6, 2]);
+        targetCamDist = 700;
       } else if (lessonIdx === 4) {
         buildNetwork([3, 6, 4, 2]);
-        triggerLiveForwardPass();
+        targetCamDist = 680;
       }
+      triggerLiveForwardPass(); // Light up animation in all guides
     });
   });
 
@@ -1086,6 +1095,7 @@ epochs = 300`;
       e.stopPropagation();
       buildNetwork([2, 2]);
       targetCamDist = 580;
+      triggerLiveForwardPass();
     });
   }
 
@@ -1095,6 +1105,7 @@ epochs = 300`;
       e.stopPropagation();
       buildNetwork([3, 6, 2]);
       targetCamDist = 650;
+      triggerLiveForwardPass();
     });
   }
 
@@ -1111,6 +1122,7 @@ epochs = 300`;
     btnLesson3Inspect.addEventListener('click', (e) => {
       e.stopPropagation();
       buildNetwork([2, 5, 2]);
+      triggerLiveForwardPass();
     });
   }
 
@@ -1119,6 +1131,7 @@ epochs = 300`;
     btnLesson4Deep.addEventListener('click', (e) => {
       e.stopPropagation();
       buildNetwork([3, 8, 6, 2]);
+      triggerLiveForwardPass();
     });
   }
 
@@ -1418,9 +1431,74 @@ epochs = 300`;
     });
   }
 
-  // Settings Modal: Share Simulator Direct Link
+  // Settings Modal: Sensitivity Sliders & Starfield Controls
+  const sliderOrbitSens = document.getElementById('sliderOrbitSens');
+  const valOrbitSens = document.getElementById('valOrbitSens');
+  const sliderZoomSens = document.getElementById('sliderZoomSens');
+  const valZoomSens = document.getElementById('valZoomSens');
+  const sliderOrbitSpeed = document.getElementById('sliderOrbitSpeed');
+  const valOrbitSpeed = document.getElementById('valOrbitSpeed');
+  const toggleStars = document.getElementById('toggleStars');
+  const btnResetSettings = document.getElementById('btnResetSettings');
+
+  if (sliderOrbitSens && valOrbitSens) {
+    sliderOrbitSens.value = settings.orbitSensitivity || 1.0;
+    valOrbitSens.textContent = (settings.orbitSensitivity || 1.0).toFixed(1) + 'x';
+    sliderOrbitSens.addEventListener('input', () => {
+      settings.orbitSensitivity = parseFloat(sliderOrbitSens.value);
+      valOrbitSens.textContent = settings.orbitSensitivity.toFixed(1) + 'x';
+      saveSettings();
+    });
+  }
+
+  if (sliderZoomSens && valZoomSens) {
+    sliderZoomSens.value = settings.zoomSensitivity || 1.0;
+    valZoomSens.textContent = (settings.zoomSensitivity || 1.0).toFixed(1) + 'x';
+    sliderZoomSens.addEventListener('input', () => {
+      settings.zoomSensitivity = parseFloat(sliderZoomSens.value);
+      valZoomSens.textContent = settings.zoomSensitivity.toFixed(1) + 'x';
+      saveSettings();
+    });
+  }
+
+  if (sliderOrbitSpeed && valOrbitSpeed) {
+    sliderOrbitSpeed.value = settings.orbitSpeed || 1.0;
+    valOrbitSpeed.textContent = (settings.orbitSpeed || 1.0).toFixed(1) + 'x';
+    sliderOrbitSpeed.addEventListener('input', () => {
+      settings.orbitSpeed = parseFloat(sliderOrbitSpeed.value);
+      valOrbitSpeed.textContent = settings.orbitSpeed.toFixed(1) + 'x';
+      saveSettings();
+    });
+  }
+
+  if (toggleStars) {
+    toggleStars.classList.toggle('active', settings.enableStarfield !== false);
+    toggleStars.addEventListener('click', () => {
+      const active = toggleStars.classList.toggle('active');
+      settings.enableStarfield = active;
+      saveSettings();
+    });
+  }
+
+  if (btnResetSettings) {
+    attachTap(btnResetSettings, () => {
+      settings = Object.assign({}, DEFAULT_SETTINGS);
+      saveSettings();
+      if (sliderOrbitSens) sliderOrbitSens.value = 1.0;
+      if (valOrbitSens) valOrbitSens.textContent = '1.0x';
+      if (sliderZoomSens) sliderZoomSens.value = 1.0;
+      if (valZoomSens) valZoomSens.textContent = '1.0x';
+      if (sliderOrbitSpeed) sliderOrbitSpeed.value = 1.0;
+      if (valOrbitSpeed) valOrbitSpeed.textContent = '1.0x';
+      if (toggleStars) toggleStars.classList.add('active');
+    });
+  }
+
+  // Settings Modal: Share Simulator Direct Link & Native Share Sheet
   const btnSettingsShareLink = document.getElementById('btnSettingsShareLink');
   const settingsShareCopyText = document.getElementById('settingsShareCopyText');
+  const btnSettingsShareSheet = document.getElementById('btnSettingsShareSheet');
+
   if (btnSettingsShareLink) {
     attachTap(btnSettingsShareLink, async () => {
       try {
@@ -1434,7 +1512,22 @@ epochs = 300`;
     });
   }
 
-  // Settings Modal: Report an Issue / Feedback (One-Click Minimal Action)
+  if (btnSettingsShareSheet) {
+    attachTap(btnSettingsShareSheet, async () => {
+      const shareData = {
+        title: 'SynapseLab: 3D Visualization Simulator for Students',
+        text: 'Interactive 3D neural network simulator with live code studio!',
+        url: 'https://synapselab.devs.li'
+      };
+      if (navigator.share) {
+        try { await navigator.share(shareData); } catch (err) {}
+      } else if (btnSettingsShareLink) {
+        btnSettingsShareLink.click();
+      }
+    });
+  }
+
+  // Settings Modal: Developer Email & Issue Reporting (One-Click Minimal Action)
   const btnCopyDevEmail = document.getElementById('btnCopyDevEmail');
   const btnSendIssueEmail = document.getElementById('btnSendIssueEmail');
   const DEV_EMAIL = 'Purohitunofficialbhagyesh@gmail.com';
@@ -1461,54 +1554,21 @@ epochs = 300`;
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // 10. AESTHETIC WEBSITE COOKIE & STORAGE PREFERENCES
-  // ---------------------------------------------------------------------------
-  const cookieConsentBanner = document.getElementById('cookieConsentBanner');
-  const btnAcceptCookies = document.getElementById('btnAcceptCookies');
-  const btnRejectCookies = document.getElementById('btnRejectCookies');
-  const toggleCookieStorage = document.getElementById('toggleCookieStorage');
-  const btnOpenCookies = document.getElementById('btnOpenCookies');
-
-  const savedConsent = localStorage.getItem('synapselab_cookie_consent');
-  if (savedConsent) {
-    if (cookieConsentBanner) cookieConsentBanner.classList.add('hidden');
-    if (savedConsent === 'rejected') {
-      settings.enableStarfield = false;
-      if (toggleCookieStorage) toggleCookieStorage.classList.remove('active');
-    }
-  }
-
-  if (toggleCookieStorage) {
-    toggleCookieStorage.addEventListener('click', () => {
-      const isActive = toggleCookieStorage.classList.toggle('active');
-      toggleCookieStorage.setAttribute('aria-checked', isActive ? 'true' : 'false');
+  // Settings Modal: Coffee Support Trigger
+  const btnSettingsOpenCoffee = document.getElementById('btnSettingsOpenCoffee');
+  if (btnSettingsOpenCoffee) {
+    attachTap(btnSettingsOpenCoffee, () => {
+      if (settingsModal) settingsModal.classList.remove('active');
+      if (coffeeModal) coffeeModal.classList.add('active');
     });
   }
 
-  if (btnAcceptCookies && cookieConsentBanner) {
-    btnAcceptCookies.addEventListener('click', () => {
-      localStorage.setItem('synapselab_cookie_consent', 'accepted');
-      localStorage.setItem('synapselab_cookie_pref_storage', 'true');
-      settings.enableStarfield = true;
-      saveSettings();
-      cookieConsentBanner.classList.add('hidden');
-    });
-  }
-
-  if (btnRejectCookies && cookieConsentBanner) {
-    btnRejectCookies.addEventListener('click', () => {
-      localStorage.setItem('synapselab_cookie_consent', 'rejected');
-      localStorage.setItem('synapselab_cookie_pref_storage', 'false');
-      settings.enableStarfield = false;
-      saveSettings();
-      cookieConsentBanner.classList.add('hidden');
-    });
-  }
-
-  if (btnOpenCookies && cookieConsentBanner) {
-    btnOpenCookies.addEventListener('click', () => {
-      cookieConsentBanner.classList.remove('hidden');
+  // Settings Modal: Legal Policy Trigger
+  const btnSettingsOpenLegal = document.getElementById('btnSettingsOpenLegal');
+  if (btnSettingsOpenLegal) {
+    attachTap(btnSettingsOpenLegal, () => {
+      if (settingsModal) settingsModal.classList.remove('active');
+      if (legalModal) legalModal.classList.add('active');
     });
   }
 

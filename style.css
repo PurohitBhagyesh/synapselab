@@ -109,41 +109,76 @@ body {
   letter-spacing: 0.1px;
 }
 
-/* Mode Switcher Segmented Control */
+/* Mode Switcher Segmented Control (Smooth Hardware-Accelerated Sliding Pill) */
 .mode-segmented {
+  position: relative;
   display: inline-flex;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  align-items: center;
+  background: #101014;
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
   padding: 3px;
-  gap: 3px;
+  gap: 0;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.slider-pill {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  background: #ffffff;
+  border-radius: 17px;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.8);
+}
+
+.mode-segmented[data-active="guide"] .slider-pill {
+  transform: translateX(0);
+}
+
+.mode-segmented[data-active="test"] .slider-pill {
+  transform: translateX(100%);
 }
 
 .mode-tab {
+  position: relative;
+  z-index: 2;
   background: transparent;
   border: none;
-  color: var(--text-muted);
-  font-size: 12.5px;
+  color: #888890;
+  font-size: 12px;
   font-weight: 600;
   padding: 5px 14px;
-  border-radius: 6px;
+  border-radius: 17px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  transition: all 0.15s ease;
+  justify-content: center;
+  gap: 6px;
+  transition: color 0.2s ease;
   font-family: inherit;
+  flex: 1;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .mode-tab:hover {
-  color: var(--text);
+  color: #e4e4e7;
 }
 
-.mode-tab.active {
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--border-strong);
+.mode-segmented[data-active="guide"] #tabGuide,
+.mode-segmented[data-active="test"] #tabTest {
+  color: #000000;
+  font-weight: 700;
+}
+
+.mode-segmented[data-active="guide"] #tabGuide:hover,
+.mode-segmented[data-active="test"] #tabTest:hover {
+  color: #000000;
 }
 
 .nav-end {
@@ -1409,8 +1444,50 @@ main {
   main {
     flex-direction: column;
     padding: 6px;
-    height: calc(100dvh - 50px - 34px);
+    height: calc(100dvh - 50px);
+    padding-bottom: 64px; /* Space for the bottom floating mode switcher */
     gap: 6px;
+  }
+
+  /* Place mode switcher floating at bottom on mobile portrait */
+  .mode-segmented {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 950;
+    min-width: 250px;
+    height: 42px;
+    padding: 3px;
+    background: rgba(14, 14, 18, 0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 1px rgba(255, 255, 255, 0.4);
+    border-radius: 24px;
+  }
+
+  .slider-pill {
+    top: 3px;
+    bottom: 3px;
+    left: 3px;
+    width: calc(50% - 3px);
+    border-radius: 20px;
+  }
+
+  .mode-tab {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+
+  .mode-tab svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Hide bottom bar on mobile so mode switcher sits cleanly at the bottom without overlap */
+  .bottom-bar {
+    display: none !important;
   }
 
   .mode-sidebar {
@@ -1432,16 +1509,6 @@ main {
     max-width: calc(100% - 16px);
     font-size: 9.5px;
     padding: 3px 8px;
-  }
-
-  .bottom-bar {
-    height: 34px;
-    padding: 0 10px;
-    font-size: 11px;
-  }
-
-  .bottom-left #footerStats {
-    display: none;
   }
 }
 
@@ -1636,19 +1703,21 @@ main {
   }
 
   .mode-segmented {
-    height: 30px;
-    padding: 2px;
+    bottom: 12px;
+    min-width: 230px;
+    height: 38px;
+    padding: 3px;
   }
 
   .mode-tab {
-    padding: 3px 8px;
-    font-size: 11px;
-    gap: 4px;
+    padding: 4px 10px;
+    font-size: 11.5px;
+    gap: 5px;
   }
 
   .mode-tab svg {
-    width: 11px;
-    height: 11px;
+    width: 13px;
+    height: 13px;
   }
 
   .nav-end {
@@ -1730,108 +1799,8 @@ main {
 }
 
 /* -------------------------------------------------------------------------
-   9. AESTHETIC MODERN WEBSITE COOKIE & STORAGE PREFERENCES BANNER
+   9. REPORT WARNING HOVER BUTTON
    ------------------------------------------------------------------------- */
-.cookie-banner {
-  position: fixed;
-  bottom: 44px;
-  left: 20px;
-  right: 20px;
-  max-width: 580px;
-  margin: 0 auto;
-  background: rgba(10, 10, 14, 0.95);
-  border: 1px solid var(--border-strong);
-  border-radius: 12px;
-  padding: 16px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 9990;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 1px rgba(255, 255, 255, 0.2);
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.cookie-banner.hidden {
-  display: none !important;
-}
-
-.cookie-banner-header {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.cookie-title-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.cookie-desc {
-  font-size: 11.5px;
-  color: var(--text-muted);
-  line-height: 1.45;
-  margin: 0;
-}
-
-.cookie-toggles-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-}
-
-.cookie-toggle-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.cookie-toggle-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.cookie-toggle-name {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #ffffff;
-}
-
-.cookie-toggle-sub {
-  font-size: 10.5px;
-  color: var(--text-muted);
-  line-height: 1.35;
-}
-
-.cookie-locked-pill {
-  font-size: 9.5px;
-  font-family: var(--font-mono);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border-strong);
-  color: var(--text-muted);
-  padding: 2px 7px;
-  border-radius: 4px;
-  white-space: nowrap;
-}
-
-.cookie-banner-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
 .btn-report-warning {
   background: #18181b !important;
   color: #ffffff !important;
@@ -1852,21 +1821,4 @@ main {
   border-color: #dc2626 !important;
   box-shadow: 0 0 8px rgba(239, 68, 68, 0.3) !important;
   transform: translateY(0);
-}
-
-@media (max-width: 640px) {
-  .cookie-banner {
-    bottom: 44px;
-    left: 10px;
-    right: 10px;
-    padding: 12px 14px;
-    gap: 10px;
-  }
-  .cookie-banner-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
-  .cookie-banner-actions .btn {
-    flex: 1;
-  }
 }
