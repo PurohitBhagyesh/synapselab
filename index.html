@@ -420,72 +420,17 @@ epochs = 300</textarea>
       </div>
 
       <div class="settings-grid">
-        <!-- Sensitivity Options -->
+        <!-- Send Feedback / Report Issue -->
         <div class="settings-section">
           <div class="settings-section-header">
-            <strong>Camera &amp; Sensitivity</strong>
-            <span class="settings-hint">Orbit &amp; Zoom Controls</span>
-          </div>
-
-          <div class="settings-control-group">
-            <div class="settings-control-header">
-              <span>Orbit Sensitivity</span>
-              <span class="settings-value-badge" id="valOrbitSens">1.0x</span>
-            </div>
-            <input type="range" class="settings-slider" id="sliderOrbitSens" min="0.3" max="2.5" step="0.1" value="1.0">
-          </div>
-
-          <div class="settings-control-group">
-            <div class="settings-control-header">
-              <span>Zoom Sensitivity</span>
-              <span class="settings-value-badge" id="valZoomSens">1.0x</span>
-            </div>
-            <input type="range" class="settings-slider" id="sliderZoomSens" min="0.3" max="2.5" step="0.1" value="1.0">
-          </div>
-
-          <div class="settings-control-group">
-            <div class="settings-control-header">
-              <span>Auto Orbit Speed</span>
-              <span class="settings-value-badge" id="valOrbitSpeed">1.0x</span>
-            </div>
-            <input type="range" class="settings-slider" id="sliderOrbitSpeed" min="0.2" max="3.0" step="0.1" value="1.0">
-          </div>
-
-          <!-- Thread Luminosity -->
-          <div class="settings-control-group">
-            <div class="settings-control-header">
-              <span>Thread Luminosity</span>
-              <span class="settings-value-badge" id="valLuminosity">55%</span>
-            </div>
-            <input type="range" class="settings-slider" id="sliderLuminosity" min="20" max="100" step="5" value="55">
-          </div>
-
-          <div class="settings-toggle-row">
-            <div>
-              <strong style="font-size:12.5px; display:block;">Moving Starfield</strong>
-              <span style="font-size:11px; color:var(--text-muted);">3D cosmic stars in background</span>
-            </div>
-            <div class="toggle-switch active" id="toggleStars">
-              <div class="toggle-thumb"></div>
-            </div>
-          </div>
-
-          <button type="button" class="btn" id="btnResetSettings" style="margin-top:4px; font-size:11.5px;">Reset to Defaults</button>
-        </div>
-
-        <div class="settings-divider"></div>
-
-        <!-- Developer Contact & Feedback -->
-        <div class="settings-section">
-          <div class="settings-section-header">
-            <strong>Report an Issue / Feedback</strong>
+            <strong>Send Feedback / Report Issue</strong>
             <span class="settings-hint">Bug, UI glitch, or suggestion</span>
           </div>
 
           <div class="settings-issue-box">
             <div class="issue-form-group">
               <input type="text" id="issueSubjectInput" class="issue-input" placeholder="Topic (e.g. Mobile Layout Glitch, Feature Request)" value="SynapseLab Feedback">
-              <textarea id="issueBodyInput" class="issue-textarea" rows="3" placeholder="Describe the issue, device type, or ideas..."></textarea>
+              <textarea id="issueBodyInput" class="issue-textarea" rows="4" placeholder="Describe the issue, device type, or ideas..."></textarea>
             </div>
 
             <button type="button" class="btn btn-report-warning" id="btnSendIssueEmail" style="width:100%; justify-content:center; gap:8px;">
@@ -497,65 +442,6 @@ epochs = 300</textarea>
             </button>
           </div>
         </div>
-
-        <div class="settings-divider"></div>
-
-        <!-- Export & Downloads -->
-        <div class="settings-section">
-          <div class="settings-section-header">
-            <strong>Export &amp; Downloads</strong>
-            <span class="settings-hint">Python script &amp; 3D network snapshot</span>
-          </div>
-
-          <div class="settings-btn-row">
-            <button type="button" class="btn" id="btnSettingsDownloadCode" style="flex:1; justify-content:center; gap:6px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              <span>Download Code (.py)</span>
-            </button>
-            <button type="button" class="btn" id="btnSettingsSaveImage" style="flex:1; justify-content:center; gap:6px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                <circle cx="12" cy="13" r="4"/>
-              </svg>
-              <span>Save Screen Image (.png)</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="settings-divider"></div>
-
-        <!-- Share Options -->
-        <div class="settings-section">
-          <div class="settings-section-header">
-            <strong>Share Simulator</strong>
-            <span class="settings-hint">Direct link</span>
-          </div>
-
-          <button type="button" class="btn" id="btnSettingsShareLink" style="width:100%; justify-content:center; gap:8px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
-            </svg>
-            <span id="settingsShareCopyText">Copy Direct Link</span>
-          </button>
-        </div>
-
-        <div class="settings-divider"></div>
-
-        <!-- Combined Privacy Policy & Terms Link -->
-        <div class="settings-section">
-          <div class="settings-section-header">
-            <strong>Legal &amp; Policy</strong>
-            <span class="settings-hint">Zero Tracking - MIT License</span>
-          </div>
-          <button type="button" class="btn open-legal-trigger" id="btnSettingsOpenLegal" style="width:100%; justify-content:center;">
-            <span>View Privacy Policy &amp; Terms of Service</span>
-          </button>
-        </div>
       </div>
     </div>
   </div>
@@ -566,6 +452,11 @@ epochs = 300</textarea>
       <div class="modal-header">
         <h3 class="modal-title" id="coffeeModalTitle">Support Developer</h3>
         <button class="modal-close-btn" id="btnCloseCoffee" type="button" aria-label="Close modal">&times;</button>
+      </div>
+
+      <!-- Live UPI QR Code -->
+      <div class="snack-qr-pad" style="display:flex; justify-content:center; align-items:center; padding:12px; background:var(--surface-alt); border:1px solid var(--border); border-radius:8px; margin-bottom:12px;">
+        <img id="snackQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&amp;format=svg&amp;data=upi%3A%2F%2Fpay%3Fpa%3DPurohit2009%40fam%26pn%3DShivam%26am%3D50%26cu%3DINR" alt="UPI Payment QR Code" width="136" height="136" style="border-radius:4px; background:#ffffff; padding:6px; display:block;">
       </div>
 
       <div class="snack-upi-copy" id="snackUpiCopyBtn" title="Click to copy UPI ID">

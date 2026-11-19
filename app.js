@@ -1397,14 +1397,8 @@ epochs = ${config.epochs || 300}`;
   const btnSaveImage = document.getElementById('btnSaveImage');
   if (btnSaveImage) attachTap(btnSaveImage, downloadNetworkImage);
 
-  const btnSettingsDownloadCode = document.getElementById('btnSettingsDownloadCode');
-  if (btnSettingsDownloadCode) attachTap(btnSettingsDownloadCode, downloadCodeFile);
-
-  const btnSettingsSaveImage = document.getElementById('btnSettingsSaveImage');
-  if (btnSettingsSaveImage) attachTap(btnSettingsSaveImage, downloadNetworkImage);
-
   // ---------------------------------------------------------------------------
-  // 8. SETTINGS & REPORT ISSUE MODAL (Minimal One-Click Design)
+  // 8. SETTINGS MODAL (Single-purpose Feedback / Report Issue)
   // ---------------------------------------------------------------------------
   const settingsModal = document.getElementById('settingsModal');
   const btnOpenSettings = document.getElementById('btnOpenSettings');
@@ -1425,7 +1419,12 @@ epochs = ${config.epochs || 300}`;
   const btnCloseShare = document.getElementById('btnCloseShare');
   const btnCloseLegal = document.getElementById('btnCloseLegal');
 
-  if (btnOpenCoffee) btnOpenCoffee.addEventListener('click', () => coffeeModal.classList.add('active'));
+  if (btnOpenCoffee) {
+    btnOpenCoffee.addEventListener('click', () => {
+      updateCoffeeQr(snackAmountInput ? snackAmountInput.value : 50);
+      if (coffeeModal) coffeeModal.classList.add('active');
+    });
+  }
   if (btnCloseCoffee) btnCloseCoffee.addEventListener('click', () => coffeeModal.classList.remove('active'));
 
   if (btnCloseShare) btnCloseShare.addEventListener('click', () => shareModal.classList.remove('active'));
@@ -1546,102 +1545,9 @@ epochs = ${config.epochs || 300}`;
     });
   }
 
-  // Settings Modal: Sensitivity Sliders & Starfield Controls
-  const sliderOrbitSens = document.getElementById('sliderOrbitSens');
-  const valOrbitSens = document.getElementById('valOrbitSens');
-  const sliderZoomSens = document.getElementById('sliderZoomSens');
-  const valZoomSens = document.getElementById('valZoomSens');
-  const sliderOrbitSpeed = document.getElementById('sliderOrbitSpeed');
-  const valOrbitSpeed = document.getElementById('valOrbitSpeed');
-  const toggleStars = document.getElementById('toggleStars');
-  const btnResetSettings = document.getElementById('btnResetSettings');
-
-  if (sliderOrbitSens && valOrbitSens) {
-    sliderOrbitSens.value = settings.orbitSensitivity || 1.0;
-    valOrbitSens.textContent = (settings.orbitSensitivity || 1.0).toFixed(1) + 'x';
-    sliderOrbitSens.addEventListener('input', () => {
-      settings.orbitSensitivity = parseFloat(sliderOrbitSens.value);
-      valOrbitSens.textContent = settings.orbitSensitivity.toFixed(1) + 'x';
-      saveSettings();
-    });
-  }
-
-  if (sliderZoomSens && valZoomSens) {
-    sliderZoomSens.value = settings.zoomSensitivity || 1.0;
-    valZoomSens.textContent = (settings.zoomSensitivity || 1.0).toFixed(1) + 'x';
-    sliderZoomSens.addEventListener('input', () => {
-      settings.zoomSensitivity = parseFloat(sliderZoomSens.value);
-      valZoomSens.textContent = settings.zoomSensitivity.toFixed(1) + 'x';
-      saveSettings();
-    });
-  }
-
-  if (sliderOrbitSpeed && valOrbitSpeed) {
-    sliderOrbitSpeed.value = settings.orbitSpeed || 1.0;
-    valOrbitSpeed.textContent = (settings.orbitSpeed || 1.0).toFixed(1) + 'x';
-    sliderOrbitSpeed.addEventListener('input', () => {
-      settings.orbitSpeed = parseFloat(sliderOrbitSpeed.value);
-      valOrbitSpeed.textContent = settings.orbitSpeed.toFixed(1) + 'x';
-      saveSettings();
-    });
-  }
-
-  const sliderLuminosity = document.getElementById('sliderLuminosity');
-  const valLuminosity = document.getElementById('valLuminosity');
-
-  if (sliderLuminosity && valLuminosity) {
-    sliderLuminosity.value = Math.round((settings.threadLuminosity || 0.55) * 100);
-    valLuminosity.textContent = Math.round((settings.threadLuminosity || 0.55) * 100) + '%';
-    sliderLuminosity.addEventListener('input', () => {
-      settings.threadLuminosity = parseFloat(sliderLuminosity.value) / 100;
-      valLuminosity.textContent = sliderLuminosity.value + '%';
-      saveSettings();
-    });
-  }
-
-  if (toggleStars) {
-    toggleStars.classList.toggle('active', settings.enableStarfield !== false);
-    toggleStars.addEventListener('click', () => {
-      const active = toggleStars.classList.toggle('active');
-      settings.enableStarfield = active;
-      saveSettings();
-    });
-  }
-
-  if (btnResetSettings) {
-    attachTap(btnResetSettings, () => {
-      settings = Object.assign({}, DEFAULT_SETTINGS);
-      saveSettings();
-      if (sliderOrbitSens) sliderOrbitSens.value = 1.0;
-      if (valOrbitSens) valOrbitSens.textContent = '1.0x';
-      if (sliderZoomSens) sliderZoomSens.value = 1.0;
-      if (valZoomSens) valZoomSens.textContent = '1.0x';
-      if (sliderOrbitSpeed) sliderOrbitSpeed.value = 1.0;
-      if (valOrbitSpeed) valOrbitSpeed.textContent = '1.0x';
-      if (sliderLuminosity) sliderLuminosity.value = 55;
-      if (valLuminosity) valLuminosity.textContent = '55%';
-      if (toggleStars) toggleStars.classList.add('active');
-    });
-  }
-
-  // Settings Modal: Share Simulator Direct Link
-  const btnSettingsShareLink = document.getElementById('btnSettingsShareLink');
-  const settingsShareCopyText = document.getElementById('settingsShareCopyText');
-
-  if (btnSettingsShareLink) {
-    attachTap(btnSettingsShareLink, async () => {
-      try {
-        await navigator.clipboard.writeText('https://synapselab.devs.li');
-        if (settingsShareCopyText) {
-          const original = settingsShareCopyText.textContent;
-          settingsShareCopyText.textContent = 'Link Copied!';
-          setTimeout(() => { settingsShareCopyText.textContent = original; }, 1800);
-        }
-      } catch (err) {}
-    });
-  }
-
-  // Settings Modal: Email Feedback & Reporting
+  // ---------------------------------------------------------------------------
+  // 10. SETTINGS MODAL: EMAIL FEEDBACK & ISSUE REPORTING
+  // ---------------------------------------------------------------------------
   const btnSendIssueEmail = document.getElementById('btnSendIssueEmail');
   const issueSubjectInput = document.getElementById('issueSubjectInput');
   const issueBodyInput = document.getElementById('issueBodyInput');
@@ -1650,19 +1556,10 @@ epochs = ${config.epochs || 300}`;
   if (btnSendIssueEmail) {
     attachTap(btnSendIssueEmail, () => {
       const topic = (issueSubjectInput && issueSubjectInput.value.trim()) || 'SynapseLab Feedback / Issue Report';
-      const userNotes = (issueBodyInput && issueBodyInput.value.trim()) || '[Describe issue here]';
+      const userNotes = (issueBodyInput && issueBodyInput.value.trim()) || '[Describe issue or feedback here]';
       const userText = `Hi Bhagyesh,\n\nI am reporting an issue / sharing feedback on SynapseLab:\n\n${userNotes}\n\n---\nPlatform: https://synapselab.devs.li\nUser-Agent: ${navigator.userAgent}`;
       const mailtoUrl = `mailto:${DEV_EMAIL}?subject=${encodeURIComponent(topic)}&body=${encodeURIComponent(userText)}`;
       window.location.href = mailtoUrl;
-    });
-  }
-
-  // Settings Modal: Legal Policy Trigger
-  const btnSettingsOpenLegal = document.getElementById('btnSettingsOpenLegal');
-  if (btnSettingsOpenLegal) {
-    attachTap(btnSettingsOpenLegal, () => {
-      if (settingsModal) settingsModal.classList.remove('active');
-      if (legalModal) legalModal.classList.add('active');
     });
   }
 
