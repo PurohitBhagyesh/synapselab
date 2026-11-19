@@ -2,45 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="dark light">
-  <title>SynapseLab — 3D Neural Network Studio for Students</title>
+  <title>SynapseLab — Interactive 3D Neural Network Studio for Students</title>
   <style>
     :root {
       color-scheme: dark;
       --bg: #070b14;
       --surface: #0f172a;
-      --surface-elevated: #1e293b;
-      --border: rgba(56, 189, 248, 0.22);
-      --border-focus: #38bdf8;
-      --cyan: #38bdf8;
+      --surface-alt: #1e293b;
+      --border: rgba(56, 189, 248, 0.2);
+      --border-strong: rgba(56, 189, 248, 0.4);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
       --emerald: #34d399;
       --amber: #fbbf24;
       --rose: #f43f5e;
       --text: #f8fafc;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
-      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      accent-color: var(--cyan);
+      accent-color: var(--accent);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-    body {
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
       background-color: var(--bg);
       color: var(--text);
       font-family: var(--font-sans);
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
+    }
+
+    body {
       display: flex;
       flex-direction: column;
     }
 
-    /* Top Navigation Bar */
+    /* Top Navigation Header */
     header {
       height: 52px;
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(15, 23, 42, 0.88);
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(16px);
       display: flex;
@@ -50,6 +55,7 @@
       z-index: 50;
       flex-shrink: 0;
     }
+
     .brand {
       display: flex;
       align-items: center;
@@ -57,195 +63,130 @@
       font-family: var(--font-mono);
       font-weight: 800;
       font-size: 15px;
-      color: var(--cyan);
+      color: var(--accent);
       letter-spacing: 0.5px;
     }
+
     .brand-beacon {
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: var(--cyan);
-      box-shadow: 0 0 12px var(--cyan);
-      animation: pulse-glow 2s infinite ease-in-out;
-    }
-    @keyframes pulse-glow {
-      0%, 100% { opacity: 0.8; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
-    }
-    .badge-student {
-      font-size: 10px;
-      text-transform: uppercase;
-      padding: 2px 7px;
-      border-radius: 4px;
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      color: var(--cyan);
-      font-family: var(--font-mono);
-      font-weight: 600;
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent);
+      animation: pulse-beacon 2s infinite ease-in-out;
     }
 
-    /* Mode Navigation Tabs */
-    .tabs-nav {
-      display: flex;
-      gap: 6px;
-      background: rgba(7, 11, 20, 0.6);
-      padding: 3px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    @keyframes pulse-beacon {
+      0%, 100% { opacity: 0.9; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
     }
-    .tab-btn {
+
+    .brand-tag {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    /* Mobile Segmented Toggle (Visible only on mobile/narrow screens) */
+    .mobile-tab-switch {
+      display: none;
+      background: rgba(7, 11, 20, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+    }
+
+    .mobile-tab-btn {
       background: transparent;
       border: none;
       color: var(--text-muted);
-      padding: 6px 14px;
+      padding: 5px 12px;
       border-radius: 6px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       transition: all 0.15s ease;
-      font-family: var(--font-sans);
     }
-    .tab-btn:hover {
+
+    .mobile-tab-btn.active {
       color: var(--text);
-      background: rgba(255, 255, 255, 0.05);
-    }
-    .tab-btn.active {
-      color: var(--text);
-      background: var(--surface-elevated);
+      background: var(--surface-alt);
       border: 1px solid var(--border);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     }
 
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
+
     .btn-action {
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      color: var(--cyan);
-      padding: 6px 12px;
+      background: var(--accent-soft);
+      border: 1px solid var(--border-strong);
+      color: var(--accent);
+      padding: 6px 14px;
       border-radius: 6px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
       font-family: var(--font-mono);
     }
+
     .btn-action:hover {
       background: rgba(56, 189, 248, 0.25);
-      border-color: var(--cyan);
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+      border-color: var(--accent);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+      transform: translateY(-1px);
     }
 
-    /* Main Workspace Container */
+    .btn-train {
+      background: rgba(52, 211, 153, 0.15);
+      border-color: rgba(52, 211, 153, 0.4);
+      color: var(--emerald);
+    }
+    .btn-train:hover {
+      background: rgba(52, 211, 153, 0.25);
+      border-color: var(--emerald);
+      box-shadow: 0 0 12px rgba(52, 211, 153, 0.35);
+    }
+
+    /* Main Split Workspace */
     main {
       flex: 1;
+      display: flex;
       position: relative;
       overflow: hidden;
-      display: flex;
-    }
-
-    /* Screen Views */
-    .view-panel {
-      position: absolute;
-      inset: 0;
-      display: none;
-      flex-direction: column;
-    }
-    .view-panel.active {
-      display: flex;
-    }
-
-    /* =========================================================================
-       VIEW 1: 3D NEURAL UNIVERSE
-       ========================================================================= */
-    #canvas3d {
       width: 100%;
-      height: 100%;
-      display: block;
-      cursor: grab;
-    }
-    #canvas3d:active { cursor: grabbing; }
-
-    .universe-hud {
-      position: absolute;
-      top: 14px;
-      left: 14px;
-      pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      z-index: 20;
-    }
-    .glass-card {
-      background: rgba(15, 23, 42, 0.78);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(14px);
-      padding: 12px 16px;
-      border-radius: 10px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.6);
-      pointer-events: auto;
-    }
-    .telemetry-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-    .telemetry-val {
-      font-weight: 700;
-      color: var(--cyan);
     }
 
-    .universe-controls {
-      position: absolute;
-      bottom: 14px;
-      left: 14px;
-      z-index: 20;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .control-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 11px;
-      font-family: var(--font-mono);
-      color: var(--text-muted);
-    }
-    .control-row label { width: 100px; }
-
-    /* =========================================================================
-       VIEW 2: CODE & ARCHITECTURE STUDIO (SPLIT SCREEN)
-       ========================================================================= */
-    .studio-container {
-      width: 100%;
-      height: 100%;
-      display: flex;
-    }
-    .editor-pane {
-      width: 480px;
+    /* Left Side: Student Code Studio */
+    .split-editor {
+      width: 440px;
       background: var(--surface);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      z-index: 10;
+      z-index: 20;
       flex-shrink: 0;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .editor-header {
+
+    .editor-top-bar {
       padding: 10px 14px;
-      background: rgba(7, 11, 20, 0.5);
+      background: rgba(7, 11, 20, 0.6);
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
@@ -254,946 +195,1135 @@
       font-size: 12px;
       color: var(--text-muted);
     }
-    .code-textarea {
+
+    .preset-chips {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      padding: 8px 12px;
+      background: rgba(15, 23, 42, 0.4);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .preset-chip-btn {
+      background: var(--surface-alt);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .preset-chip-btn:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .preset-chip-btn.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .editor-body {
       flex: 1;
+      position: relative;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .code-input {
       width: 100%;
+      height: 100%;
       background: transparent;
       color: #7dd3fc;
       border: none;
       padding: 16px;
       font-family: var(--font-mono);
-      font-size: 13px;
-      line-height: 1.6;
+      font-size: 13.5px;
+      line-height: 1.65;
       resize: none;
       outline: none;
       white-space: pre;
+      overflow-y: auto;
+      scrollbar-color: var(--surface-alt) transparent;
+      scrollbar-width: thin;
     }
+
     .editor-footer {
-      padding: 12px 14px;
+      padding: 10px 14px;
       border-top: 1px solid var(--border);
-      background: rgba(7, 11, 20, 0.5);
+      background: rgba(7, 11, 20, 0.7);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
     }
-    .preview-pane {
+
+    /* Right Side: 3D Thread Visualizer */
+    .split-visualizer {
       flex: 1;
       position: relative;
-      display: flex;
-      flex-direction: column;
       background: var(--bg);
+      overflow: hidden;
+      display: flex;
     }
-    #studioCanvas {
+
+    #canvas3d {
       width: 100%;
       height: 100%;
       display: block;
-      cursor: crosshair;
+      cursor: grab;
+      touch-action: none;
+    }
+    #canvas3d:active { cursor: grabbing; }
+
+    /* Top Left Overlay Card */
+    .vis-hud-top {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 10;
     }
 
-    /* Training Simulation HUD */
-    .loss-chart-box {
+    .glass-hud {
+      background: rgba(15, 23, 42, 0.78);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+      padding: 10px 14px;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      pointer-events: auto;
+    }
+
+    .hud-header {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+    }
+
+    .hud-metrics {
+      display: flex;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .metric-val {
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    /* Floating Loss Monitor Box */
+    .loss-hud-box {
       position: absolute;
       top: 14px;
       right: 14px;
-      width: 220px;
-      background: rgba(15, 23, 42, 0.85);
+      width: 200px;
+      background: rgba(15, 23, 42, 0.82);
       border: 1px solid var(--border);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(14px);
       border-radius: 8px;
-      padding: 10px;
+      padding: 8px 12px;
+      z-index: 10;
       font-family: var(--font-mono);
       font-size: 11px;
+      display: none;
     }
+    .loss-hud-box.visible { display: block; }
+
     #lossCanvas {
       width: 100%;
-      height: 70px;
-      display: block;
+      height: 55px;
       margin-top: 6px;
-      background: rgba(7, 11, 20, 0.6);
+      background: rgba(7, 11, 20, 0.7);
+      border-radius: 4px;
+      display: block;
+    }
+
+    /* Hover Thread Telemetry Banner (Bottom Center of 3D pane) */
+    .thread-tooltip-banner {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid var(--accent);
+      backdrop-filter: blur(14px);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(56, 189, 248, 0.25);
+      z-index: 15;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* =========================================================================
+       BUY ME A COFFEE / SUPPORT WIDGET (Bottom-Left Corner - From openlid)
+       ========================================================================= */
+    .snack-widget {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 9002;
+      font-family: var(--font-sans);
+    }
+
+    .snack-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .snack-pill:hover {
+      background-color: var(--surface-alt);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .snack-icon {
+      color: var(--amber);
+      flex-shrink: 0;
+    }
+
+    .snack-card {
+      position: absolute;
+      bottom: 48px;
+      left: 0;
+      width: 320px;
+      background-color: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      animation: snackPop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .snack-card.active { display: flex; }
+
+    @keyframes snackPop {
+      from { opacity: 0; transform: translateY(8px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .snack-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 10px;
+    }
+
+    .snack-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .snack-upi-copy {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .snack-upi-copy:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .snack-upi-copy code {
+      font-family: var(--font-mono);
+    }
+
+    .snack-close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      line-height: 1;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px 6px;
       border-radius: 4px;
     }
 
-    /* =========================================================================
-       VIEW 3: 2D SYNAPSE INSPECTOR
-       ========================================================================= */
-    .inspector-container {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-    }
-    #inspectorCanvas {
-      flex: 1;
-      width: 100%;
-      display: block;
-      cursor: crosshair;
-    }
-    .inspector-hud {
-      height: 48px;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-    }
-
-    /* =========================================================================
-       VIEW 4: STUDENT INTERACTIVE LESSONS
-       ========================================================================= */
-    .lessons-container {
-      width: 100%;
-      height: 100%;
-      overflow-y: auto;
-      padding: 30px;
-      display: flex;
-      justify-content: center;
-    }
-    .lessons-content {
-      max-width: 900px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      padding-bottom: 60px;
-    }
-    .lesson-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    }
-    .lesson-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--cyan);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .lesson-text {
-      color: #cbd5e1;
-      font-size: 14px;
-      line-height: 1.7;
-      margin-bottom: 16px;
-    }
-    .interactive-demo-box {
-      background: rgba(7, 11, 20, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 8px;
-      padding: 16px;
+    .snack-card-body {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
-    .math-formula {
-      font-family: var(--font-mono);
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      padding: 10px 14px;
-      border-radius: 6px;
-      color: var(--emerald);
-      font-size: 13px;
+
+    .snack-qr-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
     }
 
-    /* Bottom Global Status Bar */
-    footer {
-      height: 32px;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
+    .snack-qr-pad {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 8px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      font-family: var(--font-mono);
+      justify-content: center;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      min-height: 140px;
+      width: 140px;
+    }
+
+    .snack-qr-pad img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .snack-qr-caption {
       font-size: 11px;
-      color: var(--text-dim);
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .snack-input-wrap {
+      display: flex;
+      align-items: center;
+      background-color: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0 12px;
+      height: 38px;
+    }
+
+    .currency-symbol {
+      font-size: 15px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-right: 6px;
+    }
+
+    #snackAmountInput {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      width: 100%;
+    }
+
+    .snack-presets {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .preset-chip {
+      background-color: var(--surface-alt);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 0;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .preset-chip:hover {
+      background-color: var(--surface);
+      border-color: var(--border-strong);
+      color: var(--text);
+    }
+
+    .preset-chip.active {
+      background-color: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* UPI Multi-App Grid */
+    .upi-chooser-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .upi-chooser-header {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .upi-apps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .upi-app-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 8px 4px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .upi-app-btn:hover {
+      background: var(--surface);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .upi-app-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .fam-badge { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .amz-badge { background: linear-gradient(135deg, #232f3e, #131921); color: #ff9900; border: 1px solid rgba(255,153,0,0.4); }
+    .pe-badge { background: linear-gradient(135deg, #5f259f, #7c3aed); }
+    .gpay-badge { background: linear-gradient(135deg, #4285f4, #0f9d58); }
+    .paytm-badge { background: linear-gradient(135deg, #00b9f5, #002e6e); }
+    .wa-badge { background: linear-gradient(135deg, #25d366, #128c7e); }
+
+    .no-upi-alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background-color: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 11px;
+      color: #ef4444;
+    }
+
+    /* =========================================================================
+       SHARE WIDGET (Bottom-Right Corner - From openlid)
+       ========================================================================= */
+    .share-widget {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9002;
+      font-family: var(--font-sans);
+    }
+
+    .share-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .share-pill:hover {
+      background-color: var(--surface-alt);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .share-pill-icon {
+      color: var(--accent);
       flex-shrink: 0;
     }
-    .footer-left, .footer-right {
+
+    .share-card {
+      position: absolute;
+      bottom: 48px;
+      right: 0;
+      width: 290px;
+      background-color: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      animation: snackPop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .share-card.active { display: flex; }
+
+    .share-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 10px;
+    }
+
+    .share-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .share-card-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .share-close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .share-line-item {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
+      width: 100%;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
     }
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--emerald);
-      box-shadow: 0 0 6px var(--emerald);
+
+    .share-line-item:hover {
+      background: var(--surface);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .share-item-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .share-item-text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .share-item-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .share-item-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .share-item-action {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* Desktop Hover Trigger (Fine pointer) */
+    @media (hover: hover) and (pointer: fine) {
+      .snack-widget:hover .snack-card { display: flex; }
+      .share-widget:hover .share-card { display: flex; }
+    }
+
+    /* =========================================================================
+       RESPONSIVE MOBILE BREAKPOINT (<= 768px)
+       ========================================================================= */
+    @media (max-width: 768px) {
+      .mobile-tab-switch { display: inline-flex; }
+      
+      main {
+        flex-direction: column;
+      }
+
+      .split-editor {
+        width: 100%;
+        height: 100%;
+        border-right: none;
+        display: flex;
+      }
+
+      .split-visualizer {
+        width: 100%;
+        height: 100%;
+        display: none;
+      }
+
+      /* When toggled to 3D visualizer on mobile */
+      main.mobile-show-vis .split-editor { display: none; }
+      main.mobile-show-vis .split-visualizer { display: flex; }
+
+      .snack-widget {
+        left: 12px;
+        bottom: max(14px, env(safe-area-inset-bottom));
+      }
+      .share-widget {
+        right: 12px;
+        bottom: max(14px, env(safe-area-inset-bottom));
+      }
+
+      .snack-card {
+        width: 300px;
+        bottom: 44px;
+        left: 0;
+      }
+      .share-card {
+        width: 275px;
+        bottom: 44px;
+        right: 0;
+      }
+
+      .snack-pill, .share-pill {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Header -->
+  <!-- Top Navigation Bar -->
   <header>
     <div class="brand">
       <div class="brand-beacon"></div>
-      <span>SYNAPSE<span style="color:#ffffff;">LAB</span></span>
-      <span class="badge-student">Student Studio</span>
+      <span>SYNAPSE<span style="color:#fff;">LAB</span></span>
+      <span class="brand-tag">Student Mode</span>
     </div>
 
-    <nav class="tabs-nav">
-      <button class="tab-btn active" data-tab="universe">
-        <span>🌐</span> 3D Universe
+    <!-- Mobile Switcher (Code vs 3D Threads) -->
+    <div class="mobile-tab-switch">
+      <button class="mobile-tab-btn active" id="btnMobCode">
+        <span>💻</span> Code
       </button>
-      <button class="tab-btn" data-tab="studio">
-        <span>⚡</span> Code Studio
+      <button class="mobile-tab-btn" id="btnMobVis">
+        <span>🌐</span> 3D Threads
       </button>
-      <button class="tab-btn" data-tab="inspector">
-        <span>🔍</span> Synapse Inspector
-      </button>
-      <button class="tab-btn" data-tab="lessons">
-        <span>📚</span> Student Lessons
-      </button>
-    </nav>
+    </div>
 
+    <!-- Header Actions -->
     <div class="header-actions">
-      <button class="btn-action" id="trainSimBtn">
-        <span>▶</span> Train Live
+      <button class="btn-action" id="btnRebuild">
+        <span>⚡</span> Run Code
       </button>
-      <button class="btn-action" id="exportCodeBtn">
-        <span>💾</span> Export Python
+      <button class="btn-action btn-train" id="btnTrain">
+        <span>▶</span> Train Live
       </button>
     </div>
   </header>
 
-  <!-- Main Viewports Container -->
-  <main>
+  <!-- Main Split Screen Workspace -->
+  <main id="mainWorkspace">
 
-    <!-- ===================================================================
-         VIEW 1: 3D NEURAL UNIVERSE (VIRAL SCREENSHOT RECREATION)
-         =================================================================== -->
-    <section class="view-panel active" id="universePanel">
+    <!-- LEFT SCREEN: Student Code Editor -->
+    <section class="split-editor">
+      <div class="editor-top-bar">
+        <span>student_network.py</span>
+        <span style="color:var(--emerald); font-weight:600;">● Active</span>
+      </div>
+
+      <!-- Quick Preset Architectures -->
+      <div class="preset-chips">
+        <button class="preset-chip-btn active" data-cfg="[2, 4, 3, 1]">Beginner [2, 4, 3, 1]</button>
+        <button class="preset-chip-btn" data-cfg="[2, 3, 1]">Minimal [2, 3, 1]</button>
+        <button class="preset-chip-btn" data-cfg="[3, 5, 2]">Classifier [3, 5, 2]</button>
+        <button class="preset-chip-btn" data-cfg="[2, 6, 4, 1]">Exam Model [2, 6, 4, 1]</button>
+      </div>
+
+      <div class="editor-body">
+        <textarea class="code-input" id="studentCode" spellcheck="false">
+# ==========================================================
+# 🧠 Student Neural Network Definition
+# ==========================================================
+# Scenario: Predict Student Final Exam Score (0 to 100)
+# Input Features: [Study Hours, Practice Tests]
+
+# 1. Define Network Layers
+# [2 Inputs] -> [4 Hidden Neurons] -> [3 Hidden Neurons] -> [1 Output]
+layers = [2, 4, 3, 1]
+
+# 2. Hyperparameters
+activation = "relu"     # Non-linear activation function
+learning_rate = 0.05    # Gradient descent step size
+epochs = 200            # Training rounds
+
+print(f"Neural Network initialized with {len(layers)} layers!")
+# Try changing layers to [2, 3, 1] or [3, 5, 2] above
+# and watch the 3D threads update smoothly in real time!
+</textarea>
+      </div>
+
+      <div class="editor-footer">
+        <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">
+          Auto-syncs on edit
+        </span>
+        <button class="btn-action" id="btnResetCode" style="font-size:11px; padding:4px 10px; background:transparent; border-color:var(--border); color:var(--text-muted);">
+          Reset Code
+        </button>
+      </div>
+    </section>
+
+    <!-- RIGHT SCREEN: Smooth 3D Thread Visualizer -->
+    <section class="split-visualizer">
       <canvas id="canvas3d"></canvas>
 
-      <!-- 3D Overlay HUD -->
-      <div class="universe-hud">
-        <div class="glass-card">
-          <div style="font-size:13px; font-weight:800; color:var(--cyan); margin-bottom:4px;">
-            HERO LAYER: HL 4 (27 NEURONS)
+      <!-- 3D HUD (Top Left) -->
+      <div class="vis-hud-top">
+        <div class="glass-hud">
+          <div class="hud-header">
+            <span>●</span> 3D SYNAPTIC THREADS
           </div>
-          <div class="telemetry-row">
-            <span>Activation: <span class="telemetry-val">ReLU</span></span>
-            <span>Total Layers: <span class="telemetry-val" id="hudLayerCount">5</span></span>
-            <span>Curved Filaments: <span class="telemetry-val" id="hudFilamentCount">512</span></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3D Controls -->
-      <div class="universe-controls">
-        <div class="glass-card">
-          <div class="control-row" style="margin-bottom:8px;">
-            <button class="btn-action" id="autoRotateToggle" style="padding:4px 10px; font-size:11px;">
-              ⟳ Auto-Rotate: ON
-            </button>
-            <button class="btn-action" id="resetCamToggle" style="padding:4px 10px; font-size:11px; background:rgba(255,255,255,0.05); color:var(--text-muted); border-color:rgba(255,255,255,0.1);">
-              Reset View
-            </button>
-          </div>
-          <div class="control-row">
-            <label>Wave Speed:</label>
-            <input type="range" id="waveSpeedSlider" min="0.2" max="3" step="0.1" value="1.5" style="width:110px;">
-          </div>
-          <div class="control-row">
-            <label>Fiber Spread:</label>
-            <input type="range" id="fiberSpreadSlider" min="2" max="12" step="0.5" value="7" style="width:110px;">
+          <div class="hud-metrics">
+            <span>Layers: <span class="metric-val" id="visLayerCount">4</span></span>
+            <span>Total Neurons: <span class="metric-val" id="visNodeCount">10</span></span>
+            <span>Synaptic Threads: <span class="metric-val" id="visThreadCount">23</span></span>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- ===================================================================
-         VIEW 2: CODE & ARCHITECTURE STUDIO
-         =================================================================== -->
-    <section class="view-panel" id="studioPanel">
-      <div class="studio-container">
-        <!-- Code Editor Pane -->
-        <div class="editor-pane">
-          <div class="editor-header">
-            <span>// model_architecture.py</span>
-            <div style="display:flex; gap:6px;">
-              <select id="presetSelector" style="background:#070b14; color:var(--cyan); border:1px solid var(--border); font-size:11px; border-radius:4px; padding:2px 6px; font-family:var(--font-mono);">
-                <option value="hero">Preset: Hero 27-Neuron Net</option>
-                <option value="exam">Preset: Student Score Predictor [2,8,4,1]</option>
-                <option value="classifier">Preset: Classifier [3,6,6,2]</option>
-                <option value="deep">Preset: Deep Bottleneck [4,12,6,12,2]</option>
-              </select>
-            </div>
-          </div>
-
-          <textarea class="code-textarea" id="modelCodeEditor" spellcheck="false">
-# SynapseLab Neural Architecture Definition
-import numpy as np
-
-# Network Layer Topology: [Input, Hidden1, Hidden2, Hidden3, Output]
-layers = [10, 18, 22, 27, 8]
-
-# Hyperparameters
-activation = "relu"        # Options: "relu", "sigmoid", "tanh"
-learning_rate = 0.03       # Learning Rate (eta)
-loss_function = "mse"      # Mean Squared Error
-epochs = 500               # Training Iterations
-
-# Features: Study Hours, Practice Tests, Labs...
-print(f"Network initialized with {len(layers)} layers.")
-</textarea>
-
-          <div class="editor-footer">
-            <button class="btn-action" id="applyCodeBtn" style="flex:1; justify-content:center;">
-              ⚡ Rebuild & Run Network
-            </button>
-            <button class="btn-action" id="startTrainBtn" style="background:rgba(52, 211, 153, 0.15); color:var(--emerald); border-color:rgba(52, 211, 153, 0.4);">
-              ▶ Train Live
-            </button>
-          </div>
+      <!-- Live Loss Chart HUD (Top Right) -->
+      <div class="loss-hud-box" id="lossHudBox">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:var(--text-muted);">TRAINING LOSS</span>
+          <span id="lossValDisplay" style="color:var(--emerald); font-weight:bold;">0.0124</span>
         </div>
-
-        <!-- 3D Preview Pane -->
-        <div class="preview-pane">
-          <canvas id="studioCanvas"></canvas>
-
-          <!-- Training Loss Telemetry HUD -->
-          <div class="loss-chart-box">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:var(--text-muted);">TRAINING LOSS</span>
-              <span id="currentLossVal" style="color:var(--emerald); font-weight:bold;">0.0412</span>
-            </div>
-            <div style="font-size:10px; color:var(--text-dim); margin-top:2px;">
-              Epoch <span id="currentEpochVal">450</span> / 500
-            </div>
-            <canvas id="lossCanvas"></canvas>
-          </div>
-        </div>
+        <canvas id="lossCanvas"></canvas>
       </div>
-    </section>
 
-    <!-- ===================================================================
-         VIEW 3: 2D SYNAPSE INSPECTOR
-         =================================================================== -->
-    <section class="view-panel" id="inspectorPanel">
-      <div class="inspector-container">
-        <canvas id="inspectorCanvas"></canvas>
-        <div class="inspector-hud">
-          <div id="inspectorInfo" style="color:var(--text-muted); display:flex; align-items:center; gap:8px;">
-            <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--text-dim);"></span>
-            Hover or touch any connecting thread to reveal Start Dot, Waypoint, End Dot, and Synapse Weight.
-          </div>
-          <div id="inspectorCount" style="color:var(--cyan); font-weight:bold;">
-            52 Synaptic Threads
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================================================================
-         VIEW 4: STUDENT INTERACTIVE LESSONS
-         =================================================================== -->
-    <section class="view-panel" id="lessonsPanel">
-      <div class="lessons-container">
-        <div class="lessons-content">
-
-          <!-- Lesson 1 -->
-          <article class="lesson-card">
-            <div class="lesson-title">
-              <span>01</span> What is an Artificial Neuron & Synapse?
-            </div>
-            <p class="lesson-text">
-              An artificial neuron is inspired by biological brain cells. It receives one or more numeric inputs ($x_1, x_2$), multiplies each input by a learnable strength called a <strong>Weight</strong> ($w_1, w_2$), adds an adjustable baseline called a <strong>Bias</strong> ($b$), and passes the result through an <strong>Activation Function</strong> ($f$).
-            </p>
-            <div class="interactive-demo-box">
-              <div class="math-formula">
-                Formula: &nbsp; z = (w₁ · x₁) + (w₂ · x₂) + b &nbsp; | &nbsp; Output = f(z)
-              </div>
-              <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap; font-size:12px; font-family:var(--font-mono);">
-                <label>Study Hours ($x_1$): <input type="number" id="demoX1" value="6" style="width:50px; background:#070b14; color:var(--cyan); border:1px solid var(--border); padding:2px 4px; border-radius:4px;"></label>
-                <label>Weight ($w_1$): <input type="number" id="demoW1" value="5.5" step="0.5" style="width:50px; background:#070b14; color:var(--cyan); border:1px solid var(--border); padding:2px 4px; border-radius:4px;"></label>
-                <label>Bias ($b$): <input type="number" id="demoBias" value="40" style="width:50px; background:#070b14; color:var(--cyan); border:1px solid var(--border); padding:2px 4px; border-radius:4px;"></label>
-                <span style="color:var(--emerald); font-weight:bold;">Computed Output: <span id="demoResult">73.0</span></span>
-              </div>
-            </div>
-          </article>
-
-          <!-- Lesson 2 -->
-          <article class="lesson-card">
-            <div class="lesson-title">
-              <span>02</span> Activation Functions: Why We Need Non-Linearity
-            </div>
-            <p class="lesson-text">
-              Without activation functions, even a network with 100 hidden layers is mathematically identical to a single linear equation ($y = mx + b$). Non-linear activation functions allow neural networks to bend, curve, and approximate complex real-world patterns like curves, images, and language.
-            </p>
-            <div class="interactive-demo-box">
-              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; font-size:12px; font-family:var(--font-mono);">
-                <div style="background:#070b14; padding:10px; border-radius:6px; border:1px solid rgba(255,255,255,0.08);">
-                  <strong style="color:var(--cyan);">ReLU (Most Popular):</strong><br>
-                  $f(z) = \max(0, z)$<br>
-                  <span style="color:var(--text-muted); font-size:11px;">Fast computation, avoids vanishing gradients.</span>
-                </div>
-                <div style="background:#070b14; padding:10px; border-radius:6px; border:1px solid rgba(255,255,255,0.08);">
-                  <strong style="color:var(--emerald);">Sigmoid:</strong><br>
-                  $f(z) = \frac{1}{1 + e^{-z}}$<br>
-                  <span style="color:var(--text-muted); font-size:11px;">Squashes outputs smoothly between 0 and 1.</span>
-                </div>
-                <div style="background:#070b14; padding:10px; border-radius:6px; border:1px solid rgba(255,255,255,0.08);">
-                  <strong style="color:var(--amber);">Tanh:</strong><br>
-                  $f(z) = \tanh(z)$<br>
-                  <span style="color:var(--text-muted); font-size:11px;">Zero-centered, squashes between -1 and +1.</span>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <!-- Lesson 3 -->
-          <article class="lesson-card">
-            <div class="lesson-title">
-              <span>03</span> The Power of Hidden Layers ("Deep" Learning)
-            </div>
-            <p class="lesson-text">
-              In our 3D visualization, notice the column labeled <strong>HL 4</strong> with 27 neurons. Early layers detect simple low-level details (like single study habits or edges in images). Deeper hidden layers combine those simple signals into abstract high-level understanding (like exam readiness or semantic meaning).
-            </p>
-            <div class="interactive-demo-box">
-              <div class="math-formula">
-                Hierarchical Representation: Inputs ──► Low-Level Features ──► High-Level Concepts ──► Final Decision
-              </div>
-            </div>
-          </article>
-
-          <!-- Lesson 4 -->
-          <article class="lesson-card">
-            <div class="lesson-title">
-              <span>04</span> Backpropagation & Gradient Descent: How It Learns
-            </div>
-            <p class="lesson-text">
-              How does a neural network actually get smarter?
-              <br>1. <strong>Forward Pass</strong>: It makes a prediction ($\hat{y}$).
-              <br>2. <strong>Loss Calculation</strong>: It calculates how far off it was using Mean Squared Error: $\text{Loss} = (y - \hat{y})^2$.
-              <br>3. <strong>Backpropagation</strong>: Using calculus (the chain rule), it calculates which weights caused the mistake.
-              <br>4. <strong>Weight Update</strong>: It nudges every weight in the opposite direction of the slope to decrease the loss:
-            </p>
-            <div class="interactive-demo-box">
-              <div class="math-formula">
-                Update Rule: &nbsp; W := W - (learning_rate · ∂Loss/∂W)
-              </div>
-            </div>
-          </article>
-
-        </div>
+      <!-- Thread Hover Telemetry Banner -->
+      <div class="thread-tooltip-banner" id="threadBanner">
+        <span style="color:var(--amber);" id="tbStart">● Start: In_1</span>
+        <span style="color:var(--text-dim);">──►</span>
+        <span style="color:#c084fc;" id="tbMid">◆ Midpoint</span>
+        <span style="color:var(--text-dim);">──►</span>
+        <span style="color:var(--emerald);" id="tbEnd">● End: H1_2</span>
+        <span style="color:var(--accent); font-weight:bold; margin-left:8px;" id="tbWeight">W: +0.654</span>
       </div>
     </section>
 
   </main>
 
-  <!-- Bottom Telemetry & Status Bar -->
-  <footer>
-    <div class="footer-left">
-      <div style="display:flex; align-items:center; gap:6px;">
-        <span class="status-dot"></span>
-        <span style="color:var(--text); font-weight:600;">SynapseLab Engine</span>
+  <!-- =========================================================================
+       BUY ME A COFFEE / SUPPORT WIDGET (Bottom-Left Corner - From openlid)
+       ========================================================================= -->
+  <div class="snack-widget" id="snackWidget">
+    <button class="snack-pill" id="snackPillBtn" aria-label="Buy me a Coffee" aria-expanded="false">
+      <svg class="snack-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+        <line x1="6" y1="1" x2="6" y2="4"/>
+        <line x1="10" y1="1" x2="10" y2="4"/>
+        <line x1="14" y1="1" x2="14" y2="4"/>
+      </svg>
+      <span>Buy me a Coffee</span>
+    </button>
+
+    <div class="snack-card" id="snackCard" role="dialog" aria-modal="false" aria-label="Support Developer">
+      <div class="snack-card-header">
+        <div>
+          <h3 class="snack-title">Support Developer</h3>
+          <button class="snack-upi-copy" id="snackUpiCopyBtn" type="button" title="Click to copy UPI ID">
+            <code id="snackUpiText">Purohit2009@fam</code>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+          </button>
+        </div>
+        <button class="snack-close-btn" id="snackCloseBtn" type="button" aria-label="Close snack popup">&times;</button>
       </div>
-      <span>Mode: <span style="color:var(--cyan);" id="statusActiveMode">3D Universe</span></span>
-      <span>Total Synaptic Filaments: <span style="color:var(--cyan);" id="statusFilaments">512</span></span>
-    </div>
-    <div class="footer-right">
-      <span>60 FPS</span>
-      <span>WebGL / Canvas 3D</span>
-      <span style="color:var(--emerald);">● Online</span>
-    </div>
-  </footer>
 
-  <!-- ===================================================================
-       JAVASCRIPT CORE ENGINE
-       =================================================================== -->
+      <div class="snack-card-body">
+        <div class="snack-qr-wrapper">
+          <div class="snack-qr-pad">
+            <img id="snackQrImg" src="" alt="UPI QR Code" width="124" height="124">
+          </div>
+          <span class="snack-qr-caption">Scan with GPay, PhonePe, Paytm, or FamApp</span>
+        </div>
+
+        <div class="snack-input-wrap">
+          <span class="currency-symbol">&#8377;</span>
+          <input type="number" id="snackAmountInput" min="1" max="100000" placeholder="Enter amount" value="50">
+        </div>
+
+        <div class="snack-presets" id="snackPresets">
+          <button type="button" class="preset-chip" data-amt="20">&#8377;20</button>
+          <button type="button" class="preset-chip active" data-amt="50">&#8377;50</button>
+          <button type="button" class="preset-chip" data-amt="100">&#8377;100</button>
+          <button type="button" class="preset-chip" data-amt="200">&#8377;200</button>
+        </div>
+
+        <!-- 1-Click Installed UPI App Buttons -->
+        <div class="upi-chooser-section">
+          <div class="upi-chooser-header">
+            <span>Pay with installed UPI app:</span>
+          </div>
+          <div class="upi-apps-grid">
+            <button type="button" class="upi-app-btn" data-scheme="famapp" data-name="FamApp" title="Pay with FamApp">
+              <span class="upi-app-badge fam-badge">Fam</span>
+              <span>FamApp</span>
+            </button>
+            <button type="button" class="upi-app-btn" data-scheme="amazonpay" data-name="Amazon Pay" title="Pay with Amazon">
+              <span class="upi-app-badge amz-badge">a</span>
+              <span>Amazon</span>
+            </button>
+            <button type="button" class="upi-app-btn" data-scheme="phonepe" data-name="PhonePe" title="Pay with PhonePe">
+              <span class="upi-app-badge pe-badge">Pe</span>
+              <span>PhonePe</span>
+            </button>
+            <button type="button" class="upi-app-btn" data-scheme="gpay" data-name="Google Pay" title="Pay with Google Pay">
+              <span class="upi-app-badge gpay-badge">G</span>
+              <span>GPay</span>
+            </button>
+            <button type="button" class="upi-app-btn" data-scheme="paytm" data-name="Paytm" title="Pay with Paytm">
+              <span class="upi-app-badge paytm-badge">Pay</span>
+              <span>Paytm</span>
+            </button>
+            <button type="button" class="upi-app-btn" data-scheme="whatsapp" data-name="WhatsApp" title="Pay with WhatsApp">
+              <span class="upi-app-badge wa-badge">WA</span>
+              <span>WhatsApp</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="noUpiAlert" class="no-upi-alert" style="display:none;" role="alert">
+          <span id="noUpiDesc">Please scan the QR code above on your mobile phone.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       SHARE WIDGET (Bottom-Right Corner - From openlid)
+       ========================================================================= -->
+  <div class="share-widget" id="shareWidget">
+    <button class="share-pill" id="sharePillBtn" aria-label="Share SynapseLab" aria-expanded="false">
+      <svg class="share-pill-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="18" cy="5" r="3"/>
+        <circle cx="6" cy="12" r="3"/>
+        <circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+      <span>Share</span>
+    </button>
+
+    <div class="share-card" id="shareCard" role="dialog" aria-modal="false" aria-label="Share SynapseLab">
+      <div class="share-card-header">
+        <div>
+          <h3 class="share-card-title">Share SynapseLab</h3>
+          <p class="share-card-sub">Share with students, friends & classmates</p>
+        </div>
+        <button class="share-close-btn" id="shareCloseBtn" type="button" aria-label="Close share popup">&times;</button>
+      </div>
+
+      <div class="share-card-body" style="display:flex; flex-direction:column; gap:8px;">
+        <button type="button" class="share-line-item" id="btnShareCopy">
+          <div class="share-item-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+          </div>
+          <div class="share-item-text">
+            <span class="share-item-title">Copy Link</span>
+            <span class="share-item-desc">Interactive Student Lab</span>
+          </div>
+          <span class="share-item-action" id="shareCopyBadge">Copy</span>
+        </button>
+
+        <button type="button" class="share-line-item" id="btnNativeShare">
+          <div class="share-item-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+              <polyline points="16 6 12 2 8 6"/>
+              <line x1="12" y1="2" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <div class="share-item-text">
+            <span class="share-item-title">More Sharing Options</span>
+            <span class="share-item-desc">AirDrop, WhatsApp, Messages</span>
+          </div>
+          <span class="share-item-action">Share ↗</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       CORE SCRIPT ENGINE: SMOOTH 3D THREADS + CODE STUDIO + WIDGETS
+       ========================================================================= -->
   <script>
-    // Tab Navigation Logic
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const viewPanels = document.querySelectorAll('.view-panel');
-    const statusActiveMode = document.getElementById('statusActiveMode');
+    // -------------------------------------------------------------------------
+    // 1. MOBILE RESPONSIVE TOGGLE
+    // -------------------------------------------------------------------------
+    const mainWorkspace = document.getElementById('mainWorkspace');
+    const btnMobCode = document.getElementById('btnMobCode');
+    const btnMobVis = document.getElementById('btnMobVis');
 
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const target = btn.dataset.tab;
-        tabBtns.forEach(b => b.classList.remove('active'));
-        viewPanels.forEach(p => p.classList.remove('active'));
+    btnMobCode.addEventListener('click', () => {
+      btnMobCode.classList.add('active');
+      btnMobVis.classList.remove('active');
+      mainWorkspace.classList.remove('mobile-show-vis');
+    });
 
-        btn.classList.add('active');
-        document.getElementById(target + 'Panel').classList.add('active');
-        statusActiveMode.textContent = btn.innerText.replace(/[\u{1F300}-\u{1F6FF}]/gu, '').trim();
-
-        // Trigger resize on view switch
-        if (target === 'universe') resize3D();
-        if (target === 'studio') resizeStudio();
-        if (target === 'inspector') resizeInspector();
-      });
+    btnMobVis.addEventListener('click', () => {
+      btnMobVis.classList.add('active');
+      btnMobCode.classList.remove('active');
+      mainWorkspace.classList.add('mobile-show-vis');
+      resizeCanvas();
     });
 
     // -------------------------------------------------------------------------
-    // 3D NEURAL ENGINE (Common Math & Rendering)
+    // 2. SMOOTH 3D THREAD ENGINE (Beginner Friendly Small Layers by Default!)
     // -------------------------------------------------------------------------
-    function create3DSystem(canvasId) {
-      const canvas = document.getElementById(canvasId);
-      const ctx = canvas.getContext('2d');
+    const canvas = document.getElementById('canvas3d');
+    const ctx = canvas.getContext('2d');
 
-      let yaw = -0.38;
-      let pitch = 0.26;
-      let camDist = 720;
-      let fov = 520;
-      let autoRotate = true;
-      let waveSpeed = 1.5;
-      let fiberSpread = 7.0;
+    // Smooth Camera State with Lerping
+    let targetYaw = -0.36;
+    let targetPitch = 0.24;
+    let currentYaw = -0.36;
+    let currentPitch = 0.24;
+    let camDist = 680;
+    let targetCamDist = 680;
+    let fov = 480;
 
-      let isDragging = false;
-      let lastX = 0, lastY = 0;
+    let autoRotate = true;
+    let wavePulseTime = 0;
+    let isDragging = false;
+    let lastX = 0, lastY = 0;
 
-      let layerConfigs = [
-        { name: "Input", neurons: 10, z: -300, act: "Linear" },
-        { name: "HL 2", neurons: 18, z: -150, act: "ReLU" },
-        { name: "HL 3", neurons: 22, z: 0, act: "ReLU" },
-        { name: "HL 4", neurons: 27, z: 150, act: "ReLU" }, // Hero column
-        { name: "Output", neurons: 8, z: 300, act: "Softmax" }
-      ];
+    // Small, beginner-friendly layer definition: [2, 4, 3, 1]
+    let layerSizes = [2, 4, 3, 1];
+    let nodes = [];
+    let threads = [];
+    let hoveredThread = null;
 
-      let nodes = [];
-      let curvedThreads = [];
-      let pulseTime = 0;
+    function buildArchitecture(sizes) {
+      layerSizes = sizes;
+      nodes = [];
+      threads = [];
 
-      function build(configs) {
-        if (configs) layerConfigs = configs;
-        nodes = [];
-        curvedThreads = [];
+      const numLayers = layerSizes.length;
+      const totalDepth = 480;
+      const zStep = totalDepth / (numLayers - 1 || 1);
 
-        layerConfigs.forEach((layer, lIdx) => {
-          const count = layer.neurons;
-          const totalH = 380;
-          const startY = -totalH / 2;
-          const stepY = totalH / (count - 1 || 1);
+      layerSizes.forEach((count, lIdx) => {
+        const z = -totalDepth / 2 + lIdx * zStep;
+        const totalH = Math.min(320, count * 55);
+        const startY = -totalH / 2;
+        const stepY = count > 1 ? totalH / (count - 1) : 0;
 
-          for (let i = 0; i < count; i++) {
-            nodes.push({
-              x: 0, y: startY + i * stepY, z: layer.z,
-              layerIdx: lIdx, index: i, layerName: layer.name,
-              total: count, act: layer.act
-            });
-          }
-        });
-
-        // Threads
-        for (let l = 0; l < layerConfigs.length - 1; l++) {
-          const srcNodes = nodes.filter(n => n.layerIdx === l);
-          const dstNodes = nodes.filter(n => n.layerIdx === l + 1);
-
-          srcNodes.forEach((src, sIdx) => {
-            dstNodes.forEach((dst, dIdx) => {
-              const dz = dst.z - src.z;
-              const spreadX = ((sIdx - srcNodes.length / 2) + (dIdx - dstNodes.length / 2)) * fiberSpread;
-              const spreadY = (sIdx - dIdx) * 2.0;
-
-              const p1 = { x: src.x + spreadX, y: src.y + spreadY, z: src.z + dz * 0.35 };
-              const p2 = { x: dst.x + spreadX * 0.75, y: dst.y - spreadY * 0.6, z: src.z + dz * 0.65 };
-              const seed = Math.sin(sIdx * 23 + dIdx * 41);
-
-              curvedThreads.push({
-                src, dst, p1, p2, seed,
-                alpha: Math.min(0.4, 0.12 + Math.abs(seed) * 0.2)
-              });
-            });
+        for (let i = 0; i < count; i++) {
+          nodes.push({
+            x: 0,
+            y: count === 1 ? 0 : startY + i * stepY,
+            z: z,
+            layerIdx: lIdx,
+            nodeIdx: i,
+            label: lIdx === 0 ? (i === 0 ? "Hours" : "Tests") : (lIdx === numLayers - 1 ? "Score" : `H${lIdx}_${i+1}`)
           });
         }
-
-        const countEl = document.getElementById('hudFilamentCount');
-        const statusEl = document.getElementById('statusFilaments');
-        if (countEl) countEl.textContent = curvedThreads.length;
-        if (statusEl) statusEl.textContent = curvedThreads.length;
-      }
-
-      function project(x, y, z, cx, cy) {
-        const cosY = Math.cos(yaw), sinY = Math.sin(yaw);
-        const x1 = x * cosY - z * sinY;
-        const z1 = z * cosY + x * sinY;
-
-        const cosP = Math.cos(pitch), sinP = Math.sin(pitch);
-        const y2 = y * cosP - z1 * sinP;
-        const z2 = z1 * cosP + y * sinP + camDist;
-
-        if (z2 <= 20) return null;
-        const scale = fov / z2;
-        return { x: cx + x1 * scale, y: cy + y2 * scale, scale, depth: z2 };
-      }
-
-      function evalCubic(p0, p1, p2, p3, t) {
-        const it = 1 - t;
-        return it*it*it*p0 + 3*it*it*t*p1 + 3*it*t*t*p2 + t*t*t*p3;
-      }
-
-      function resize() {
-        const rect = canvas.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) return;
-        const dpr = window.devicePixelRatio || 1;
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      }
-
-      // Input events
-      canvas.addEventListener('mousedown', e => {
-        isDragging = true;
-        lastX = e.clientX;
-        lastY = e.clientY;
-        autoRotate = false;
-        const autoBtn = document.getElementById('autoRotateToggle');
-        if (autoBtn) autoBtn.textContent = "⟳ Auto-Rotate: OFF";
-      });
-      window.addEventListener('mouseup', () => isDragging = false);
-      canvas.addEventListener('mousemove', e => {
-        if (!isDragging) return;
-        yaw += (e.clientX - lastX) * 0.007;
-        pitch = Math.max(-0.6, Math.min(0.9, pitch + (e.clientY - lastY) * 0.007));
-        lastX = e.clientX;
-        lastY = e.clientY;
-      });
-      canvas.addEventListener('wheel', e => {
-        e.preventDefault();
-        camDist = Math.max(250, Math.min(1300, camDist + e.deltaY * 0.7));
-      }, { passive: false });
-
-      // Render
-      function render() {
-        if (autoRotate) yaw += 0.0025;
-        pulseTime += 0.02 * waveSpeed;
-
-        const rect = canvas.getBoundingClientRect();
-        const cx = rect.width / 2;
-        const cy = rect.height / 2 + 15;
-
-        ctx.clearRect(0, 0, rect.width, rect.height);
-
-        // 3D Grid Floor
-        const gridY = 230;
-        const size = 500;
-        const step = 60;
-        ctx.lineWidth = 0.8;
-        for (let z = -size; z <= size; z += step) {
-          const pA = project(-size, gridY, z, cx, cy);
-          const pB = project(size, gridY, z, cx, cy);
-          if (pA && pB) {
-            const alpha = Math.max(0, Math.min(0.25, 1 - (pA.depth + pB.depth) / 2400));
-            ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
-            ctx.beginPath();
-            ctx.moveTo(pA.x, pA.y);
-            ctx.lineTo(pB.x, pB.y);
-            ctx.stroke();
-          }
-        }
-        for (let x = -size; x <= size; x += step) {
-          const pA = project(x, gridY, -size, cx, cy);
-          const pB = project(x, gridY, size, cx, cy);
-          if (pA && pB) {
-            const alpha = Math.max(0, Math.min(0.25, 1 - (pA.depth + pB.depth) / 2400));
-            ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
-            ctx.beginPath();
-            ctx.moveTo(pA.x, pA.y);
-            ctx.lineTo(pB.x, pB.y);
-            ctx.stroke();
-          }
-        }
-
-        // Curved Threads
-        curvedThreads.forEach(t => {
-          const segments = 10;
-          let prevP = project(t.src.x, t.src.y, t.src.z, cx, cy);
-          if (!prevP) return;
-
-          ctx.beginPath();
-          ctx.moveTo(prevP.x, prevP.y);
-          for (let i = 1; i <= segments; i++) {
-            const r = i / segments;
-            const x = evalCubic(t.src.x, t.p1.x, t.p2.x, t.dst.x, r);
-            const y = evalCubic(t.src.y, t.p1.y, t.p2.y, t.dst.y, r);
-            const z = evalCubic(t.src.z, t.p1.z, t.p2.z, t.dst.z, r);
-            const cp = project(x, y, z, cx, cy);
-            if (cp) ctx.lineTo(cp.x, cp.y);
-          }
-          ctx.strokeStyle = `rgba(224, 242, 254, ${t.alpha})`;
-          ctx.lineWidth = 0.8;
-          ctx.stroke();
-
-          // Signal Wave
-          const prog = (pulseTime + Math.abs(t.seed) * 2.5) % 1;
-          const wx = evalCubic(t.src.x, t.p1.x, t.p2.x, t.dst.x, prog);
-          const wy = evalCubic(t.src.y, t.p1.y, t.p2.y, t.dst.y, prog);
-          const wz = evalCubic(t.src.z, t.p1.z, t.p2.z, t.dst.z, prog);
-          const wp = project(wx, wy, wz, cx, cy);
-          if (wp) {
-            ctx.beginPath();
-            ctx.arc(wp.x, wp.y, 1.6 * wp.scale * 1.5, 0, Math.PI * 2);
-            ctx.fillStyle = '#38bdf8';
-            ctx.fill();
-          }
-        });
-
-        // Floating Layer Headers
-        layerConfigs.forEach(cfg => {
-          const pTop = project(0, -225, cfg.z, cx, cy);
-          if (!pTop) return;
-          const w = 96 * pTop.scale * 1.5;
-          const h = 36 * pTop.scale * 1.5;
-          const x = pTop.x - w / 2;
-          const y = pTop.y - h;
-
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.82)';
-          ctx.fillRect(x, y, w, h);
-          ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(x, y, w, h);
-
-          ctx.fillStyle = '#ffffff';
-          ctx.font = `bold ${Math.max(8, Math.round(10.5 * pTop.scale * 1.5))}px monospace`;
-          ctx.textAlign = 'center';
-          ctx.fillText(cfg.name, pTop.x, y + 15 * pTop.scale * 1.5);
-
-          ctx.fillStyle = '#38bdf8';
-          ctx.font = `${Math.max(7, Math.round(8.5 * pTop.scale * 1.5))}px monospace`;
-          ctx.fillText(`N: ${cfg.neurons} | ${cfg.act}`, pTop.x, y + 27 * pTop.scale * 1.5);
-        });
-
-        // Depth-Sorted Nodes
-        const projNodes = [];
-        nodes.forEach(n => {
-          const p = project(n.x, n.y, n.z, cx, cy);
-          if (p) projNodes.push({ node: n, p });
-        });
-        projNodes.sort((a, b) => b.p.depth - a.p.depth);
-
-        projNodes.forEach(({ node, p }) => {
-          const isHero = node.layerName === "HL 4";
-          const r = (isHero ? 3.8 : 2.8) * p.scale * 1.6;
-
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, r * 2.2, 0, Math.PI * 2);
-          ctx.fillStyle = isHero ? 'rgba(56, 189, 248, 0.4)' : 'rgba(255, 255, 255, 0.2)';
-          ctx.fill();
-
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-          ctx.fillStyle = '#ffffff';
-          ctx.fill();
-
-          if (isHero && p.scale > 0.6) {
-            ctx.fillStyle = '#94a3b8';
-            ctx.font = `${Math.max(7, Math.round(8 * p.scale))}px monospace`;
-            ctx.textAlign = 'left';
-            ctx.fillText(`N${node.index + 1}`, p.x + r + 4, p.y + 2.5);
-          }
-        });
-
-        requestAnimationFrame(render);
-      }
-
-      return {
-        build, resize, render,
-        setWaveSpeed: s => waveSpeed = s,
-        setSpread: s => { fiberSpread = s; build(); },
-        toggleAutoRotate: () => autoRotate = !autoRotate,
-        resetCam: () => { yaw = -0.38; pitch = 0.26; camDist = 720; }
-      };
-    }
-
-    // Initialize 3D Systems
-    const sysUniverse = create3DSystem('canvas3d');
-    sysUniverse.build();
-    sysUniverse.resize();
-    sysUniverse.render();
-
-    function resize3D() { sysUniverse.resize(); }
-
-    const sysStudio = create3DSystem('studioCanvas');
-    sysStudio.build();
-    sysStudio.resize();
-    sysStudio.render();
-
-    function resizeStudio() { sysStudio.resize(); }
-
-    // Universe UI Listeners
-    document.getElementById('autoRotateToggle').addEventListener('click', e => {
-      sysUniverse.toggleAutoRotate();
-      e.target.textContent = e.target.textContent.includes('ON') ? "⟳ Auto-Rotate: OFF" : "⟳ Auto-Rotate: ON";
-    });
-    document.getElementById('resetCamToggle').addEventListener('click', () => sysUniverse.resetCam());
-    document.getElementById('waveSpeedSlider').addEventListener('input', e => sysUniverse.setWaveSpeed(parseFloat(e.target.value)));
-    document.getElementById('fiberSpreadSlider').addEventListener('input', e => sysUniverse.setSpread(parseFloat(e.target.value)));
-
-    // -------------------------------------------------------------------------
-    // CODE STUDIO & ARCHITECTURE SYNC
-    // -------------------------------------------------------------------------
-    const codeEditor = document.getElementById('modelCodeEditor');
-    const presetSelector = document.getElementById('presetSelector');
-    const applyCodeBtn = document.getElementById('applyCodeBtn');
-    const startTrainBtn = document.getElementById('startTrainBtn');
-    const trainSimBtn = document.getElementById('trainSimBtn');
-
-    const presets = {
-      hero: [10, 18, 22, 27, 8],
-      exam: [2, 8, 4, 1],
-      classifier: [3, 6, 6, 2],
-      deep: [4, 12, 6, 12, 2]
-    };
-
-    presetSelector.addEventListener('change', () => {
-      const selected = presets[presetSelector.value];
-      codeEditor.value = `# SynapseLab Neural Architecture Definition
-import numpy as np
-
-layers = ${JSON.stringify(selected)}
-activation = "relu"
-learning_rate = 0.03
-epochs = 500
-`;
-      applyCode();
-    });
-
-    function applyCode() {
-      const matches = codeEditor.value.match(/layers\s*=\s*\[(.*?)\]/);
-      if (matches && matches[1]) {
-        const nums = matches[1].split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
-        if (nums.length >= 2) {
-          const newConfigs = nums.map((count, i) => {
-            const z = (i - (nums.length - 1) / 2) * (600 / (nums.length - 1));
-            return {
-              name: i === 0 ? "Input" : (i === nums.length - 1 ? "Output" : `HL ${i+1}`),
-              neurons: Math.min(30, Math.max(1, count)),
-              z,
-              act: i === nums.length - 1 ? "Linear" : "ReLU"
-            };
-          });
-          sysStudio.build(newConfigs);
-          sysUniverse.build(newConfigs);
-          document.getElementById('hudLayerCount').textContent = nums.length;
-        }
-      }
-    }
-
-    applyCodeBtn.addEventListener('click', applyCode);
-
-    // -------------------------------------------------------------------------
-    // TRAINING SIMULATION & LOSS CURVE
-    // -------------------------------------------------------------------------
-    const lossCanvas = document.getElementById('lossCanvas');
-    const lossCtx = lossCanvas.getContext('2d');
-    let lossHistory = [];
-    let isTraining = false;
-
-    function runTrainingSimulation() {
-      if (isTraining) return;
-      isTraining = true;
-      lossHistory = [1.0];
-      let epoch = 0;
-      const maxEpochs = 100;
-
-      const currentLossVal = document.getElementById('currentLossVal');
-      const currentEpochVal = document.getElementById('currentEpochVal');
-
-      const interval = setInterval(() => {
-        epoch++;
-        const prevLoss = lossHistory[lossHistory.length - 1];
-        const newLoss = Math.max(0.005, prevLoss * 0.94 + (Math.random() - 0.5) * 0.01);
-        lossHistory.push(newLoss);
-
-        currentLossVal.textContent = newLoss.toFixed(4);
-        currentEpochVal.textContent = (epoch * 5);
-
-        // Draw Loss Graph
-        lossCtx.clearRect(0, 0, lossCanvas.width, lossCanvas.height);
-        lossCtx.beginPath();
-        lossCtx.strokeStyle = '#34d399';
-        lossCtx.lineWidth = 1.5;
-
-        lossHistory.forEach((val, idx) => {
-          const x = (idx / maxEpochs) * lossCanvas.width;
-          const y = (val / 1.0) * (lossCanvas.height - 8) + 4;
-          if (idx === 0) lossCtx.moveTo(x, y);
-          else lossCtx.lineTo(x, y);
-        });
-        lossCtx.stroke();
-
-        if (epoch >= maxEpochs) {
-          clearInterval(interval);
-          isTraining = false;
-        }
-      }, 30);
-    }
-
-    startTrainBtn.addEventListener('click', runTrainingSimulation);
-    trainSimBtn.addEventListener('click', () => {
-      document.querySelector('[data-tab="studio"]').click();
-      runTrainingSimulation();
-    });
-
-    // -------------------------------------------------------------------------
-    // VIEW 3: 2D SYNAPSE INSPECTOR
-    // -------------------------------------------------------------------------
-    const insCanvas = document.getElementById('inspectorCanvas');
-    const insCtx = insCanvas.getContext('2d');
-    const insInfo = document.getElementById('inspectorInfo');
-    const insCount = document.getElementById('inspectorCount');
-
-    let insNodes = [];
-    let insThreads = [];
-    let insHovered = null;
-
-    function resizeInspector() {
-      const rect = insCanvas.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) return;
-      const dpr = window.devicePixelRatio || 1;
-      insCanvas.width = rect.width * dpr;
-      insCanvas.height = rect.height * dpr;
-      insCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      build2DInspector(rect.width, rect.height);
-    }
-
-    function build2DInspector(w, h) {
-      insNodes = [];
-      insThreads = [];
-      const layers = [2, 8, 4, 1];
-      const hPad = 80;
-      const vPad = 40;
-      const colStep = (w - hPad * 2) / (layers.length - 1);
-
-      layers.forEach((cnt, lIdx) => {
-        const x = hPad + lIdx * colStep;
-        const col = [];
-        const stepY = (h - vPad * 2) / (cnt + 1);
-        for (let i = 0; i < cnt; i++) {
-          col.push({
-            x, y: vPad + (i + 1) * stepY,
-            layer: lIdx, index: i,
-            label: lIdx === 0 ? (i === 0 ? "Hours" : "Tests") : (lIdx === 3 ? "Score" : `H${lIdx}_${i+1}`)
-          });
-        }
-        insNodes.push(col);
       });
 
-      for (let l = 0; l < layers.length - 1; l++) {
-        insNodes[l].forEach(src => {
-          insNodes[l + 1].forEach(dst => {
-            const weight = (Math.sin(src.x * 11 + dst.y * 7) * 0.9).toFixed(3);
-            insThreads.push({
+      // Construct Smooth Curved Filaments (Synaptic Threads)
+      for (let l = 0; l < numLayers - 1; l++) {
+        const srcNodes = nodes.filter(n => n.layerIdx === l);
+        const dstNodes = nodes.filter(n => n.layerIdx === l + 1);
+
+        srcNodes.forEach((src, sIdx) => {
+          dstNodes.forEach((dst, dIdx) => {
+            const dz = dst.z - src.z;
+            const spreadX = ((sIdx - srcNodes.length / 2) + (dIdx - dstNodes.length / 2)) * 7.5;
+            const spreadY = (sIdx - dIdx) * 2.2;
+
+            const p1 = { x: src.x + spreadX, y: src.y + spreadY, z: src.z + dz * 0.35 };
+            const p2 = { x: dst.x + spreadX * 0.75, y: dst.y - spreadY * 0.5, z: src.z + dz * 0.65 };
+
+            // Deterministic weight for demonstration
+            const seed = Math.sin(sIdx * 17 + dIdx * 31);
+            const weight = (seed * 0.85).toFixed(3);
+
+            threads.push({
               src, dst,
+              p1, p2,
+              seed,
+              weight: parseFloat(weight),
               midX: (src.x + dst.x) / 2,
               midY: (src.y + dst.y) / 2,
-              weight: parseFloat(weight)
+              midZ: (src.z + dst.z) / 2
             });
           });
         });
       }
-      insCount.textContent = `${insThreads.length} Synaptic Threads`;
+
+      // Update Telemetry
+      document.getElementById('visLayerCount').textContent = layerSizes.length;
+      document.getElementById('visNodeCount').textContent = nodes.length;
+      document.getElementById('visThreadCount').textContent = threads.length;
     }
 
+    // 3D Perspective Projection Math
+    function project3D(x, y, z, cx, cy) {
+      const cosY = Math.cos(currentYaw), sinY = Math.sin(currentYaw);
+      const x1 = x * cosY - z * sinY;
+      const z1 = z * cosY + x * sinY;
+
+      const cosP = Math.cos(currentPitch), sinP = Math.sin(currentPitch);
+      const y2 = y * cosP - z1 * sinP;
+      const z2 = z1 * cosP + y * sinP + camDist;
+
+      if (z2 <= 20) return null;
+      const scale = fov / z2;
+      return { x: cx + x1 * scale, y: cy + y2 * scale, scale, depth: z2 };
+    }
+
+    function evalCubic(p0, p1, p2, p3, t) {
+      const it = 1 - t;
+      return it*it*it*p0 + 3*it*it*t*p1 + 3*it*t*t*p2 + t*t*t*p3;
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    // Mouse & Touch Orbit Controls with Inertial Smoothing
+    canvas.addEventListener('mousedown', e => {
+      isDragging = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      autoRotate = false;
+    });
+
+    window.addEventListener('mouseup', () => isDragging = false);
+
+    canvas.addEventListener('mousemove', e => {
+      if (isDragging) {
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        targetYaw += dx * 0.007;
+        targetPitch = Math.max(-0.6, Math.min(0.85, targetPitch + dy * 0.007));
+        lastX = e.clientX;
+        lastY = e.clientY;
+      }
+      checkThreadHover(e.clientX, e.clientY);
+    });
+
+    // Touch Support
+    canvas.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        lastX = e.touches[0].clientX;
+        lastY = e.touches[0].clientY;
+        autoRotate = false;
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', e => {
+      if (!isDragging || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - lastX;
+      const dy = e.touches[0].clientY - lastY;
+      targetYaw += dx * 0.007;
+      targetPitch = Math.max(-0.6, Math.min(0.85, targetPitch + dy * 0.007));
+      lastX = e.touches[0].clientX;
+      lastY = e.touches[0].clientY;
+      checkThreadHover(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', () => isDragging = false);
+
+    canvas.addEventListener('wheel', e => {
+      e.preventDefault();
+      targetCamDist = Math.max(300, Math.min(1100, targetCamDist + e.deltaY * 0.6));
+    }, { passive: false });
+
+    // Distance to 2D projected line segment for hover
     function distToSeg(px, py, x1, y1, x2, y2) {
       const l2 = (x2 - x1)**2 + (y2 - y1)**2;
       if (l2 === 0) return Math.hypot(px - x1, py - y1);
@@ -1201,124 +1331,559 @@ epochs = 500
       return Math.hypot(px - (x1 + t*(x2 - x1)), py - (y1 + t*(y2 - y1)));
     }
 
-    insCanvas.addEventListener('mousemove', e => {
-      const rect = insCanvas.getBoundingClientRect();
-      const px = e.clientX - rect.x;
-      const py = e.clientY - rect.y;
+    const threadBanner = document.getElementById('threadBanner');
+    const tbStart = document.getElementById('tbStart');
+    const tbMid = document.getElementById('tbMid');
+    const tbEnd = document.getElementById('tbEnd');
+    const tbWeight = document.getElementById('tbWeight');
+
+    function checkThreadHover(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const px = clientX - rect.x;
+      const py = clientY - rect.y;
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
 
       let closest = null;
-      let minD = 14;
-      insThreads.forEach(t => {
-        const d = distToSeg(px, py, t.src.x, t.src.y, t.dst.x, t.dst.y);
-        if (d < minD) { minD = d; closest = t; }
-      });
+      let minD = 12;
 
-      insHovered = closest;
-      if (closest) {
-        insInfo.innerHTML = `
-          <span style="color:var(--amber);">● START: ${closest.src.label} (${Math.round(closest.src.x)}, ${Math.round(closest.src.y)})</span>
-          <span style="color:var(--text-dim);">──►</span>
-          <span style="color:#c084fc;">◆ MID: (${Math.round(closest.midX)}, ${Math.round(closest.midY)})</span>
-          <span style="color:var(--text-dim);">──►</span>
-          <span style="color:var(--emerald);">● END: ${closest.dst.label} (${Math.round(closest.dst.x)}, ${Math.round(closest.dst.y)})</span>
-          <span style="margin-left:14px; color:${closest.weight >= 0 ? 'var(--cyan)' : 'var(--amber)'}; font-weight:bold;">
-            Weight: ${closest.weight >= 0 ? '+' : ''}${closest.weight}
-          </span>
-        `;
-      }
-    });
-
-    function renderInspector() {
-      const rect = insCanvas.getBoundingClientRect();
-      insCtx.clearRect(0, 0, rect.width, rect.height);
-
-      // Threads
-      insThreads.forEach(t => {
-        const isH = (t === insHovered);
-        insCtx.beginPath();
-        insCtx.moveTo(t.src.x, t.src.y);
-        insCtx.lineTo(t.dst.x, t.dst.y);
-        if (isH) {
-          insCtx.strokeStyle = '#fbbf24';
-          insCtx.lineWidth = 3.5;
-        } else {
-          insCtx.strokeStyle = t.weight >= 0 ? 'rgba(56, 189, 248, 0.25)' : 'rgba(251, 146, 60, 0.25)';
-          insCtx.lineWidth = 1;
+      threads.forEach(t => {
+        const pA = project3D(t.src.x, t.src.y, t.src.z, cx, cy);
+        const pB = project3D(t.dst.x, t.dst.y, t.dst.z, cx, cy);
+        if (pA && pB) {
+          const d = distToSeg(px, py, pA.x, pA.y, pB.x, pB.y);
+          if (d < minD) {
+            minD = d;
+            closest = t;
+          }
         }
-        insCtx.stroke();
       });
 
-      // Hover highlights
-      if (insHovered) {
-        const t = insHovered;
-        // Start dot
-        insCtx.beginPath();
-        insCtx.arc(t.src.x, t.src.y, 6, 0, Math.PI * 2);
-        insCtx.fillStyle = '#fbbf24';
-        insCtx.fill();
-        // Midpoint
-        insCtx.beginPath();
-        insCtx.arc(t.midX, t.midY, 5, 0, Math.PI * 2);
-        insCtx.fillStyle = '#c084fc';
-        insCtx.fill();
-        // End dot
-        insCtx.beginPath();
-        insCtx.arc(t.dst.x, t.dst.y, 6, 0, Math.PI * 2);
-        insCtx.fillStyle = '#34d399';
-        insCtx.fill();
+      hoveredThread = closest;
+      if (closest) {
+        tbStart.textContent = `● Start: ${closest.src.label}`;
+        tbMid.textContent = `◆ Waypoint`;
+        tbEnd.textContent = `● End: ${closest.dst.label}`;
+        tbWeight.textContent = `W: ${closest.weight >= 0 ? '+' : ''}${closest.weight}`;
+        tbWeight.style.color = closest.weight >= 0 ? 'var(--accent)' : 'var(--amber)';
+        threadBanner.style.display = 'flex';
+      } else {
+        threadBanner.style.display = 'none';
+      }
+    }
+
+    // Perspective 3D Grid Floor
+    function drawGridFloor(cx, cy) {
+      const gridY = 210;
+      const size = 420;
+      const step = 60;
+      ctx.lineWidth = 0.8;
+
+      for (let z = -size; z <= size; z += step) {
+        const pA = project3D(-size, gridY, z, cx, cy);
+        const pB = project3D(size, gridY, z, cx, cy);
+        if (pA && pB) {
+          const alpha = Math.max(0, Math.min(0.22, 1 - (pA.depth + pB.depth) / 2200));
+          ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+          ctx.beginPath();
+          ctx.moveTo(pA.x, pA.y);
+          ctx.lineTo(pB.x, pB.y);
+          ctx.stroke();
+        }
+      }
+      for (let x = -size; x <= size; x += step) {
+        const pA = project3D(x, gridY, -size, cx, cy);
+        const pB = project3D(x, gridY, size, cx, cy);
+        if (pA && pB) {
+          const alpha = Math.max(0, Math.min(0.22, 1 - (pA.depth + pB.depth) / 2200));
+          ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+          ctx.beginPath();
+          ctx.moveTo(pA.x, pA.y);
+          ctx.lineTo(pB.x, pB.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Main 60 FPS Render Loop with Smooth Camera Lerp
+    function renderLoop() {
+      // Smooth camera interpolation
+      if (autoRotate) targetYaw += 0.002;
+      currentYaw += (targetYaw - currentYaw) * 0.08;
+      currentPitch += (targetPitch - currentPitch) * 0.08;
+      camDist += (targetCamDist - camDist) * 0.08;
+      wavePulseTime += 0.025;
+
+      const rect = canvas.getBoundingClientRect();
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+
+      ctx.clearRect(0, 0, rect.width, rect.height);
+
+      // 1. Grid Floor
+      drawGridFloor(cx, cy);
+
+      // 2. Smooth Curved Filaments (Synaptic Threads)
+      threads.forEach(t => {
+        const isHovered = (t === hoveredThread);
+        const segments = 12;
+        let prevP = project3D(t.src.x, t.src.y, t.src.z, cx, cy);
+        if (!prevP) return;
+
+        ctx.beginPath();
+        ctx.moveTo(prevP.x, prevP.y);
+
+        for (let i = 1; i <= segments; i++) {
+          const r = i / segments;
+          const x = evalCubic(t.src.x, t.p1.x, t.p2.x, t.dst.x, r);
+          const y = evalCubic(t.src.y, t.p1.y, t.p2.y, t.dst.y, r);
+          const z = evalCubic(t.src.z, t.p1.z, t.p2.z, t.dst.z, r);
+          const cp = project3D(x, y, z, cx, cy);
+          if (cp) ctx.lineTo(cp.x, cp.y);
+        }
+
+        if (isHovered) {
+          ctx.strokeStyle = '#facc15';
+          ctx.lineWidth = 3.2;
+          ctx.shadowColor = '#facc15';
+          ctx.shadowBlur = 10;
+        } else {
+          ctx.strokeStyle = t.weight >= 0 
+            ? 'rgba(56, 189, 248, 0.32)' 
+            : 'rgba(251, 146, 60, 0.32)';
+          ctx.lineWidth = Math.abs(t.weight) * 1.5 + 0.8;
+          ctx.shadowBlur = 0;
+        }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Animated Signal Wave Packet gliding along the curve
+        const waveProg = (wavePulseTime + Math.abs(t.seed) * 2.2) % 1;
+        const wx = evalCubic(t.src.x, t.p1.x, t.p2.x, t.dst.x, waveProg);
+        const wy = evalCubic(t.src.y, t.p1.y, t.p2.y, t.dst.y, waveProg);
+        const wz = evalCubic(t.src.z, t.p1.z, t.p2.z, t.dst.z, waveProg);
+        const wp = project3D(wx, wy, wz, cx, cy);
+
+        if (wp && !isHovered) {
+          ctx.beginPath();
+          ctx.arc(wp.x, wp.y, 1.8 * wp.scale * 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = t.weight >= 0 ? '#38bdf8' : '#fb923c';
+          ctx.fill();
+        }
+
+        // If hovered, render Start Dot, Midpoint Dot, and End Dot
+        if (isHovered) {
+          const sp = project3D(t.src.x, t.src.y, t.src.z, cx, cy);
+          const ep = project3D(t.dst.x, t.dst.y, t.dst.z, cx, cy);
+          const mp = project3D(t.midX, t.midY, t.midZ, cx, cy);
+
+          // Start Dot (Amber)
+          if (sp) {
+            ctx.beginPath();
+            ctx.arc(sp.x, sp.y, 7, 0, Math.PI * 2);
+            ctx.fillStyle = '#fbbf24';
+            ctx.fill();
+          }
+          // Mid Dot (Purple)
+          if (mp) {
+            ctx.beginPath();
+            ctx.arc(mp.x, mp.y, 6, 0, Math.PI * 2);
+            ctx.fillStyle = '#c084fc';
+            ctx.fill();
+          }
+          // End Dot (Emerald)
+          if (ep) {
+            ctx.beginPath();
+            ctx.arc(ep.x, ep.y, 7, 0, Math.PI * 2);
+            ctx.fillStyle = '#34d399';
+            ctx.fill();
+          }
+        }
+      });
+
+      // 3. Floating Layer Indicator Cards
+      layerSizes.forEach((count, lIdx) => {
+        const totalDepth = 480;
+        const z = -totalDepth / 2 + lIdx * (totalDepth / (layerSizes.length - 1 || 1));
+        const pTop = project3D(0, -180, z, cx, cy);
+        if (!pTop) return;
+
+        const w = 75 * pTop.scale * 1.5;
+        const h = 26 * pTop.scale * 1.5;
+        const x = pTop.x - w / 2;
+        const y = pTop.y - h;
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x, y, w, h);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${Math.max(8, Math.round(10 * pTop.scale * 1.5))}px monospace`;
+        ctx.textAlign = 'center';
+        const name = lIdx === 0 ? "Input" : (lIdx === layerSizes.length - 1 ? "Output" : `Hidden ${lIdx}`);
+        ctx.fillText(name, pTop.x, y + 11 * pTop.scale * 1.5);
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = `${Math.max(7, Math.round(8 * pTop.scale * 1.5))}px monospace`;
+        ctx.fillText(`${count} Neurons`, pTop.x, y + 21 * pTop.scale * 1.5);
+      });
+
+      // 4. Depth-Sorted Glowing Neurons
+      const projNodes = [];
+      nodes.forEach(n => {
+        const p = project3D(n.x, n.y, n.z, cx, cy);
+        if (p) projNodes.push({ node: n, p });
+      });
+      projNodes.sort((a, b) => b.p.depth - a.p.depth);
+
+      projNodes.forEach(({ node, p }) => {
+        const isInput = node.layerIdx === 0;
+        const isOutput = node.layerIdx === layerSizes.length - 1;
+        const radius = 4.2 * p.scale * 1.5;
+
+        // Outer Glow
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, radius * 2.2, 0, Math.PI * 2);
+        ctx.fillStyle = isInput ? 'rgba(56, 189, 248, 0.35)' : (isOutput ? 'rgba(52, 211, 153, 0.35)' : 'rgba(192, 132, 252, 0.35)');
+        ctx.fill();
+
+        // Solid Core
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+
+        // Node Label
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = `${Math.max(7, Math.round(8.5 * p.scale))}px monospace`;
+        ctx.textAlign = isInput ? 'right' : 'left';
+        const offX = isInput ? -radius - 6 : radius + 6;
+        ctx.fillText(node.label, p.x + offX, p.y + 3);
+      });
+
+      requestAnimationFrame(renderLoop);
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. STUDENT CODE STUDIO & AUTO-SYNC
+    // -------------------------------------------------------------------------
+    const studentCode = document.getElementById('studentCode');
+    const btnRebuild = document.getElementById('btnRebuild');
+    const btnResetCode = document.getElementById('btnResetCode');
+    const presetChipBtns = document.querySelectorAll('.preset-chip-btn');
+
+    function syncCodeToNetwork() {
+      const match = studentCode.value.match(/layers\s*=\s*\[(.*?)\]/);
+      if (match && match[1]) {
+        const parsed = match[1].split(',')
+          .map(n => parseInt(n.trim(), 10))
+          .filter(n => !isNaN(n) && n > 0 && n <= 16);
+
+        if (parsed.length >= 2) {
+          buildArchitecture(parsed);
+          presetChipBtns.forEach(b => {
+            b.classList.toggle('active', b.dataset.cfg === JSON.stringify(parsed));
+          });
+        }
+      }
+    }
+
+    studentCode.addEventListener('input', syncCodeToNetwork);
+    btnRebuild.addEventListener('click', syncCodeToNetwork);
+
+    presetChipBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cfg = JSON.parse(btn.dataset.cfg);
+        presetChipBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        studentCode.value = `# ==========================================================
+# 🧠 Student Neural Network Definition
+# ==========================================================
+
+layers = ${JSON.stringify(cfg)}
+activation = "relu"
+learning_rate = 0.05
+epochs = 200
+
+print(f"Network updated: {layers}")
+`;
+        syncCodeToNetwork();
+      });
+    });
+
+    btnResetCode.addEventListener('click', () => {
+      studentCode.value = `# ==========================================================
+# 🧠 Student Neural Network Definition
+# ==========================================================
+# Scenario: Predict Student Final Exam Score (0 to 100)
+# Input Features: [Study Hours, Practice Tests]
+
+layers = [2, 4, 3, 1]
+activation = "relu"
+learning_rate = 0.05
+epochs = 200
+
+print(f"Neural Network initialized with {len(layers)} layers!")
+`;
+      syncCodeToNetwork();
+    });
+
+    // -------------------------------------------------------------------------
+    // 4. LIVE TRAINING SIMULATION & LOSS CURVE
+    // -------------------------------------------------------------------------
+    const btnTrain = document.getElementById('btnTrain');
+    const lossHudBox = document.getElementById('lossHudBox');
+    const lossCanvas = document.getElementById('lossCanvas');
+    const lossCtx = lossCanvas.getContext('2d');
+    const lossValDisplay = document.getElementById('lossValDisplay');
+
+    let isTraining = false;
+    let trainHistory = [];
+
+    btnTrain.addEventListener('click', () => {
+      if (isTraining) return;
+      isTraining = true;
+      lossHudBox.classList.add('visible');
+      trainHistory = [1.0];
+      let step = 0;
+      const maxSteps = 80;
+
+      // On mobile, switch to visualizer to see the training
+      if (window.innerWidth <= 768) {
+        btnMobVis.click();
       }
 
-      // Nodes
-      insNodes.forEach((col, lIdx) => {
-        col.forEach(n => {
-          insCtx.beginPath();
-          insCtx.arc(n.x, n.y, 5, 0, Math.PI * 2);
-          insCtx.fillStyle = lIdx === 0 ? '#38bdf8' : (lIdx === 3 ? '#34d399' : '#818cf8');
-          insCtx.fill();
+      const trainInterval = setInterval(() => {
+        step++;
+        const prev = trainHistory[trainHistory.length - 1];
+        const current = Math.max(0.008, prev * 0.93 + (Math.random() - 0.5) * 0.008);
+        trainHistory.push(current);
 
-          insCtx.fillStyle = '#94a3b8';
-          insCtx.font = '10px monospace';
-          insCtx.textAlign = lIdx === 0 ? 'right' : (lIdx === 3 ? 'left' : 'center');
-          const off = lIdx === 0 ? -10 : (lIdx === 3 ? 10 : 0);
-          const yOff = (lIdx > 0 && lIdx < 3) ? -10 : 3;
-          insCtx.fillText(n.label, n.x + off, n.y + yOff);
+        lossValDisplay.textContent = current.toFixed(4);
+
+        // Draw Loss Graph
+        lossCtx.clearRect(0, 0, lossCanvas.width, lossCanvas.height);
+        lossCtx.beginPath();
+        lossCtx.strokeStyle = '#34d399';
+        lossCtx.lineWidth = 1.6;
+
+        trainHistory.forEach((val, i) => {
+          const x = (i / maxSteps) * lossCanvas.width;
+          const y = (val / 1.0) * (lossCanvas.height - 6) + 3;
+          if (i === 0) lossCtx.moveTo(x, y);
+          else lossCtx.lineTo(x, y);
         });
+        lossCtx.stroke();
+
+        if (step >= maxSteps) {
+          clearInterval(trainInterval);
+          isTraining = false;
+        }
+      }, 35);
+    });
+
+    // -------------------------------------------------------------------------
+    // 5. BUY ME A COFFEE / SUPPORT WIDGET (From openlid)
+    // -------------------------------------------------------------------------
+    const snackWidget = document.getElementById('snackWidget');
+    const snackPillBtn = document.getElementById('snackPillBtn');
+    const snackCard = document.getElementById('snackCard');
+    const snackCloseBtn = document.getElementById('snackCloseBtn');
+    const snackAmountInput = document.getElementById('snackAmountInput');
+    const snackPresets = document.getElementById('snackPresets');
+    const snackQrImg = document.getElementById('snackQrImg');
+    const snackUpiCopyBtn = document.getElementById('snackUpiCopyBtn');
+    const snackUpiText = document.getElementById('snackUpiText');
+
+    const UPI_ID = 'Purohit2009@fam';
+    const PAYEE_NAME = 'Shivam';
+
+    function updateSnackQr(amount) {
+      const amt = Math.max(1, parseInt(amount, 10) || 50);
+      const upiUri = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`;
+      if (snackQrImg) {
+        snackQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&format=svg&data=${encodeURIComponent(upiUri)}`;
+      }
+    }
+
+    if (snackPillBtn && snackCard) {
+      snackPillBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isActive = snackCard.classList.toggle('active');
+        snackPillBtn.setAttribute('aria-expanded', String(isActive));
+        if (isActive && snackAmountInput) updateSnackQr(snackAmountInput.value || 50);
       });
 
-      requestAnimationFrame(renderInspector);
+      if (snackCloseBtn) {
+        snackCloseBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          snackCard.classList.remove('active');
+          snackPillBtn.setAttribute('aria-expanded', 'false');
+        });
+      }
+
+      document.addEventListener('click', (e) => {
+        if (snackWidget && !snackWidget.contains(e.target) && snackCard.classList.contains('active')) {
+          snackCard.classList.remove('active');
+          snackPillBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
     }
-    renderInspector();
 
-    // -------------------------------------------------------------------------
-    // LESSON 1 CALCULATOR
-    // -------------------------------------------------------------------------
-    const demoX1 = document.getElementById('demoX1');
-    const demoW1 = document.getElementById('demoW1');
-    const demoBias = document.getElementById('demoBias');
-    const demoResult = document.getElementById('demoResult');
+    if (snackPresets && snackAmountInput) {
+      snackPresets.addEventListener('click', (e) => {
+        const chip = e.target.closest('.preset-chip');
+        if (!chip) return;
+        const amt = chip.getAttribute('data-amt');
+        snackAmountInput.value = amt;
+        snackPresets.querySelectorAll('.preset-chip').forEach(b => b.classList.remove('active'));
+        chip.classList.add('active');
+        updateSnackQr(amt);
+      });
 
-    function updateDemoCalc() {
-      const x = parseFloat(demoX1.value) || 0;
-      const w = parseFloat(demoW1.value) || 0;
-      const b = parseFloat(demoBias.value) || 0;
-      demoResult.textContent = (x * w + b).toFixed(1);
+      snackAmountInput.addEventListener('input', () => {
+        const val = snackAmountInput.value;
+        snackPresets.querySelectorAll('.preset-chip').forEach(b => {
+          b.classList.toggle('active', b.getAttribute('data-amt') === val);
+        });
+        updateSnackQr(val);
+      });
     }
-    [demoX1, demoW1, demoBias].forEach(el => el.addEventListener('input', updateDemoCalc));
 
-    // Export Python script
-    document.getElementById('exportCodeBtn').addEventListener('click', () => {
-      const blob = new Blob([codeEditor.value], { type: 'text/plain' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'neural_network_student_model.py';
-      a.click();
+    if (snackUpiCopyBtn && snackUpiText) {
+      snackUpiCopyBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        try {
+          await navigator.clipboard.writeText(UPI_ID);
+          const orig = snackUpiText.textContent;
+          snackUpiText.textContent = 'Copied!';
+          setTimeout(() => snackUpiText.textContent = orig, 1500);
+        } catch (err) {
+          console.error(err);
+        }
+      });
+    }
+
+    // Installed UPI Apps Click Handlers
+    const upiAppButtons = document.querySelectorAll('.upi-app-btn');
+    const noUpiAlert = document.getElementById('noUpiAlert');
+    const noUpiDesc = document.getElementById('noUpiDesc');
+
+    upiAppButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const scheme = btn.dataset.scheme;
+        const appName = btn.dataset.name;
+        const amt = Math.max(1, parseInt(snackAmountInput ? snackAmountInput.value : 50, 10) || 50);
+        const query = `pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`;
+        let uri = '';
+
+        switch (scheme) {
+          case 'famapp': uri = `in.fampay.app://upi/pay?${query}`; break;
+          case 'amazonpay': uri = `amazonpay://upi/pay?${query}`; break;
+          case 'phonepe': uri = `phonepe://pay?${query}`; break;
+          case 'gpay': uri = `tez://upi/pay?${query}`; break;
+          case 'paytm': uri = `paytmmp://pay?${query}`; break;
+          case 'whatsapp': uri = `whatsapp://pay?${query}`; break;
+          default: uri = `upi://pay?${query}`; break;
+        }
+
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+        if (!isMobile) {
+          if (noUpiAlert && noUpiDesc) {
+            noUpiDesc.textContent = `Please scan the QR code above with ${appName} or Google Pay on your phone.`;
+            noUpiAlert.style.display = 'flex';
+          }
+          return;
+        }
+        window.location.href = uri;
+      });
     });
 
-    window.addEventListener('resize', () => {
-      resize3D();
-      resizeStudio();
-      resizeInspector();
-    });
+    updateSnackQr(50);
+
+    // -------------------------------------------------------------------------
+    // 6. SHARE WIDGET (From openlid)
+    // -------------------------------------------------------------------------
+    const shareWidget = document.getElementById('shareWidget');
+    const sharePillBtn = document.getElementById('sharePillBtn');
+    const shareCard = document.getElementById('shareCard');
+    const shareCloseBtn = document.getElementById('shareCloseBtn');
+    const btnShareCopy = document.getElementById('btnShareCopy');
+    const shareCopyBadge = document.getElementById('shareCopyBadge');
+    const btnNativeShare = document.getElementById('btnNativeShare');
+
+    if (sharePillBtn && shareCard) {
+      sharePillBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isActive = shareCard.classList.toggle('active');
+        sharePillBtn.setAttribute('aria-expanded', String(isActive));
+      });
+
+      if (shareCloseBtn) {
+        shareCloseBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          shareCard.classList.remove('active');
+          sharePillBtn.setAttribute('aria-expanded', 'false');
+        });
+      }
+
+      document.addEventListener('click', (e) => {
+        if (shareWidget && !shareWidget.contains(e.target) && shareCard.classList.contains('active')) {
+          shareCard.classList.remove('active');
+          sharePillBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    if (btnShareCopy) {
+      btnShareCopy.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          if (shareCopyBadge) {
+            const orig = shareCopyBadge.textContent;
+            shareCopyBadge.textContent = 'Copied!';
+            shareCopyBadge.style.color = 'var(--emerald)';
+            setTimeout(() => {
+              shareCopyBadge.textContent = orig;
+              shareCopyBadge.style.color = '';
+            }, 1800);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      });
+    }
+
+    if (btnNativeShare) {
+      btnNativeShare.addEventListener('click', async () => {
+        const shareData = {
+          title: 'SynapseLab — 3D Neural Network Studio for Students',
+          text: 'Check out this interactive 3D neural network visualizer and code studio!',
+          url: window.location.href
+        };
+        if (navigator.share) {
+          try {
+            await navigator.share(shareData);
+          } catch (err) {}
+        } else {
+          try {
+            await navigator.clipboard.writeText(shareData.url);
+            alert('Link copied to clipboard!');
+          } catch (err) {}
+        }
+      });
+    }
+
+    // -------------------------------------------------------------------------
+    // INITIALIZATION
+    // -------------------------------------------------------------------------
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    buildArchitecture([2, 4, 3, 1]); // Beginner friendly small layers
+    renderLoop();
   </script>
 </body>
 </html>
