@@ -327,10 +327,63 @@ document.addEventListener('DOMContentLoaded', () => {
     isDragging = false;
   });
 
-  // Viewport Toolbar Buttons
+  // Viewport Toolbar & Fullscreen Controls
   const btnZoomIn = document.getElementById('btnZoomIn');
   const btnZoomOut = document.getElementById('btnZoomOut');
   const btnResetView = document.getElementById('btnResetView');
+  const btnFullscreen = document.getElementById('btnFullscreen');
+  const btnExitFullscreen = document.getElementById('btnExitFullscreen');
+  const visPane = document.querySelector('.vis-pane');
+
+  function toggleFullscreen(forceState) {
+    if (!visPane) return;
+    const isFullscreen = visPane.classList.contains('fullscreen-active');
+    const targetState = (forceState !== undefined) ? forceState : !isFullscreen;
+
+    if (targetState) {
+      visPane.classList.add('fullscreen-active');
+      if (btnFullscreen) {
+        btnFullscreen.title = 'Exit Fullscreen (F or Esc)';
+        btnFullscreen.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="4 14 10 14 10 20"/>
+          <polyline points="20 10 14 10 14 4"/>
+          <line x1="14" y1="10" x2="21" y2="3"/>
+          <line x1="3" y1="21" x2="10" y2="14"/>
+        </svg>`;
+      }
+      try {
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        }
+      } catch (err) {}
+    } else {
+      visPane.classList.remove('fullscreen-active');
+      if (btnFullscreen) {
+        btnFullscreen.title = 'Toggle Fullscreen (F)';
+        btnFullscreen.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>`;
+      }
+      try {
+        if (document.fullscreenElement && document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      } catch (err) {}
+    }
+
+    setTimeout(() => {
+      resizeCanvas();
+      drawPerspectiveScene();
+    }, 40);
+  }
+
+  if (btnFullscreen) {
+    btnFullscreen.addEventListener('click', () => toggleFullscreen());
+  }
+
+  if (btnExitFullscreen) {
+    btnExitFullscreen.addEventListener('click', () => toggleFullscreen(false));
+  }
 
   if (btnZoomIn) {
     btnZoomIn.addEventListener('click', () => {
@@ -361,18 +414,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Keyboard Shortcuts
   window.addEventListener('keydown', e => {
-    if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) return;
+    if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (btnRunCode) btnRunCode.click();
+      }
+      return;
+    }
     if (e.code === 'Space') {
       e.preventDefault();
       if (btnToggleOrbit) btnToggleOrbit.click();
     } else if (e.code === 'KeyR') {
       if (btnResetView) btnResetView.click();
+    } else if (e.code === 'KeyF') {
+      e.preventDefault();
+      toggleFullscreen();
+    } else if (e.code === 'Escape') {
+      if (visPane && visPane.classList.contains('fullscreen-active')) {
+        e.preventDefault();
+        toggleFullscreen(false);
+      }
     }
   });
 
   // ---------------------------------------------------------------------------
-  // 5. HIGH-PERFORMANCE 60-120 FPS 3D RENDER LOOP
+  // 5. HIGH-PERFORMANCE 60-120 FPS 3D RENDER LOOP & LIVE RUN CASCADE
   // ---------------------------------------------------------------------------
+  const visLiveBadge = document.getElementById('visLiveBadge');
+  const visLiveText = document.getElementById('visLiveText');
+  let isForwardPassRunning = false;
+  let forwardPassStartTime = 0;
+  let forwardPassStage = 0;
+  const STAGE_DURATION_MS = 450;
+
+  function triggerLiveForwardPass() {
+    syncCodeToNetwork();
+    isForwardPassRunning = true;
+    forwardPassStartTime = performance.now();
+    forwardPassStage = 0;
+
+    if (btnRunCode) {
+      btnRunCode.classList.add('running');
+      btnRunCode.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation:spin 0.8s linear infinite;">
+        <circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="16"/>
+      </svg><span>Running...</span>`;
+    }
+
+    if (visLiveBadge && visLiveText) {
+      visLiveBadge.style.borderColor = '#ffffff';
+      visLiveText.textContent = `FORWARD PASS: INITIALIZING LAYER 0 INPUTS...`;
+    }
+  }
+
   function drawPerspectiveScene() {
     if (canvasW <= 0 || canvasH <= 0) return;
 
@@ -425,9 +518,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. HARDWARE-ACCELERATED NATIVE BEZIER FILAMENTS
     const lum = settings.threadLuminosity || 0.55;
+    const activeStageLayer = Math.floor(forwardPassStage);
+    const isSurgingStage = isForwardPassRunning;
 
     threads.forEach(t => {
       const isConnectedToHovered = hoveredNode ? (t.src === hoveredNode || t.dst === hoveredNode) : false;
+      const isSurging = isSurgingStage && (t.src.layerIdx === activeStageLayer);
 
       // Project the 4 Bezier control points directly
       const pSrc = project3D(t.src.x, t.src.y, t.src.z, cx, cy);
@@ -441,7 +537,16 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.moveTo(pSrc.x, pSrc.y);
       ctx.bezierCurveTo(p1.x, p1.y, p2.x, p2.y, pDst.x, pDst.y);
 
-      if (hoveredNode) {
+      if (isSurging) {
+        // High intensity pulse when forward pass wave surges through this layer
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+        ctx.lineWidth = 4.0;
+        ctx.stroke();
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.0;
+        ctx.stroke();
+      } else if (hoveredNode) {
         if (isConnectedToHovered) {
           // Dual pass stroke for clean, instant, lag-free glow
           ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
@@ -462,21 +567,25 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.stroke();
       }
 
-      // Optical wave pulse
-      const speedMultiplier = (hoveredNode && isConnectedToHovered) ? 1.8 : 1.0;
-      const waveProg = (wavePulseTime * speedMultiplier + Math.abs(t.seed) * 2.4) % 1;
-      const wx = evalCubic(t.src.x, t.p1.x, t.p2.x, t.dst.x, waveProg);
-      const wy = evalCubic(t.src.y, t.p1.y, t.p2.y, t.dst.y, waveProg);
-      const wz = evalCubic(t.src.z, t.p1.z, t.p2.z, t.dst.z, waveProg);
-      const wp = project3D(wx, wy, wz, cx, cy);
+      // Optical wave pulse: flowing live signals along every thread, surging on run
+      const speedMultiplier = (hoveredNode && isConnectedToHovered) ? 1.8 : (isSurging ? 2.8 : 1.0);
+      const pulseOffsets = isSurging ? [0, 0.45] : [0];
 
-      if (wp && (!hoveredNode || isConnectedToHovered)) {
-        ctx.beginPath();
-        const pSize = isConnectedToHovered ? 3.0 : 1.8;
-        ctx.arc(wp.x, wp.y, pSize * wp.scale * 1.5, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
-        ctx.fill();
-      }
+      pulseOffsets.forEach(off => {
+        const waveProg = (wavePulseTime * speedMultiplier + Math.abs(t.seed) * 2.4 + off) % 1;
+        const wx = evalCubic(t.src.x, t.p1.x, t.p2.x, t.dst.x, waveProg);
+        const wy = evalCubic(t.src.y, t.p1.y, t.p2.y, t.dst.y, waveProg);
+        const wz = evalCubic(t.src.z, t.p1.z, t.p2.z, t.dst.z, waveProg);
+        const wp = project3D(wx, wy, wz, cx, cy);
+
+        if (wp && (!hoveredNode || isConnectedToHovered || isSurging)) {
+          ctx.beginPath();
+          const pSize = (isConnectedToHovered || isSurging) ? 3.0 : 1.8;
+          ctx.arc(wp.x, wp.y, pSize * wp.scale * 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+        }
+      });
     });
 
     // 4. Floating Layer Headers (Monochrome Glass Cards)
@@ -520,16 +629,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     projNodes.forEach(({ node, p }) => {
       const isHovered = (hoveredNode === node);
-      const radius = (isHovered ? 6.2 : 4.6) * p.scale * 1.5;
+      const isCurrentLayerActive = isForwardPassRunning && (node.layerIdx === activeStageLayer);
+      const radius = (isHovered || isCurrentLayerActive ? 6.2 : 4.6) * p.scale * 1.5;
 
       // Glow halo
       ctx.beginPath();
-      ctx.arc(p.x, p.y, radius * (isHovered ? 2.8 : 2.0), 0, Math.PI * 2);
-      ctx.fillStyle = isHovered ? 'rgba(255, 255, 255, 0.45)' : 'rgba(255, 255, 255, 0.16)';
+      ctx.arc(p.x, p.y, radius * (isHovered ? 2.8 : (isCurrentLayerActive ? 2.6 : 2.0)), 0, Math.PI * 2);
+      ctx.fillStyle = (isHovered || isCurrentLayerActive) ? 'rgba(255, 255, 255, 0.45)' : 'rgba(255, 255, 255, 0.16)';
       ctx.fill();
 
-      // Outer focus ring if hovered
-      if (isHovered) {
+      // Outer focus ring if hovered or actively firing
+      if (isHovered || isCurrentLayerActive) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, radius * 1.8, 0, Math.PI * 2);
         ctx.strokeStyle = '#ffffff';
@@ -541,8 +651,8 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.beginPath();
       ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
       ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = isHovered ? '#ffffff' : '#1c1c20';
-      ctx.lineWidth = isHovered ? 2.0 : 1.5;
+      ctx.strokeStyle = (isHovered || isCurrentLayerActive) ? '#ffffff' : '#1c1c20';
+      ctx.lineWidth = (isHovered || isCurrentLayerActive) ? 2.0 : 1.5;
       ctx.fill();
       ctx.stroke();
 
@@ -606,6 +716,42 @@ document.addEventListener('DOMContentLoaded', () => {
     currentPitch += (targetPitch - currentPitch) * 0.08;
     camDist += (targetCamDist - camDist) * 0.08;
     wavePulseTime += 0.024;
+
+    // Handle Live Forward-Pass Animation Cascade
+    if (isForwardPassRunning) {
+      const elapsed = performance.now() - forwardPassStartTime;
+      const totalStages = Math.max(1, layerSizes.length - 1);
+      const totalDuration = totalStages * STAGE_DURATION_MS;
+      forwardPassStage = elapsed / STAGE_DURATION_MS;
+
+      if (elapsed < totalDuration) {
+        const curL = Math.min(layerSizes.length - 1, Math.floor(forwardPassStage));
+        const nextL = Math.min(layerSizes.length - 1, curL + 1);
+        if (visLiveText) {
+          visLiveText.textContent = `FORWARD PASS: LAYER ${curL} -> LAYER ${nextL} (${threads.length} THREADS FIRING)`;
+        }
+        const liveThreadCount = document.getElementById('liveThreadCount');
+        if (liveThreadCount) {
+          liveThreadCount.textContent = `Live Run: Layer ${curL} -> Layer ${nextL}`;
+        }
+      } else {
+        isForwardPassRunning = false;
+        if (btnRunCode) {
+          btnRunCode.classList.remove('running');
+          btnRunCode.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg><span>Run</span>`;
+        }
+        if (visLiveBadge && visLiveText) {
+          visLiveBadge.style.borderColor = 'var(--border-strong)';
+          visLiveText.textContent = `LIVE SIGNAL FLOW: ${threads.length} THREADS ACTIVE`;
+        }
+        const liveThreadCount = document.getElementById('liveThreadCount');
+        if (liveThreadCount) {
+          liveThreadCount.textContent = `${layerSizes.length} Layers • ${nodes.length} Neurons • ${threads.length} Synapses`;
+        }
+      }
+    }
 
     drawPerspectiveScene();
     requestAnimationFrame(animationLoop);
@@ -738,8 +884,7 @@ epochs = 300`;
 
   if (btnRunCode) {
     btnRunCode.addEventListener('click', () => {
-      syncCodeToNetwork();
-      wavePulseTime += 1.0;
+      triggerLiveForwardPass();
     });
   }
 
@@ -988,7 +1133,7 @@ epochs = 300`;
   if (btnNativeShare) {
     btnNativeShare.addEventListener('click', async () => {
       const shareData = {
-        title: 'SynapseLab — 3D Visualization Simulator for Students',
+        title: 'SynapseLab: 3D Visualization Simulator for Students',
         text: 'Interactive 3D neural network simulator with luminous white filaments!',
         url: window.location.href
       };
@@ -1001,7 +1146,32 @@ epochs = 300`;
   }
 
   // ---------------------------------------------------------------------------
-  // 10. INITIALIZATION
+  // 10. COOKIE & DPDP CONSENT BANNER
+  // ---------------------------------------------------------------------------
+  const cookieConsentBanner = document.getElementById('cookieConsentBanner');
+  const btnAcceptCookies = document.getElementById('btnAcceptCookies');
+  const btnCookieLearnMore = document.getElementById('btnCookieLearnMore');
+
+  if (localStorage.getItem('synapselab_cookie_consent') === 'true') {
+    if (cookieConsentBanner) cookieConsentBanner.classList.add('hidden');
+  }
+
+  if (btnAcceptCookies && cookieConsentBanner) {
+    btnAcceptCookies.addEventListener('click', () => {
+      localStorage.setItem('synapselab_cookie_consent', 'true');
+      cookieConsentBanner.classList.add('hidden');
+    });
+  }
+
+  if (btnCookieLearnMore) {
+    btnCookieLearnMore.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (legalModal) legalModal.classList.add('active');
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // 11. INITIALIZATION
   // ---------------------------------------------------------------------------
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
