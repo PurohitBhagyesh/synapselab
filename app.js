@@ -1,7 +1,7 @@
 /**
  * SynapseLab Application Engine
  * 3D Visualization Simulator for Students
- * Pure Black & White Monochrome Aesthetic • Precision 3D Engine • Comprehensive Sensitivity Controls
+ * Pure Black & White Monochrome Aesthetic • 60-120 FPS High Performance Engine
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -65,12 +65,18 @@ document.addEventListener('DOMContentLoaded', () => {
   if (tabTest) tabTest.addEventListener('click', () => switchMode('test'));
 
   // ---------------------------------------------------------------------------
-  // 3. PERSISTENT 3D VISUALIZER ENGINE (MONOCHROME BLACK & WHITE)
+  // 3. PERSISTENT 3D VISUALIZER ENGINE (CACHED SIZING & HIGH PERFORMANCE)
   // ---------------------------------------------------------------------------
   const canvas = document.getElementById('canvas3d');
   if (!canvas) return;
 
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { alpha: false });
+
+  // Cached canvas dimensions to completely avoid getBoundingClientRect() during 60 FPS loop
+  let canvasW = 600;
+  let canvasH = 450;
+  let cx = 300;
+  let cy = 225;
 
   // Camera State with Smooth Inertial Lerping
   let targetYaw = -0.38;
@@ -86,9 +92,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let lastX = 0, lastY = 0;
   let mouseScreenX = -9999, mouseScreenY = -9999;
   let hoveredNode = null;
+  let hoverCheckPending = false;
 
   // 3D Moving Stars Background
-  const starCount = 200;
+  const starCount = 180;
   const stars = [];
   for (let i = 0; i < starCount; i++) {
     stars.push({
@@ -122,10 +129,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const stepY = count > 1 ? totalH / (count - 1) : 0;
 
       for (let i = 0; i < count; i++) {
+        // True 3D spatial curvature in X and Z so nodes and all sets of threads are visible from all angles
+        const spreadFactor = count > 1 ? (i / (count - 1) - 0.5) : 0;
+        const nodeX = Math.sin(spreadFactor * Math.PI * 0.75) * 90;
+        const nodeZ = z + Math.cos(spreadFactor * Math.PI * 0.75) * 35;
+        const nodeY = count === 1 ? 0 : startY + i * stepY;
+
         nodes.push({
-          x: 0,
-          y: count === 1 ? 0 : startY + i * stepY,
-          z: z,
+          x: nodeX,
+          y: nodeY,
+          z: nodeZ,
           layerIdx: lIdx,
           nodeIdx: i,
           layerName: lIdx === 0 ? "Input Layer" : (lIdx === numLayers - 1 ? "Output Layer" : `Hidden Layer ${lIdx}`),
@@ -134,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Generate sweeping, organic 3D curved white filaments
+    // Generate sweeping 3D curved filaments across all layers
     for (let l = 0; l < numLayers - 1; l++) {
       const srcNodes = nodes.filter(n => n.layerIdx === l);
       const dstNodes = nodes.filter(n => n.layerIdx === l + 1);
@@ -142,11 +155,22 @@ document.addEventListener('DOMContentLoaded', () => {
       srcNodes.forEach((src, sIdx) => {
         dstNodes.forEach((dst, dIdx) => {
           const dz = dst.z - src.z;
-          const spreadX = ((sIdx - srcNodes.length / 2) + (dIdx - dstNodes.length / 2)) * 7.5;
-          const spreadY = (sIdx - dIdx) * 2.2;
+          const dx = dst.x - src.x;
+          const dy = dst.y - src.y;
 
-          const p1 = { x: src.x + spreadX, y: src.y + spreadY, z: src.z + dz * 0.35 };
-          const p2 = { x: dst.x + spreadX * 0.75, y: dst.y - spreadY * 0.5, z: src.z + dz * 0.65 };
+          const curvatureX = ((sIdx - srcNodes.length / 2) + (dIdx - dstNodes.length / 2)) * 10;
+          const curvatureY = (sIdx - dIdx) * 4;
+
+          const p1 = {
+            x: src.x + dx * 0.35 + curvatureX,
+            y: src.y + dy * 0.15 + curvatureY,
+            z: src.z + dz * 0.35
+          };
+          const p2 = {
+            x: dst.x - dx * 0.35 + curvatureX * 0.8,
+            y: dst.y - dy * 0.15 - curvatureY * 0.5,
+            z: src.z + dz * 0.65
+          };
 
           const seed = Math.sin(sIdx * 19 + dIdx * 37);
           threads.push({
@@ -187,30 +211,30 @@ document.addEventListener('DOMContentLoaded', () => {
   function resizeCanvas() {
     if (!canvas || !canvas.parentElement) return;
     const rect = canvas.parentElement.getBoundingClientRect();
-    const w = rect.width || canvas.parentElement.clientWidth || 600;
-    const h = rect.height || canvas.parentElement.clientHeight || 450;
-    if (w <= 0 || h <= 0) return;
+    canvasW = rect.width || canvas.parentElement.clientWidth || 600;
+    canvasH = rect.height || canvas.parentElement.clientHeight || 450;
+    if (canvasW <= 0 || canvasH <= 0) return;
+
+    cx = canvasW / 2;
+    cy = canvasH / 2;
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
+    canvas.width = canvasW * dpr;
+    canvas.height = canvasH * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
   // ---------------------------------------------------------------------------
-  // 4. MOUSE / TOUCH INTERACTION & TOUCH-TO-LIGHT-UP
+  // 4. MOUSE / TOUCH INTERACTION & THROTTLED DOT DETECTION
   // ---------------------------------------------------------------------------
   const btnToggleOrbit = document.getElementById('btnToggleOrbit');
 
   function updateHoveredDot(screenX, screenY) {
-    const rect = canvas.parentElement.getBoundingClientRect();
-    const cx = (rect.width || 600) / 2;
-    const cy = (rect.height || 450) / 2;
-
     let closest = null;
-    let minDist = 22; // 22px hit radius
+    let minDist = 22;
 
-    nodes.forEach(n => {
+    for (let i = 0; i < nodes.length; i++) {
+      const n = nodes[i];
       const p = project3D(n.x, n.y, n.z, cx, cy);
       if (p) {
         const dx = screenX - p.x;
@@ -221,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
           closest = n;
         }
       }
-    });
+    }
 
     hoveredNode = closest;
     canvas.style.cursor = hoveredNode ? 'pointer' : (isDragging ? 'grabbing' : 'grab');
@@ -246,8 +270,12 @@ document.addEventListener('DOMContentLoaded', () => {
       targetPitch = Math.max(-0.65, Math.min(0.85, targetPitch + (e.clientY - lastY) * sens));
       lastX = e.clientX;
       lastY = e.clientY;
-    } else {
-      updateHoveredDot(mouseScreenX, mouseScreenY);
+    } else if (!hoverCheckPending) {
+      hoverCheckPending = true;
+      requestAnimationFrame(() => {
+        updateHoveredDot(mouseScreenX, mouseScreenY);
+        hoverCheckPending = false;
+      });
     }
   });
 
@@ -305,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
     isDragging = false;
   });
 
-  // Modern Viewport Toolbar
+  // Viewport Toolbar Buttons
   const btnZoomIn = document.getElementById('btnZoomIn');
   const btnZoomOut = document.getElementById('btnZoomOut');
   const btnResetView = document.getElementById('btnResetView');
@@ -337,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Keyboard Navigation
+  // Keyboard Shortcuts
   window.addEventListener('keydown', e => {
     if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) return;
     if (e.code === 'Space') {
@@ -349,30 +377,28 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 5. 3D RENDER LOOP: PURE BLACK & WHITE + TOUCH LIGHT-UP
+  // 5. HIGH-PERFORMANCE 60-120 FPS 3D RENDER LOOP
   // ---------------------------------------------------------------------------
   function drawPerspectiveScene() {
-    if (!canvas || canvas.width === 0 || canvas.height === 0) return;
-    const rect = canvas.parentElement.getBoundingClientRect();
-    const cx = (rect.width || 600) / 2;
-    const cy = (rect.height || 450) / 2;
+    if (canvasW <= 0 || canvasH <= 0) return;
 
-    ctx.clearRect(0, 0, rect.width, rect.height);
+    // Fast fill background
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, canvasW, canvasH);
 
-    // 1. Moving 3D Cosmic Starfield (Monochrome)
+    // 1. Moving 3D Cosmic Starfield
     if (settings.enableStarfield) {
       stars.forEach(s => {
         s.z -= 0.35 * settings.orbitSpeed;
         if (s.z < -800) s.z = 800;
 
         const p = project3D(s.x, s.y, s.z, cx, cy);
-        if (p && p.x >= 0 && p.x <= rect.width && p.y >= 0 && p.y <= rect.height) {
+        if (p && p.x >= 0 && p.x <= canvasW && p.y >= 0 && p.y <= canvasH) {
           const twinkle = 0.6 + 0.4 * Math.sin(wavePulseTime * 2.5 + s.phase);
           const alpha = s.baseAlpha * twinkle * Math.max(0, Math.min(1, 1 - p.depth / 2200));
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, s.size * Math.max(0.5, p.scale), 0, Math.PI * 2);
           ctx.fillStyle = `rgba(255, 255, 255, ${alpha.toFixed(2)})`;
-          ctx.fill();
+          const sz = s.size * Math.max(0.6, p.scale);
+          ctx.fillRect(p.x, p.y, sz, sz);
         }
       });
     }
@@ -383,70 +409,62 @@ document.addEventListener('DOMContentLoaded', () => {
     const step = 60;
     ctx.lineWidth = 0.75;
 
+    ctx.beginPath();
     for (let z = -size; z <= size; z += step) {
       const pA = project3D(-size, gridY, z, cx, cy);
       const pB = project3D(size, gridY, z, cx, cy);
       if (pA && pB) {
-        const alpha = Math.max(0, Math.min(0.12, 1 - (pA.depth + pB.depth) / 2200));
-        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
-        ctx.beginPath();
         ctx.moveTo(pA.x, pA.y);
         ctx.lineTo(pB.x, pB.y);
-        ctx.stroke();
       }
     }
     for (let x = -size; x <= size; x += step) {
       const pA = project3D(x, gridY, -size, cx, cy);
       const pB = project3D(x, gridY, size, cx, cy);
       if (pA && pB) {
-        const alpha = Math.max(0, Math.min(0.12, 1 - (pA.depth + pB.depth) / 2200));
-        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
-        ctx.beginPath();
         ctx.moveTo(pA.x, pA.y);
         ctx.lineTo(pB.x, pB.y);
-        ctx.stroke();
       }
     }
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.stroke();
 
-    // 3. 3D WHITE FILAMENTS & TOUCH ISOLATION LIGHTING
+    // 3. HARDWARE-ACCELERATED NATIVE BEZIER FILAMENTS
+    const lum = settings.threadLuminosity || 0.55;
+
     threads.forEach(t => {
       const isConnectedToHovered = hoveredNode ? (t.src === hoveredNode || t.dst === hoveredNode) : false;
 
-      const segments = 12;
-      let prevP = project3D(t.src.x, t.src.y, t.src.z, cx, cy);
-      if (!prevP) return;
+      // Project the 4 Bezier control points directly
+      const pSrc = project3D(t.src.x, t.src.y, t.src.z, cx, cy);
+      const p1 = project3D(t.p1.x, t.p1.y, t.p1.z, cx, cy);
+      const p2 = project3D(t.p2.x, t.p2.y, t.p2.z, cx, cy);
+      const pDst = project3D(t.dst.x, t.dst.y, t.dst.z, cx, cy);
+
+      if (!pSrc || !p1 || !p2 || !pDst) return;
 
       ctx.beginPath();
-      ctx.moveTo(prevP.x, prevP.y);
+      ctx.moveTo(pSrc.x, pSrc.y);
+      ctx.bezierCurveTo(p1.x, p1.y, p2.x, p2.y, pDst.x, pDst.y);
 
-      for (let i = 1; i <= segments; i++) {
-        const r = i / segments;
-        const x = evalCubic(t.src.x, t.p1.x, t.p2.x, t.dst.x, r);
-        const y = evalCubic(t.src.y, t.p1.y, t.p2.y, t.dst.y, r);
-        const z = evalCubic(t.src.z, t.p1.z, t.p2.z, t.dst.z, r);
-        const cp = project3D(x, y, z, cx, cy);
-        if (cp) ctx.lineTo(cp.x, cp.y);
-      }
-
-      // Touch / Hover isolation logic
       if (hoveredNode) {
         if (isConnectedToHovered) {
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 2.4;
-          ctx.shadowColor = '#ffffff';
-          ctx.shadowBlur = 10;
+          // Dual pass stroke for clean, instant, lag-free glow
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+          ctx.lineWidth = 4.5;
           ctx.stroke();
-          ctx.shadowBlur = 0;
+
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2.0;
+          ctx.stroke();
         } else {
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
           ctx.lineWidth = 0.75;
           ctx.stroke();
         }
       } else {
-        // Normal state: clean white silk filaments
-        const lum = settings.threadLuminosity || 0.55;
         ctx.strokeStyle = `rgba(255, 255, 255, ${lum})`;
-        ctx.lineWidth = 1.25;
+        ctx.lineWidth = 1.15;
         ctx.stroke();
       }
 
@@ -458,17 +476,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const wz = evalCubic(t.src.z, t.p1.z, t.p2.z, t.dst.z, waveProg);
       const wp = project3D(wx, wy, wz, cx, cy);
 
-      if (wp) {
-        if (!hoveredNode || isConnectedToHovered) {
-          ctx.beginPath();
-          const pSize = isConnectedToHovered ? 3.0 : 1.8;
-          ctx.arc(wp.x, wp.y, pSize * wp.scale * 1.5, 0, Math.PI * 2);
-          ctx.fillStyle = '#ffffff';
-          ctx.shadowColor = '#ffffff';
-          ctx.shadowBlur = isConnectedToHovered ? 12 : 5;
-          ctx.fill();
-          ctx.shadowBlur = 0;
-        }
+      if (wp && (!hoveredNode || isConnectedToHovered)) {
+        ctx.beginPath();
+        const pSize = isConnectedToHovered ? 3.0 : 1.8;
+        ctx.arc(wp.x, wp.y, pSize * wp.scale * 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
       }
     });
 
@@ -517,8 +530,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Glow halo
       ctx.beginPath();
-      ctx.arc(p.x, p.y, radius * (isHovered ? 3.0 : 2.2), 0, Math.PI * 2);
-      ctx.fillStyle = isHovered ? 'rgba(255, 255, 255, 0.45)' : 'rgba(255, 255, 255, 0.18)';
+      ctx.arc(p.x, p.y, radius * (isHovered ? 2.8 : 2.0), 0, Math.PI * 2);
+      ctx.fillStyle = isHovered ? 'rgba(255, 255, 255, 0.45)' : 'rgba(255, 255, 255, 0.16)';
       ctx.fill();
 
       // Outer focus ring if hovered
@@ -568,8 +581,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const th = 56;
       let tx = tip.x;
       let ty = tip.y;
-      if (tx + tw > rect.width - 10) tx = tip.x - tw - 24;
-      if (ty + th > rect.height - 10) ty = rect.height - th - 10;
+      if (tx + tw > canvasW - 10) tx = tip.x - tw - 24;
+      if (ty + th > canvasH - 10) ty = canvasH - th - 10;
       if (ty < 10) ty = 10;
 
       ctx.fillStyle = 'rgba(9, 9, 11, 0.95)';
@@ -636,31 +649,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------------------------------------------------------------------------
-  // 7. TEST MODE LIVE CODING & SIMULATION
+  // 7. TEST MODE LIVE CODING & SIMULATION (PURE SIMPLE CODE, ZERO INSTRUCTIONS)
   // ---------------------------------------------------------------------------
   const studentCode = document.getElementById('studentCode');
   const btnRunCode = document.getElementById('btnRunCode');
   const btnTrainLive = document.getElementById('btnTrainLive');
   const btnResetCode = document.getElementById('btnResetCode');
 
-  const defaultStarterCode = `# ==========================================================
-# SynapseLab: Student Code & Architecture Lab
-# Type or edit layers below to see 3D threads update live!
-# ==========================================================
-
-# 1. Define Layer Architecture [Input, Hidden..., Output]
-layers = [3, 8, 4, 1]
-
-# 2. Hyperparameters
-activation = "relu"     # Non-linear activation for neurons
-learning_rate = 0.05    # Gradient descent step size
-epochs = 300            # Training iterations
-
-print(f"Network initialized: {layers}")
-
-# STUDENT EXPERIMENT:
-# Change layers above to [4, 10, 6, 2] or [2, 6, 6, 1]
-# The 3D filaments and neuron nodes will rebuild immediately!`;
+  const defaultStarterCode = `layers = [3, 8, 4, 1]
+activation = "relu"
+learning_rate = 0.05
+epochs = 300`;
 
   function syncCodeToNetwork() {
     if (!studentCode) return;
