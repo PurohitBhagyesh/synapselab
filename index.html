@@ -76,63 +76,123 @@
          LEFT PANE 1: GUIDE MODE (Student Interactive Classroom)
          --------------------------------------------------------------------- -->
     <aside class="mode-sidebar guide-sidebar active" id="paneGuide">
+      <!-- Guide Mode Header: Educational Read-Only Experience -->
       <div class="guide-header">
-        <h2>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M12 16v-4M12 8h.01"/>
-          </svg>
-          <span>Interactive Student Guide</span>
-        </h2>
+        <div class="guide-header-top">
+          <h2>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 16v-4M12 8h.01"/>
+            </svg>
+            <span>Interactive Student Guide</span>
+          </h2>
+          <span class="guide-mode-tag">Read-Only</span>
+        </div>
+        <div class="guide-notice-pill">
+          <span>Curriculum and visual mechanics. To write and execute custom Python code, switch to <strong>Test Mode</strong> above.</span>
+        </div>
         <span class="guide-badge" id="hudGuideStats">3 Layers &bull; 11 Neurons &bull; 24 Synapses</span>
       </div>
 
       <div class="lesson-list">
         <!-- Lesson 1 -->
-        <article class="lesson-card active">
-          <div class="lesson-tag">LESSON 01 &bull; ANATOMY</div>
-          <h3 class="lesson-title">What is a Neural Network?</h3>
+        <article class="lesson-card active" data-lesson="0">
+          <div class="lesson-tag">LESSON 01 &bull; ANATOMY & LAYERS</div>
+          <h3 class="lesson-title">What is an Artificial Neural Network?</h3>
           <p class="lesson-desc">
-            An artificial neural network organizes compute into distinct layers. Data enters through the <strong>Input Layer</strong>, transforms through intermediate <strong>Hidden Layers</strong>, and arrives at the <strong>Output Layer</strong>. Touch or hover any dot to isolate its synapses.
+            An artificial neural network (ANN) organizes compute into distinct layers of neurons (nodes) connected sequentially from input to output:
           </p>
-          <button class="lesson-action" type="button">
-            <span>&bull; View 3-Layer Network [3, 6, 2]</span>
-          </button>
+          <ul class="lesson-points">
+            <li><strong>Input Layer</strong>: Sensor nodes that accept raw feature vectors (e.g. study hours, sensor readings). Neurons here do not transform data; they distribute inputs forward.</li>
+            <li><strong>Hidden Layer(s)</strong>: Feature detectors that combine inputs into intermediate mathematical abstractions.</li>
+            <li><strong>Output Layer</strong>: Decision nodes generating target predictions (e.g. classification class probabilities).</li>
+          </ul>
+          <div class="lesson-actions-group">
+            <button class="lesson-action" id="btnLesson1Starter" type="button">
+              <span>Load 2-Layer Starter [2, 2]</span>
+            </button>
+            <button class="lesson-action" id="btnLesson1Standard" type="button">
+              <span>Load 3-Layer Network [3, 6, 2]</span>
+            </button>
+          </div>
         </article>
 
         <!-- Lesson 2 -->
-        <article class="lesson-card">
-          <div class="lesson-tag">LESSON 02 &bull; SYNAPSES</div>
-          <h3 class="lesson-title">The Threads (Synapses & Weights)</h3>
+        <article class="lesson-card" data-lesson="1">
+          <div class="lesson-tag">LESSON 02 &bull; SYNAPSES & WEIGHTS</div>
+          <h3 class="lesson-title">Synaptic Filaments and Numeric Weights</h3>
           <p class="lesson-desc">
-            The luminous white curves connecting dots are <strong>synapses</strong>. Each thread carries a mathematical weight <em>w</em> that amplifies or dampens data flowing between neurons. Touching a dot highlights all incoming and outgoing connections.
+            The white luminous filaments connecting neurons represent <strong>synapses</strong>. Each synapse carries an adjustable mathematical scalar called a <strong>weight (w)</strong>:
           </p>
+          <ul class="lesson-points">
+            <li><strong>Positive weight</strong>: Excitatory synapse that amplifies signals passed to the downstream neuron.</li>
+            <li><strong>Negative weight</strong>: Inhibitory synapse that dampens or suppresses incoming data.</li>
+            <li><strong>Magnitude (|w|)</strong>: Governs the strength of the connection. Hover or touch any neuron dot to isolate its incoming fan-in and outgoing fan-out.</li>
+          </ul>
           <button class="lesson-action" id="btnPulseGuide" type="button">
-            <span>&bull; Pulse Synaptic Signal Waves</span>
+            <span>Pulse Synaptic Signal Wave Across Network</span>
           </button>
         </article>
 
         <!-- Lesson 3 -->
-        <article class="lesson-card">
-          <div class="lesson-tag">LESSON 03 &bull; MATH & RELU</div>
-          <h3 class="lesson-title">Inside a Neuron (Activation)</h3>
+        <article class="lesson-card" data-lesson="2">
+          <div class="lesson-tag">LESSON 03 &bull; THE NEURON & RELU</div>
+          <h3 class="lesson-title">Weighted Summation and Non-Linear Activation</h3>
           <p class="lesson-desc">
-            Each neuron computes a linear combination <em>z = &sum;(w &times; x) + b</em> and passes it through an activation function like <strong>ReLU</strong>: <em>f(z) = max(0, z)</em> to model complex non-linear patterns.
+            Inside each artificial neuron dot, two fundamental mathematical steps occur before passing output to subsequent layers:
           </p>
-          <button class="lesson-action" type="button">
-            <span>&bull; Inspect Activated Neurons [2, 5, 2]</span>
+          <ul class="lesson-points">
+            <li><strong>Weighted Sum</strong>: Computes <em>z = &sum;(w<sub>i</sub> &times; x<sub>i</sub>) + b</em>, where <em>b</em> is a trainable bias term shifting the firing threshold.</li>
+            <li><strong>Activation Function (ReLU)</strong>: <em>f(z) = max(0, z)</em>. Without non-linear activations, stacks of layers collapse into a single trivial linear equation, unable to model non-linear boundaries.</li>
+          </ul>
+          <button class="lesson-action" id="btnLesson3Inspect" type="button">
+            <span>Inspect Activated Network [2, 5, 2]</span>
           </button>
         </article>
 
         <!-- Lesson 4 -->
-        <article class="lesson-card">
+        <article class="lesson-card" data-lesson="3">
           <div class="lesson-tag">LESSON 04 &bull; DEEP LEARNING</div>
-          <h3 class="lesson-title">Deep Abstraction & Loss</h3>
+          <h3 class="lesson-title">Hierarchical Abstraction in Deep Networks</h3>
           <p class="lesson-desc">
-            Adding hidden layers enables hierarchical feature extraction. During training, backpropagation compares network outputs to target labels and minimizes error through gradient descent.
+            A network is considered <strong>Deep</strong> when it contains two or more hidden layers. Depth enables hierarchical representation learning:
           </p>
-          <button class="lesson-action" type="button">
-            <span>&bull; Load Deep Network [3, 8, 6, 2]</span>
+          <ul class="lesson-points">
+            <li><strong>Initial Hidden Layers</strong>: Detect low-level primitive features such as edge angles and boundaries.</li>
+            <li><strong>Intermediate Layers</strong>: Combine primitives into geometric contours, shapes, and textures.</li>
+            <li><strong>Deep Hidden Layers</strong>: Synthesize high-level semantic concepts before reaching the final decision layer.</li>
+          </ul>
+          <button class="lesson-action" id="btnLesson4Deep" type="button">
+            <span>Load Deep 4-Layer Network [3, 8, 6, 2]</span>
+          </button>
+        </article>
+
+        <!-- Lesson 5 -->
+        <article class="lesson-card" data-lesson="4">
+          <div class="lesson-tag">LESSON 05 &bull; TRAINING & GRADIENT DESCENT</div>
+          <h3 class="lesson-title">Loss Functions and Backpropagation</h3>
+          <p class="lesson-desc">
+            Neural networks do not guess; they optimize parameters iteratively through calculus:
+          </p>
+          <ul class="lesson-points">
+            <li><strong>Loss Function (&Lscr;)</strong>: Measures output prediction error compared to true training labels.</li>
+            <li><strong>Backpropagation</strong>: Computes analytical partial derivatives <em>&part;&Lscr;/&part;w</em> for every weight via the calculus chain rule.</li>
+            <li><strong>Gradient Descent</strong>: Updates weights opposite the error gradient: <em>w &larr; w - &eta; &part;&Lscr;/&part;w</em>, where <em>&eta;</em> is the learning rate.</li>
+          </ul>
+          <button class="lesson-action" id="btnLesson5Train" type="button">
+            <span>Simulate Backprop Training Cascade</span>
+          </button>
+        </article>
+
+        <!-- Lesson 6: Transition to Code -->
+        <article class="lesson-card cta-card" data-lesson="5">
+          <div class="lesson-tag">LESSON 06 &bull; CODE LAB</div>
+          <h3 class="lesson-title">Ready to Build Your Own Architecture?</h3>
+          <p class="lesson-desc">
+            You now understand layers, synapses, weights, activations, and backpropagation. Switch over to <strong>Test Mode</strong> to edit <code>network_threads.py</code> directly: customize layer dimensions, tune learning rates, and run forward passes live!
+          </p>
+          <button class="lesson-action primary-action" id="btnSwitchToTest" type="button">
+            <span>Switch to Test Mode (Code Lab) &rarr;</span>
           </button>
         </article>
       </div>
@@ -152,6 +212,7 @@
             <line x1="9" y1="17" x2="13" y2="17"/>
           </svg>
           <span class="vscode-tab-title">network_threads.py</span>
+          <span class="code-mode-tag">Write Mode</span>
           <button class="vscode-tab-close" type="button" aria-label="Close tab">&times;</button>
         </div>
 
@@ -304,17 +365,6 @@ epochs = 300</textarea>
         </svg>
         <span>Buy me a Coffee</span>
       </button>
-
-      <button class="bottom-action-btn" id="btnOpenShare" type="button">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="18" cy="5" r="3"/>
-          <circle cx="6" cy="12" r="3"/>
-          <circle cx="18" cy="19" r="3"/>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-        </svg>
-        <span>Share</span>
-      </button>
     </div>
   </footer>
 
@@ -379,6 +429,73 @@ epochs = 300</textarea>
         </div>
 
         <button type="button" class="btn" id="btnResetSettings" style="margin-top:4px; font-size:11.5px;">Reset to Defaults</button>
+
+        <!-- Divider -->
+        <div class="settings-divider"></div>
+
+        <!-- Share Simulator (Moved from Bottom Bar) -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <strong>Share Simulator</strong>
+            <span class="settings-hint">Direct link or system sheet</span>
+          </div>
+          <div class="settings-btn-row">
+            <button type="button" class="btn" id="btnSettingsShareLink">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+              </svg>
+              <span id="settingsShareCopyText">Copy Direct Link</span>
+            </button>
+            <button type="button" class="btn" id="btnSettingsShareSheet">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+              <span>Share Sheet</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="settings-divider"></div>
+
+        <!-- Report an Issue / Feedback (Prefilled with Developer Email) -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <strong>Report an Issue / Feedback</strong>
+            <span class="settings-hint">Bug, UI glitch, or suggestion</span>
+          </div>
+          
+          <div class="settings-issue-box">
+            <div class="issue-developer-info">
+              <span class="issue-label">Developer:</span>
+              <span class="issue-email-value" id="developerEmail">Purohitunofficialbhagyesh@gmail.com</span>
+              <button type="button" class="btn-micro" id="btnCopyDevEmail" title="Copy developer email">Copy</button>
+            </div>
+
+            <div class="issue-form-group">
+              <input type="text" id="issueSubjectInput" class="issue-input" placeholder="Topic (e.g. Mobile Layout Glitch, Feature Request)" value="SynapseLab Feedback">
+              <textarea id="issueBodyInput" class="issue-textarea" rows="2" placeholder="Describe the issue, device type, or ideas..."></textarea>
+            </div>
+
+            <div class="settings-btn-row">
+              <button type="button" class="btn primary" id="btnSendIssueEmail">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                <span>Send Report via Email</span>
+              </button>
+              <a href="https://github.com/PurohitBhagyesh/synapselab/issues" target="_blank" rel="noopener noreferrer" class="btn">
+                <span>GitHub Issues &rarr;</span>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

@@ -758,33 +758,88 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------------------------------------------------------------------------
-  // 6. GUIDE MODE INTERACTIVE LESSONS
+  // 6. GUIDE MODE INTERACTIVE LESSONS & CALL-TO-ACTIONS
   // ---------------------------------------------------------------------------
   const lessonCards = document.querySelectorAll('.lesson-card');
-  lessonCards.forEach((card, idx) => {
+  lessonCards.forEach((card) => {
     card.addEventListener('click', () => {
       lessonCards.forEach(c => c.classList.remove('active'));
       card.classList.add('active');
 
-      if (idx === 0) {
+      const lessonIdx = parseInt(card.dataset.lesson, 10);
+      if (lessonIdx === 0) {
         buildNetwork([3, 6, 2]);
         targetCamDist = 650;
-      } else if (idx === 1) {
+      } else if (lessonIdx === 1) {
         buildNetwork([3, 8, 3]);
         wavePulseTime += 1.0;
-      } else if (idx === 2) {
+      } else if (lessonIdx === 2) {
         buildNetwork([2, 5, 2]);
-      } else if (idx === 3) {
+      } else if (lessonIdx === 3) {
         buildNetwork([3, 8, 6, 2]);
+      } else if (lessonIdx === 4) {
+        buildNetwork([3, 6, 4, 2]);
+        triggerLiveForwardPass();
       }
     });
   });
+
+  const btnLesson1Starter = document.getElementById('btnLesson1Starter');
+  if (btnLesson1Starter) {
+    btnLesson1Starter.addEventListener('click', (e) => {
+      e.stopPropagation();
+      buildNetwork([2, 2]);
+      targetCamDist = 580;
+    });
+  }
+
+  const btnLesson1Standard = document.getElementById('btnLesson1Standard');
+  if (btnLesson1Standard) {
+    btnLesson1Standard.addEventListener('click', (e) => {
+      e.stopPropagation();
+      buildNetwork([3, 6, 2]);
+      targetCamDist = 650;
+    });
+  }
 
   const btnPulseGuide = document.getElementById('btnPulseGuide');
   if (btnPulseGuide) {
     btnPulseGuide.addEventListener('click', (e) => {
       e.stopPropagation();
-      wavePulseTime += 1.4;
+      triggerLiveForwardPass();
+    });
+  }
+
+  const btnLesson3Inspect = document.getElementById('btnLesson3Inspect');
+  if (btnLesson3Inspect) {
+    btnLesson3Inspect.addEventListener('click', (e) => {
+      e.stopPropagation();
+      buildNetwork([2, 5, 2]);
+    });
+  }
+
+  const btnLesson4Deep = document.getElementById('btnLesson4Deep');
+  if (btnLesson4Deep) {
+    btnLesson4Deep.addEventListener('click', (e) => {
+      e.stopPropagation();
+      buildNetwork([3, 8, 6, 2]);
+    });
+  }
+
+  const btnLesson5Train = document.getElementById('btnLesson5Train');
+  if (btnLesson5Train) {
+    btnLesson5Train.addEventListener('click', (e) => {
+      e.stopPropagation();
+      buildNetwork([3, 6, 4, 2]);
+      triggerLiveForwardPass();
+    });
+  }
+
+  const btnSwitchToTest = document.getElementById('btnSwitchToTest');
+  if (btnSwitchToTest && tabTest) {
+    btnSwitchToTest.addEventListener('click', (e) => {
+      e.stopPropagation();
+      tabTest.click();
     });
   }
 
@@ -1018,7 +1073,6 @@ epochs = 300`;
   const legalModal = document.getElementById('legalModal');
 
   const btnOpenCoffee = document.getElementById('btnOpenCoffee');
-  const btnOpenShare = document.getElementById('btnOpenShare');
   const btnCloseCoffee = document.getElementById('btnCloseCoffee');
   const btnCloseShare = document.getElementById('btnCloseShare');
   const btnCloseLegal = document.getElementById('btnCloseLegal');
@@ -1026,7 +1080,6 @@ epochs = 300`;
   if (btnOpenCoffee) btnOpenCoffee.addEventListener('click', () => coffeeModal.classList.add('active'));
   if (btnCloseCoffee) btnCloseCoffee.addEventListener('click', () => coffeeModal.classList.remove('active'));
 
-  if (btnOpenShare) btnOpenShare.addEventListener('click', () => shareModal.classList.add('active'));
   if (btnCloseShare) btnCloseShare.addEventListener('click', () => shareModal.classList.remove('active'));
 
   if (btnCloseLegal) btnCloseLegal.addEventListener('click', () => legalModal.classList.remove('active'));
@@ -1142,6 +1195,68 @@ epochs = 300`;
       } else if (btnShareCopy) {
         btnShareCopy.click();
       }
+    });
+  }
+
+  // Settings Modal: Share Simulator Controls
+  const btnSettingsShareLink = document.getElementById('btnSettingsShareLink');
+  const settingsShareCopyText = document.getElementById('settingsShareCopyText');
+  const btnSettingsShareSheet = document.getElementById('btnSettingsShareSheet');
+
+  if (btnSettingsShareLink) {
+    btnSettingsShareLink.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        if (settingsShareCopyText) {
+          const original = settingsShareCopyText.textContent;
+          settingsShareCopyText.textContent = 'Link Copied!';
+          setTimeout(() => { settingsShareCopyText.textContent = original; }, 1800);
+        }
+      } catch (err) {}
+    });
+  }
+
+  if (btnSettingsShareSheet) {
+    btnSettingsShareSheet.addEventListener('click', async () => {
+      const shareData = {
+        title: 'SynapseLab: 3D Visualization Simulator for Students',
+        text: 'Interactive 3D neural network simulator with luminous white filaments!',
+        url: window.location.href
+      };
+      if (navigator.share) {
+        try { await navigator.share(shareData); } catch (err) {}
+      } else if (shareModal) {
+        shareModal.classList.add('active');
+      }
+    });
+  }
+
+  // Settings Modal: Report an Issue / Feedback
+  const btnCopyDevEmail = document.getElementById('btnCopyDevEmail');
+  const btnSendIssueEmail = document.getElementById('btnSendIssueEmail');
+  const issueSubjectInput = document.getElementById('issueSubjectInput');
+  const issueBodyInput = document.getElementById('issueBodyInput');
+  const DEV_EMAIL = 'Purohitunofficialbhagyesh@gmail.com';
+
+  if (btnCopyDevEmail) {
+    btnCopyDevEmail.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(DEV_EMAIL);
+        const orig = btnCopyDevEmail.textContent;
+        btnCopyDevEmail.textContent = 'Copied!';
+        setTimeout(() => { btnCopyDevEmail.textContent = orig; }, 1500);
+      } catch (err) {}
+    });
+  }
+
+  if (btnSendIssueEmail) {
+    btnSendIssueEmail.addEventListener('click', () => {
+      const topic = (issueSubjectInput && issueSubjectInput.value.trim()) || 'SynapseLab Issue Report';
+      const userText = (issueBodyInput && issueBodyInput.value.trim()) || 'Describe your issue or suggestion here...';
+      const sysInfo = `System Info: ${navigator.userAgent} (${window.innerWidth}x${window.innerHeight})`;
+      const fullBody = `${userText}\n\n---\n${sysInfo}`;
+      const mailtoUrl = `mailto:${DEV_EMAIL}?subject=${encodeURIComponent(topic)}&body=${encodeURIComponent(fullBody)}`;
+      window.location.href = mailtoUrl;
     });
   }
 

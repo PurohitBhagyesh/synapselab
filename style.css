@@ -235,6 +235,12 @@ main {
   background: var(--surface-alt);
   border-bottom: 1px solid var(--border);
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.guide-header-top {
+  display: flex;
   align-items: center;
   justify-content: space-between;
 }
@@ -248,6 +254,43 @@ main {
   gap: 8px;
 }
 
+.guide-mode-tag, .code-mode-tag {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.guide-mode-tag {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
+}
+
+.code-mode-tag {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #ffffff;
+  margin-left: 6px;
+}
+
+.guide-notice-pill {
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed var(--border-strong);
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.guide-notice-pill strong {
+  color: #ffffff;
+}
+
 .guide-badge {
   font-size: 10.5px;
   font-family: "SF Mono", Menlo, Consolas, monospace;
@@ -256,6 +299,7 @@ main {
   padding: 2px 7px;
   border-radius: 4px;
   border: 1px solid var(--border-strong);
+  align-self: flex-start;
 }
 
 .lesson-list {
@@ -307,6 +351,38 @@ main {
   line-height: 1.5;
 }
 
+.lesson-points {
+  margin: 8px 0 6px 16px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.lesson-points li {
+  margin-bottom: 4px;
+}
+
+.lesson-points strong {
+  color: #ffffff;
+}
+
+.lesson-actions-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.lesson-card.cta-card {
+  border-color: var(--border-strong);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lesson-card.cta-card:hover {
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .lesson-action {
   margin-top: 9px;
   display: inline-flex;
@@ -326,6 +402,18 @@ main {
 .lesson-action:hover {
   border-color: var(--border-strong);
   background: var(--border);
+}
+
+.lesson-action.primary-action {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+  font-weight: 700;
+  padding: 7px 14px;
+}
+
+.lesson-action.primary-action:hover {
+  background: #e4e4e7;
 }
 
 /* -------------------------------------------------------------------------
@@ -924,6 +1012,137 @@ main {
   transform: translateX(18px);
 }
 
+/* Settings Modal Extensions (Share & Issue Reporting) */
+#settingsModal .modal-dialog {
+  width: 440px;
+  max-width: 95vw;
+  max-height: 88vh;
+  overflow-y: auto;
+}
+
+.settings-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-section-header strong {
+  font-size: 12.5px;
+  color: var(--text);
+}
+
+.settings-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.settings-btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+.settings-btn-row .btn {
+  flex: 1;
+  justify-content: center;
+  font-size: 11.5px;
+  padding: 7px 10px;
+}
+
+.settings-issue-box {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.issue-developer-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border);
+  padding: 5px 8px;
+  border-radius: 5px;
+}
+
+.issue-label {
+  color: var(--text-muted);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.issue-email-value {
+  color: #ffffff;
+  font-family: "SF Mono", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-micro {
+  background: var(--border);
+  color: #ffffff;
+  border: none;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn-micro:hover {
+  background: var(--border-strong);
+}
+
+.issue-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.issue-input, .issue-textarea {
+  width: 100%;
+  background: #000000;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 6px 10px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 11.5px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.issue-input:focus, .issue-textarea:focus {
+  border-color: #ffffff;
+}
+
+.issue-textarea {
+  resize: vertical;
+  min-height: 52px;
+}
+
 /* Buy Me a Coffee QR & UPI Layout */
 .snack-qr-pad {
   background: #ffffff;
@@ -1073,20 +1292,88 @@ main {
 }
 
 /* -------------------------------------------------------------------------
-   8. MOBILE RESPONSIVENESS
+   8. MOBILE RESPONSIVENESS (< 820px and < 560px)
    ------------------------------------------------------------------------- */
 @media (max-width: 820px) {
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
   main {
     flex-direction: column;
-    padding: 8px;
+    padding: 6px;
+    height: calc(100dvh - 52px - 36px);
+    height: calc(100vh - 52px - 36px);
+    gap: 6px;
   }
+
   .mode-sidebar {
     width: 100%;
     height: 48%;
   }
+
   .vis-pane {
     width: 100%;
     height: 52%;
+  }
+
+  .nav-inner {
+    padding: 0 10px;
+    gap: 8px;
+  }
+
+  .brand-sub {
+    display: none;
+  }
+
+  .mode-segmented {
+    height: 34px;
+  }
+
+  .mode-tab {
+    padding: 4px 10px;
+    font-size: 11.5px;
+  }
+
+  .bottom-bar {
+    padding: 0 10px;
+    font-size: 11px;
+  }
+
+  .bottom-left #footerStats {
+    display: none;
+  }
+
+  .modal-dialog {
+    padding: 14px;
+    width: 95vw;
+  }
+}
+
+@media (max-width: 560px) {
+  .nav-inner .btn span {
+    display: none;
+  }
+
+  .nav-inner .nav-icon-btn span {
+    display: none;
+  }
+
+  .vscode-tab-actions .vscode-action-btn:nth-child(2) {
+    display: none;
+  }
+
+  .bottom-bar {
+    height: auto;
+    padding: 6px 10px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .bottom-left {
+    gap: 8px;
+    flex-wrap: wrap;
   }
 }
 

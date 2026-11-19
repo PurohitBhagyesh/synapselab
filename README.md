@@ -2,25 +2,43 @@
 
 An interactive, zero-dependency, open-source 3D neural network visualizer and code studio engineered to make deep learning intuitive, visual, and tactile for students.
 
+```
+       [Input Layer]              [Hidden Layers]             [Output Layer]
+          ( x1 )  ─── w11 ───>  (  h1  )  ─── w1 ───>  (  y1  )
+          ( x2 )  ─── w21 ───>  (  h2  )  ─── w2 ───>  (  y2  )
+          ( x3 )  ─── w31 ───>  (  h3  )
+```
+
 ---
 
-## Overview
+## GitHub Repository Details (Copy & Paste)
+
+Fill these exact fields into your repository details at [github.com/PurohitBhagyesh/synapselab](https://github.com/PurohitBhagyesh/synapselab):
+
+* **Description**: `Interactive 3D neural network visualizer & live Python code lab for students. Hardware-accelerated filaments, real-time forward pass, zero dependencies.`
+* **Website**: `https://synapselab.devs.li` (or `https://synapselab.vercel.app`)
+* **Topics**: `neural-networks`, `deep-learning`, `3d-visualization`, `machine-learning`, `education`, `python`, `simulator`, `canvas`, `webgl`, `students`
+
+---
+
+## Overview: Two Complementary Student Modes
 
 SynapseLab provides two distinct working environments tailored for learning:
 
-* **Guide Mode**: A structured, interactive learning curriculum explaining what an artificial neural network is, what the layers (Input, Hidden, Output) do, what the synaptic threads and weights represent, and how signals flow forward to produce predictions. Touching or hovering any neuron dot isolates its incoming and outgoing synapses with real-time HUD telemetry.
-* **Test Mode**: A distraction-free code laboratory (`network_threads.py`) for students to write real Python architecture code (`layers = [3, 8, 4, 1]`), adjust hyperparameters, simulate training, trigger live multi-stage forward passes, and watch 3D white filaments adapt in real time.
+* **Guide Mode (Interactive Curriculum &bull; Read-Only)**: A structured step-by-step visual syllabus explaining artificial neural networks, synaptic filaments, numeric weights, ReLU activation functions, deep representations, and backpropagation. Students touch and hover neurons to isolate incoming and outgoing connections without worrying about code syntax.
+* **Test Mode (Code Lab &bull; Write Mode)**: A full VS Code-inspired laboratory (`network_threads.py`). Students edit custom Python layer architecture (`layers = [3, 8, 4, 1]`), adjust hyperparameters, simulate training, and click **Run** to execute live multi-stage signal cascades across all 3D threads.
 
 ---
 
 ## Core Features
 
-* **3D Visualization Simulator**: 3D cubic Bezier filaments rendered in continuous real-time perspective, depth-sorted neurons, and an orientation floor grid at 60-120 FPS.
-* **Live Run Forward Pass**: Clicking **Run** (or pressing `Cmd/Ctrl + Enter`) triggers a multi-stage sequential forward pass wave across all layers, illuminating active neurons and firing fast signal beads along all threads.
-* **Fullscreen Mode & Back Navigation**: Click the Fullscreen icon in the viewport toolbar (or press `F`) to expand the 3D visualizer to 100% of the screen. A prominent **Back** button in the top-left (or pressing `Esc`) instantly restores the split-screen view.
-* **Moving Cosmic Starfield**: Over 200 3D background stars with smooth parallax drifting and twinkle oscillation.
-* **Synaptic Isolation on Touch/Hover**: Touching or hovering any neuron dot immediately lights up its connected threads with intense luminous glow while softly dimming the rest of the network.
-* **VS Code Editing Experience (`network_threads.py`)**: Authentic editor layout with line numbers, cursor position tracking (`Ln X, Col Y`), 4-space Tab indentation, and bracket auto-closing.
+* **Hardware-Accelerated 3D Filaments**: Native cubic Bezier spline evaluation rendered in real-time perspective (`60-120 FPS`), with depth-sorted neurons, radiant halos, and an orientation floor grid.
+* **Live Forward Pass & Signal Cascade**: Clicking **Run** (or pressing `Cmd/Ctrl + Enter`) triggers a multi-stage signal pulse across all layers, illuminating neurons sequentially from input to output.
+* **Full Screen Mode & Back Navigation**: Click the Fullscreen icon in the viewport toolbar (or press `F`) to expand the visualizer across the full display. A prominent **Back** button in the top-left (or pressing `Esc`) instantly restores the split view.
+* **Moving Cosmic Starfield**: Over 200 3D background stars with smooth parallax drifting, twinkle oscillation, and toggle controls.
+* **Synaptic Isolation on Touch/Hover**: Touching or hovering any neuron dot immediately lights up its connected filaments with high-contrast dual-pass strokes while softly dimming the rest of the network.
+* **VS Code Editing Experience (`network_threads.py`)**: Authentic editor layout with line numbers gutter, cursor position tracking (`Ln X, Col Y`), 4-space Tab indentation, bracket auto-closing, and zero tutorial banners.
+* **Settings & Developer Issue Reporting**: Built-in simulator settings (orbit sensitivity, zoom sensitivity, auto-orbit speed, thread luminosity) plus a direct issue reporter prefilled with `Purohitunofficialbhagyesh@gmail.com`.
 * **Pure Monochrome Design**: Built adhering strictly to modern standards: zero emojis, zero em dashes, zero purple gradients, zero pill buttons, high-contrast black and white styling (`#000000`, `#ffffff`).
 * **Compliance & DPDP Act 2023**: 100% in-browser client execution, zero tracking cookies, local storage strictly for UI preferences, and complete legal transparency.
 
@@ -38,7 +56,76 @@ SynapseLab provides two distinct working environments tailored for learning:
 
 ---
 
-## Quick Start
+## Deploying to Vercel with DEVS.LI Custom Subdomain
+
+This project includes a production-ready `vercel.json` file. Follow these steps to publish live with your free `devs.li` subdomain:
+
+### Step 1: Deploy on Vercel
+1. Go to [vercel.com/new](https://vercel.com/new).
+2. Connect your GitHub account and import `PurohitBhagyesh/synapselab`.
+3. Keep default settings (Framework Preset: **Other**, Root Directory: `./`).
+4. Click **Deploy**. Vercel will deploy the site in seconds (e.g. `synapselab.vercel.app`).
+
+### Step 2: Configure Your Subdomain on DEVS.LI
+1. Go to [devs.li/dashboard](https://devs.li/dashboard).
+2. Claim your desired subdomain: e.g. `synapselab.devs.li`.
+3. In DNS Management for your subdomain, add a **CNAME** record:
+   * **Type**: `CNAME`
+   * **Host / Name**: `@` (or `synapselab`)
+   * **Target / Value**: `cname.vercel-dns.com`
+
+### Step 3: Add Subdomain to Vercel
+1. In your Vercel Project Dashboard, navigate to **Settings** -> **Domains**.
+2. Enter your subdomain: `synapselab.devs.li` and click **Add**.
+3. Vercel will verify the DNS record and automatically generate a free SSL/TLS certificate.
+4. Your website is now live globally at `https://synapselab.devs.li`!
+
+---
+
+## Quick Start (Local Development)
+
+Open directly in your web browser (Safari, Chrome, Firefox, Edge):
+
+```bash
+cd ~/Desktop/neural_network_project
+open index.html
+```
+
+Or run a local lightweight server:
+
+```bash
+python3 -m http.server 8000
+# Then visit http://localhost:8000
+```
+
+---
+
+## Included Python Implementation Scripts
+
+In addition to the in-browser simulator, this repository includes practical Python reference implementations:
+
+| Script | Description |
+| :--- | :--- |
+| `train_nn.py` | Trains an MLP with `scikit-learn` and saves `neural_network_model.joblib`. |
+| `predict_nn.py` | Runs inference using the trained joblib model. |
+| `neural_network_from_scratch.py` | Pure NumPy multi-layer forward/backward pass, ReLU activation, and MSE loss. |
+| `plot_network.py` | Matplotlib script producing publication-quality diagrams (`neural_network_threads.png`). |
+
+---
+
+## Developer Contact & Issues
+
+* Developer: **Bhagyesh Purohit**
+* Email: `Purohitunofficialbhagyesh@gmail.com`
+* GitHub: [@PurohitBhagyesh](https://github.com/PurohitBhagyesh)
+* Repository: [https://github.com/PurohitBhagyesh/synapselab](https://github.com/PurohitBhagyesh/synapselab)
+* Issue Tracker: [https://github.com/PurohitBhagyesh/synapselab/issues](https://github.com/PurohitBhagyesh/synapselab/issues)
+
+---
+
+## License
+
+MIT License. Open for educational, academic, and developer use.
 
 Open directly in your web browser (Safari, Chrome, Firefox, Edge):
 
