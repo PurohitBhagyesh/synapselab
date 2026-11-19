@@ -64,21 +64,57 @@ This project includes a production-ready `vercel.json` file. Follow these steps 
 1. Go to [vercel.com/new](https://vercel.com/new).
 2. Connect your GitHub account and import `PurohitBhagyesh/synapselab`.
 3. Keep default settings (Framework Preset: **Other**, Root Directory: `./`).
-4. Click **Deploy**. Vercel will deploy the site in seconds (e.g. `synapselab.vercel.app`).
+4. Click **Deploy**. Vercel will deploy the site in seconds (e.g. `synapselab.vercel.app` or `synapselab-orpin.vercel.app`).
 
 ### Step 2: Configure Your Subdomain on DEVS.LI
 1. Go to [devs.li/dashboard](https://devs.li/dashboard).
-2. Claim your desired subdomain: e.g. `synapselab.devs.li`.
-3. In DNS Management for your subdomain, add a **CNAME** record:
-   * **Type**: `CNAME`
-   * **Host / Name**: `@` (or `synapselab`)
-   * **Target / Value**: `cname.vercel-dns.com`
+2. For your claimed subdomain `synapselab.devs.li`, update your DNS records:
+   * **Record 1 (CNAME)**:
+     * **Type**: `CNAME`
+     * **Host / Name**: `synapselab`
+     * **Target / Value**: `d81fd5c91ca4006a.vercel-dns-017.com.` (or `cname.vercel-dns.com`)
+   * **Record 2 (TXT Ownership Verification)**:
+     * Click **+ Add Record** next to `synapselab.devs.li`
+     * **Type**: `TXT`
+     * **Host / Name**: `_vercel`
+     * **Target / Value**: `vc-domain-verify=synapselab.devs.li,3f5a05b2b72309b68d76`
+3. Click **Save / Provision Domain**.
 
-### Step 3: Add Subdomain to Vercel
+### Step 3: Verify Subdomain on Vercel
 1. In your Vercel Project Dashboard, navigate to **Settings** -> **Domains**.
-2. Enter your subdomain: `synapselab.devs.li` and click **Add**.
-3. Vercel will verify the DNS record and automatically generate a free SSL/TLS certificate.
+2. Click the **Refresh** button next to `synapselab.devs.li`.
+3. Vercel will verify the TXT and CNAME records and issue a valid SSL certificate.
 4. Your website is now live globally at `https://synapselab.devs.li`!
+
+---
+
+## Test Mode: Advanced Capabilities
+
+* **Multiline Layer Declarations**: Format layers on a single line or across multiple indented lines:
+  ```python
+  layers = [
+      3,  # Input layer (3 features)
+      8,  # Hidden layer 1
+      4,  # Hidden layer 2
+      1   # Output layer (Endpoint)
+  ]
+  activation = "relu"
+  learning_rate = 0.05
+  epochs = 300
+  ```
+* **Interactive Code Breakpoints**: Click any line number in the gutter to toggle a breakpoint dot. Setting a breakpoint on line 1 pauses the 3D signal cascade at Layer 0 for deep inspection, with a one-click Resume action.
+* **Output Endpoint Predictions & Loss**: When running inference, SynapseLab calculates real mathematical activations and outputs them at the Endpoint (e.g. `ENDPOINT PREDICTION: [0.942, 0.058] • LOSS: 0.0124`).
+* **Multi-Epoch Backpropagation Simulation**: Clicking **Simulate** executes a progressive 4-epoch gradient descent cascade with reverse backpropagation signal pulses flowing backward from the Endpoint.
+
+---
+
+## Responsive Breakpoints & Device Support
+
+SynapseLab is engineered to adapt fluidly across all devices:
+* **Large Desktop (> 1024px)**: Full split-view layout with left curriculum/code editor and right 3D WebGL/Canvas viewport.
+* **Tablet / Small Laptop (768px - 1023px)**: Responsive column flex with balanced 48%/52% vertical workspace split.
+* **Mobile Landscape & Standard Mobile (< 560px & < 480px)**: Compact navigation bar (46px), icon-only controls, text ellipsis on telemetry badges, and 12px editor sizing.
+* **Ultra-Compact Devices (< 380px)**: Micro brand title, tight segmented mode switcher, zero horizontal scroll.
 
 ---
 

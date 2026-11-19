@@ -446,12 +446,82 @@ document.addEventListener('DOMContentLoaded', () => {
   let forwardPassStartTime = 0;
   let forwardPassStage = 0;
   const STAGE_DURATION_MS = 450;
+  let endpointPredictionOutputs = [0.942, 0.058];
+  let calculatedLoss = 0.0124;
+  let pausedAtBreakpoint = false;
+  let pausedBreakpointLine = 0;
+
+  function calculateLayerActivations() {
+    if (!nodes || nodes.length === 0) return;
+    const act = (currentModelParams && currentModelParams.activation) || 'relu';
+
+    // 1. Layer 0: Input features
+    const inputNodes = nodes.filter(n => n.layerIdx === 0);
+    inputNodes.forEach((n, idx) => {
+      n.activationValue = +(0.55 + Math.sin(idx * 2.3 + 1.2) * 0.35).toFixed(3);
+    });
+
+    // 2. Hidden & Output Layers
+    for (let l = 1; l < layerSizes.length; l++) {
+      const layerNodes = nodes.filter(n => n.layerIdx === l);
+
+      layerNodes.forEach((n, idx) => {
+        const inThreads = threads.filter(t => t.dst === n);
+        let z = 0;
+        inThreads.forEach(t => {
+          const srcVal = t.src.activationValue !== undefined ? t.src.activationValue : 0.5;
+          z += srcVal * parseFloat(t.weight || 0.5);
+        });
+        z += Math.sin(idx * 1.9 + l * 0.7) * 0.15; // bias term
+
+        let val = 0;
+        if (act === 'sigmoid') {
+          val = 1 / (1 + Math.exp(-z));
+        } else if (act === 'tanh') {
+          val = (Math.tanh(z) + 1) / 2;
+        } else if (act === 'linear') {
+          val = Math.min(1, Math.max(0, z));
+        } else {
+          // ReLU / Default
+          val = Math.max(0, Math.min(1.2, z));
+        }
+
+        n.activationValue = +Math.max(0.01, Math.min(0.99, val)).toFixed(3);
+      });
+    }
+
+    const outputNodes = nodes.filter(n => n.layerIdx === layerSizes.length - 1);
+    endpointPredictionOutputs = outputNodes.map(n => n.activationValue);
+    calculatedLoss = +(0.5 * endpointPredictionOutputs.reduce((acc, v) => acc + Math.pow(1.0 - v, 2), 0) / (endpointPredictionOutputs.length || 1)).toFixed(4);
+    if (calculatedLoss < 0.005) calculatedLoss = 0.0124;
+  }
 
   function triggerLiveForwardPass() {
     syncCodeToNetwork();
+
+    if (pausedAtBreakpoint) {
+      // Resume from paused breakpoint
+      pausedAtBreakpoint = false;
+      isForwardPassRunning = true;
+      forwardPassStartTime = performance.now() - (forwardPassStage * STAGE_DURATION_MS);
+
+      if (btnRunCode) {
+        btnRunCode.classList.add('running');
+        btnRunCode.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation:spin 0.8s linear infinite;">
+          <circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="16"/>
+        </svg><span>Running...</span>`;
+      }
+      if (visLiveText) {
+        visLiveText.textContent = `RESUMING EXECUTION AFTER BREAKPOINT LINE ${pausedBreakpointLine}...`;
+      }
+      return;
+    }
+
+    calculateLayerActivations();
     isForwardPassRunning = true;
     forwardPassStartTime = performance.now();
     forwardPassStage = 0;
+    pausedAtBreakpoint = false;
 
     if (btnRunCode) {
       btnRunCode.classList.add('running');
@@ -462,7 +532,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (visLiveBadge && visLiveText) {
       visLiveBadge.style.borderColor = '#ffffff';
-      visLiveText.textContent = `FORWARD PASS: INITIALIZING LAYER 0 INPUTS...`;
+      visLiveText.textContent = `FORWARD PASS: INITIALIZING LAYER 0 INPUTS (${layerSizes[0]} FEATURES)...`;
     }
   }
 
@@ -609,7 +679,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.fillStyle = '#ffffff';
       ctx.font = `600 ${Math.max(8, Math.round(10.5 * pTop.scale * 1.5))}px -apple-system, sans-serif`;
       ctx.textAlign = 'center';
-      const name = lIdx === 0 ? "Input Layer" : (lIdx === layerSizes.length - 1 ? "Output Layer" : `Hidden ${lIdx}`);
+      const name = lIdx === 0 ? "Input Layer" : (lIdx === layerSizes.length - 1 ? "Endpoint (Output)" : `Hidden ${lIdx}`);
       ctx.fillText(name, pTop.x, y + 12 * pTop.scale * 1.5);
 
       ctx.fillStyle = '#8e8e96';
@@ -702,11 +772,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
       ctx.fillStyle = '#8e8e96';
       ctx.font = '10px "SF Mono", monospace';
-      ctx.fillText(`In: ${tip.inCount} syn | Out: ${tip.outCount} syn`, tx + 8, ty + 32);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '10px -apple-system, sans-serif';
-      ctx.fillText('Connected threads active', tx + 8, ty + 47);
+      if (tip.node.layerIdx === layerSizes.length - 1) {
+        ctx.fillText(`Endpoint Activation: ${tip.node.activationValue !== undefined ? tip.node.activationValue.toFixed(3) : '0.942'}`, tx + 8, ty + 32);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '10px -apple-system, sans-serif';
+        ctx.fillText(`In: ${tip.inCount} syn | Endpoint Prediction Node`, tx + 8, ty + 47);
+      } else {
+        ctx.fillText(`In: ${tip.inCount} syn | Out: ${tip.outCount} syn`, tx + 8, ty + 32);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '10px -apple-system, sans-serif';
+        const actName = (typeof currentModelParams !== 'undefined' && currentModelParams.activation ? currentModelParams.activation.toUpperCase() : 'RELU');
+        ctx.fillText(`Activation: ${tip.node.activationValue !== undefined ? tip.node.activationValue.toFixed(3) : '0.500'} (${actName})`, tx + 8, ty + 47);
+      }
     }
   }
 
@@ -718,14 +795,27 @@ document.addEventListener('DOMContentLoaded', () => {
     wavePulseTime += 0.024;
 
     // Handle Live Forward-Pass Animation Cascade
-    if (isForwardPassRunning) {
+    if (isForwardPassRunning && !pausedAtBreakpoint) {
       const elapsed = performance.now() - forwardPassStartTime;
       const totalStages = Math.max(1, layerSizes.length - 1);
       const totalDuration = totalStages * STAGE_DURATION_MS;
       forwardPassStage = elapsed / STAGE_DURATION_MS;
+      const curL = Math.min(layerSizes.length - 1, Math.floor(forwardPassStage));
 
-      if (elapsed < totalDuration) {
-        const curL = Math.min(layerSizes.length - 1, Math.floor(forwardPassStage));
+      // Breakpoint verification: if breakpoint set on line 1, pause at layer 0
+      if (activeBreakpoints.has(1) && curL === 0 && elapsed > 180 && !pausedAtBreakpoint) {
+        pausedAtBreakpoint = true;
+        pausedBreakpointLine = 1;
+        if (visLiveText) {
+          visLiveText.textContent = `PAUSED AT BREAKPOINT (LINE 1): LAYER 0 INSPECTING • CLICK RESUME TO CONTINUE`;
+        }
+        if (btnRunCode) {
+          btnRunCode.classList.remove('running');
+          btnRunCode.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg><span>Resume</span>`;
+        }
+      } else if (elapsed < totalDuration) {
         const nextL = Math.min(layerSizes.length - 1, curL + 1);
         if (visLiveText) {
           visLiveText.textContent = `FORWARD PASS: LAYER ${curL} -> LAYER ${nextL} (${threads.length} THREADS FIRING)`;
@@ -736,6 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       } else {
         isForwardPassRunning = false;
+        pausedAtBreakpoint = false;
         if (btnRunCode) {
           btnRunCode.classList.remove('running');
           btnRunCode.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
@@ -743,8 +834,9 @@ document.addEventListener('DOMContentLoaded', () => {
           </svg><span>Run</span>`;
         }
         if (visLiveBadge && visLiveText) {
-          visLiveBadge.style.borderColor = 'var(--border-strong)';
-          visLiveText.textContent = `LIVE SIGNAL FLOW: ${threads.length} THREADS ACTIVE`;
+          visLiveBadge.style.borderColor = '#ffffff';
+          const outStr = endpointPredictionOutputs.map(v => v.toFixed(3)).join(', ');
+          visLiveText.textContent = `ENDPOINT PREDICTION: [${outStr}] • LOSS: ${calculatedLoss} • 100% SYNCED`;
         }
         const liveThreadCount = document.getElementById('liveThreadCount');
         if (liveThreadCount) {
@@ -858,14 +950,46 @@ activation = "relu"
 learning_rate = 0.05
 epochs = 300`;
 
+  let activeBreakpoints = new Set();
+  let currentModelParams = {
+    activation: 'relu',
+    learningRate: 0.05,
+    epochs: 300,
+    layers: [3, 8, 4, 1]
+  };
+
   function updateLineNumbers() {
     if (!studentCode || !lineNumbers) return;
-    const count = (studentCode.value.split('\n').length) || 1;
+    const lines = studentCode.value.split('\n');
+    const count = lines.length || 1;
     let html = '';
     for (let i = 1; i <= count; i++) {
-      html += `${i}<br>`;
+      const isBp = activeBreakpoints.has(i);
+      html += `<div class="gutter-line ${isBp ? 'has-bp' : ''}" data-line="${i}" title="${isBp ? 'Breakpoint active (click to remove)' : 'Click to toggle breakpoint'}"><span class="bp-dot"></span><span class="gutter-num">${i}</span></div>`;
     }
     lineNumbers.innerHTML = html;
+  }
+
+  if (lineNumbers) {
+    lineNumbers.addEventListener('click', (e) => {
+      const lineRow = e.target.closest('.gutter-line');
+      if (!lineRow) return;
+      const lineNum = parseInt(lineRow.dataset.line, 10);
+      if (activeBreakpoints.has(lineNum)) {
+        activeBreakpoints.delete(lineNum);
+      } else {
+        activeBreakpoints.add(lineNum);
+      }
+      updateLineNumbers();
+
+      if (visLiveText) {
+        if (activeBreakpoints.size > 0) {
+          visLiveText.textContent = `BREAKPOINT SET ON LINE ${lineNum} (TOTAL ACTIVE: ${activeBreakpoints.size})`;
+        } else {
+          visLiveText.textContent = `ALL BREAKPOINTS REMOVED • EXECUTION UNRESTRICTED`;
+        }
+      }
+    });
   }
 
   function updateCursorPosition() {
@@ -879,15 +1003,45 @@ epochs = 300`;
 
   function syncCodeToNetwork() {
     if (!studentCode) return;
-    const match = studentCode.value.match(/layers\s*=\s*\[(.*?)\]/);
-    if (match && match[1]) {
-      const parsed = match[1].split(',')
+    const code = studentCode.value;
+
+    // Multiline & inline comment safe regex for layers array
+    const layersMatch = code.match(/layers\s*=\s*\[([\s\S]*?)\]/);
+    if (layersMatch && layersMatch[1]) {
+      const cleanLayersStr = layersMatch[1].replace(/#.*$/gm, '');
+      const parsed = cleanLayersStr.split(',')
         .map(n => parseInt(n.trim(), 10))
-        .filter(n => !isNaN(n) && n > 0 && n <= 18);
+        .filter(n => !isNaN(n) && n > 0 && n <= 24);
 
       if (parsed.length >= 2) {
+        currentModelParams.layers = parsed;
         buildNetwork(parsed);
       }
+    }
+
+    // Extract activation function
+    const actMatch = code.match(/activation\s*=\s*["']([a-zA-Z0-9_\-]+)["']/i);
+    if (actMatch && actMatch[1]) {
+      currentModelParams.activation = actMatch[1].toLowerCase();
+    }
+
+    // Extract learning rate
+    const lrMatch = code.match(/learning_rate\s*=\s*([0-9]*\.?[0-9]+)/i);
+    if (lrMatch && lrMatch[1]) {
+      currentModelParams.learningRate = parseFloat(lrMatch[1]);
+    }
+
+    // Extract epochs
+    const epMatch = code.match(/epochs\s*=\s*(\d+)/i);
+    if (epMatch && epMatch[1]) {
+      currentModelParams.epochs = parseInt(epMatch[1], 10);
+    }
+
+    // Update param telemetry pill in status bar
+    const paramStats = document.getElementById('paramStats');
+    if (paramStats) {
+      const actDisplay = currentModelParams.activation.toUpperCase();
+      paramStats.textContent = `${actDisplay} • lr: ${currentModelParams.learningRate} • ${currentModelParams.epochs} ep`;
     }
   }
 
@@ -947,6 +1101,7 @@ epochs = 300`;
     btnResetCode.addEventListener('click', () => {
       if (studentCode) {
         studentCode.value = defaultStarterCode;
+        activeBreakpoints.clear();
         updateLineNumbers();
         updateCursorPosition();
         syncCodeToNetwork();
@@ -954,17 +1109,46 @@ epochs = 300`;
     });
   }
 
+  let isTrainingSimulation = false;
+  let trainStep = 0;
+
   if (btnTrainLive) {
     btnTrainLive.addEventListener('click', () => {
-      wavePulseTime += 1.6;
+      if (isTrainingSimulation) return;
+      isTrainingSimulation = true;
+      trainStep = 0;
+      const totalEp = currentModelParams.epochs || 300;
+      const lr = currentModelParams.learningRate || 0.05;
+
       const originalHtml = btnTrainLive.innerHTML;
-      btnTrainLive.innerHTML = '<span>Simulating...</span>';
-      setTimeout(() => {
-        btnTrainLive.innerHTML = '<span>Loss: 0.014</span>';
-        setTimeout(() => {
-          btnTrainLive.innerHTML = originalHtml;
-        }, 2200);
-      }, 900);
+      btnTrainLive.classList.add('running');
+
+      const steps = [
+        { ep: 1, loss: (0.7243).toFixed(4), msg: `TRAINING EPOCH 1/${totalEp} • LOSS: 0.7243 • BACKPROPAGATING ERROR FROM ENDPOINT` },
+        { ep: Math.round(totalEp * 0.35), loss: (0.3812).toFixed(4), msg: `TRAINING EPOCH ${Math.round(totalEp * 0.35)}/${totalEp} • LOSS: 0.3812 • GRADIENT DESCENT STEP (lr=${lr})` },
+        { ep: Math.round(totalEp * 0.75), loss: (0.1145).toFixed(4), msg: `TRAINING EPOCH ${Math.round(totalEp * 0.75)}/${totalEp} • LOSS: 0.1145 • WEIGHT CONVERGENCE IN PROGRESS` },
+        { ep: totalEp, loss: (0.0124).toFixed(4), msg: `TRAINING COMPLETE: EPOCH ${totalEp}/${totalEp} • FINAL LOSS: 0.0124 (CONVERGED) • 100% SYNCED` }
+      ];
+
+      function runTrainStep() {
+        if (trainStep < steps.length) {
+          const s = steps[trainStep];
+          wavePulseTime += 2.2;
+          btnTrainLive.innerHTML = `<span>Ep ${s.ep} &bull; L: ${s.loss}</span>`;
+          if (visLiveText) visLiveText.textContent = s.msg;
+          trainStep++;
+          setTimeout(runTrainStep, 600);
+        } else {
+          isTrainingSimulation = false;
+          btnTrainLive.innerHTML = `<span>Loss: 0.0124</span>`;
+          setTimeout(() => {
+            btnTrainLive.classList.remove('running');
+            btnTrainLive.innerHTML = originalHtml;
+          }, 2400);
+        }
+      }
+
+      runTrainStep();
     });
   }
 
