@@ -83,7 +83,7 @@
           </svg>
           <span>Interactive Student Guide</span>
         </h2>
-        <span class="guide-badge">4 LESSONS</span>
+        <span class="guide-badge" id="hudGuideStats">3 Layers &bull; 11 Neurons &bull; 24 Synapses</span>
       </div>
 
       <div class="lesson-list">
@@ -138,49 +138,88 @@
     </aside>
 
     <!-- ---------------------------------------------------------------------
-         LEFT PANE 2: TEST MODE (Live Code Studio & Lab - Zero Guidance)
+         LEFT PANE 2: TEST MODE (VS Code Professional Experience)
          --------------------------------------------------------------------- -->
     <aside class="mode-sidebar code-sidebar" id="paneTest">
-      <div class="code-header">
-        <div class="traffic-dots">
-          <span class="traffic-dot"></span>
-          <span class="traffic-dot"></span>
-          <span class="traffic-dot"></span>
+      <!-- VS Code Tabs Bar -->
+      <div class="vscode-tabs-bar">
+        <div class="vscode-tab active">
+          <svg class="vscode-file-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="9" y1="13" x2="15" y2="13"/>
+            <line x1="9" y1="17" x2="13" y2="17"/>
+          </svg>
+          <span class="vscode-tab-title">student_network.py</span>
+          <button class="vscode-tab-close" type="button" aria-label="Close tab">&times;</button>
         </div>
-        <span class="code-title">student_network.py</span>
-        <div class="live-badge">
-          <span class="live-beacon"></span>
-          <span>Live Sync</span>
+
+        <div class="vscode-tab-actions">
+          <button class="vscode-action-btn primary" id="btnRunCode" type="button" title="Run Code">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            <span>Run</span>
+          </button>
+          <button class="vscode-action-btn" id="btnTrainLive" type="button" title="Simulate Training">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+            <span>Simulate</span>
+          </button>
+          <button class="vscode-action-btn" id="btnResetCode" type="button" title="Reset Code">
+            <span>Reset</span>
+          </button>
         </div>
       </div>
 
-      <textarea class="code-textarea" id="studentCode" spellcheck="false">layers = [3, 8, 4, 1]
+      <!-- VS Code Breadcrumbs -->
+      <div class="vscode-breadcrumbs">
+        <span>synapselab</span>
+        <span class="bc-sep">&rsaquo;</span>
+        <span>src</span>
+        <span class="bc-sep">&rsaquo;</span>
+        <span class="bc-file">student_network.py</span>
+      </div>
+
+      <!-- VS Code Editor Body (Gutter + Textarea) -->
+      <div class="vscode-editor-body">
+        <div class="vscode-gutter" id="lineNumbers">1<br>2<br>3<br>4</div>
+        <textarea class="vscode-textarea" id="studentCode" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">layers = [3, 8, 4, 1]
 activation = "relu"
 learning_rate = 0.05
 epochs = 300</textarea>
+      </div>
 
-      <div class="code-footer">
-        <span class="code-footer-left" id="liveThreadCount">56 Synaptic Threads &bull; 16 Neurons</span>
-        <div class="code-footer-right">
-          <button class="btn-code-action" id="btnResetCode" type="button">Reset</button>
-          <button class="btn-code-action" id="btnTrainLive" type="button">Simulate Training</button>
-          <button class="btn-code-action primary" id="btnRunCode" type="button">Run Code</button>
+      <!-- VS Code Status Bar (Information moved here from Image 1!) -->
+      <div class="vscode-status-bar">
+        <div class="status-left">
+          <span class="status-item">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="6" y1="3" x2="6" y2="15"/>
+              <circle cx="18" cy="6" r="3"/>
+              <circle cx="6" cy="18" r="3"/>
+              <path d="M18 9a9 9 0 0 1-9 9"/>
+            </svg>
+            main*
+          </span>
+          <span class="status-item" id="cursorPos">Ln 1, Col 1</span>
+          <span class="status-item">Spaces: 4</span>
+          <span class="status-item">UTF-8</span>
+          <span class="status-item">Python 3.12</span>
+        </div>
+        <div class="status-right">
+          <span class="status-item live-pill" id="liveThreadCount">4 Layers &bull; 16 Neurons &bull; 60 Synapses</span>
         </div>
       </div>
     </aside>
 
     <!-- ---------------------------------------------------------------------
-         RIGHT PANE: PERSISTENT 3D WHITE FILAMENTS & STARFIELD VISUALIZER
+         RIGHT PANE: UNCLUTTERED 3D WHITE FILAMENTS & STARFIELD VISUALIZER
          --------------------------------------------------------------------- -->
     <section class="vis-pane">
       <div class="canvas-wrap">
         <canvas id="canvas3d"></canvas>
-      </div>
-
-      <!-- Floating HUD Badge (Top Left) -->
-      <div class="vis-hud-badge">
-        <strong id="hudTitle">GUIDE MODE: 3D SIMULATOR</strong>
-        <span id="hudStats">3 Layers (11 Neurons &bull; 24 Synapses)</span>
       </div>
 
       <!-- Modern Frosted Viewport Toolbar (Top Right) -->
@@ -225,7 +264,7 @@ epochs = 300</textarea>
        ========================================================================= -->
   <footer class="bottom-bar">
     <div class="bottom-left">
-      <span>SynapseLab &bull; 3D Visualization Simulator for Students</span>
+      <span id="footerStats">SynapseLab &bull; 3D Visualization Simulator for Students</span>
       <button class="legal-link open-legal-trigger" id="btnOpenPrivacy" type="button">Privacy Policy</button>
       <button class="legal-link open-legal-trigger" id="btnOpenTerms" type="button">Terms</button>
       <button class="legal-link open-legal-trigger" id="btnOpenCookies" type="button">Cookies & DPDP Act</button>

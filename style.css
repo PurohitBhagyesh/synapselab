@@ -1,7 +1,7 @@
 /* ==========================================================================
    SynapseLab Design System
    3D Visualization Simulator for Students
-   Strict Monochrome: Pure Black & White, High Contrast, Precision Engineering
+   Strict Monochrome: Pure Black & White, High Contrast, VS Code Aesthetics
    ========================================================================== */
 
 :root {
@@ -20,8 +20,12 @@
   --accent: #ffffff;
   --accent-soft: #1a1a1f;
 
-  --code-bg: #08080a;
-  --code-border: #1e1e22;
+  --vscode-bg: #0d0d10;
+  --vscode-gutter: #121216;
+  --vscode-gutter-text: #50505a;
+  --vscode-border: #222228;
+  --vscode-status: #121216;
+
   --nav-bg: rgba(0, 0, 0, 0.94);
 }
 
@@ -208,7 +212,7 @@ main {
 
 /* Left Pane Switcher: Guide vs Test Code */
 .mode-sidebar {
-  width: 440px;
+  width: 450px;
   flex-shrink: 0;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -248,7 +252,7 @@ main {
   font-size: 10.5px;
   font-family: "SF Mono", Menlo, Consolas, monospace;
   background: rgba(255, 255, 255, 0.08);
-  color: var(--text);
+  color: var(--text-muted);
   padding: 2px 7px;
   border-radius: 4px;
   border: 1px solid var(--border-strong);
@@ -325,117 +329,195 @@ main {
 }
 
 /* -------------------------------------------------------------------------
-   4. TEST MODE CODE SIDEBAR (Clean Monochrome Lab)
+   4. AUTHENTIC VS CODE EDITOR EXPERIENCE
    ------------------------------------------------------------------------- */
-.code-header {
-  height: 38px;
+.code-sidebar {
+  background: var(--vscode-bg);
+  border-color: var(--vscode-border);
+}
+
+/* VS Code Tab Bar */
+.vscode-tabs-bar {
+  height: 36px;
+  background: #09090b;
+  border-bottom: 1px solid var(--vscode-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 0 0;
+  user-select: none;
+}
+
+.vscode-tab {
+  height: 100%;
   padding: 0 14px;
-  background: var(--surface-alt);
-  border-bottom: 1px solid var(--border);
+  background: var(--vscode-bg);
+  border-right: 1px solid var(--vscode-border);
+  border-top: 1px solid #ffffff;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.traffic-dots {
-  display: flex;
-  gap: 6px;
-}
-.traffic-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #333338;
-}
-
-.code-title {
-  font-family: "SF Mono", Menlo, Consolas, monospace;
+  gap: 7px;
   font-size: 12px;
   color: var(--text);
+  font-family: "Segoe UI", -apple-system, sans-serif;
+  cursor: pointer;
 }
 
-.live-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-family: "SF Mono", monospace;
-  color: var(--text-muted);
+.vscode-file-icon {
+  color: #8e8e96;
 }
 
-.live-beacon {
-  width: 6px;
-  height: 6px;
-  background: #ffffff;
-  border-radius: 50%;
-  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
-}
-
-.code-textarea {
-  flex: 1;
-  width: 100%;
-  background: var(--code-bg);
-  color: #f1f5f9;
+.vscode-tab-close {
+  background: transparent;
   border: none;
-  padding: 14px;
-  font-family: "SF Mono", Menlo, Consolas, monospace;
-  font-size: 13px;
-  line-height: 1.6;
-  resize: none;
-  outline: none;
-  white-space: pre;
-  overflow-y: auto;
-}
-
-.code-footer {
-  padding: 8px 12px;
-  border-top: 1px solid var(--border);
-  background: var(--surface-alt);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 11.5px;
-  font-family: "SF Mono", Menlo, Consolas, monospace;
-}
-
-.code-footer-left {
   color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 3px;
+  margin-left: 4px;
+}
+.vscode-tab-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
 }
 
-.code-footer-right {
+.vscode-tab-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
-.btn-code-action {
-  background: var(--surface);
+.vscode-action-btn {
+  background: transparent;
   border: 1px solid var(--border);
-  color: var(--text);
+  color: var(--text-muted);
   font-size: 11px;
   font-weight: 600;
-  padding: 4px 9px;
-  border-radius: 5px;
+  padding: 3px 8px;
+  border-radius: 4px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-family: inherit;
   transition: all 0.15s ease;
 }
 
-.btn-code-action:hover {
+.vscode-action-btn:hover {
   border-color: var(--border-strong);
-  background: var(--border);
+  color: var(--text);
+  background: var(--surface-hover);
 }
 
-.btn-code-action.primary {
-  background: var(--text);
-  color: var(--bg);
-  border-color: var(--text);
+.vscode-action-btn.primary {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+.vscode-action-btn.primary:hover {
+  background: #e4e4e7;
+}
+
+/* VS Code Breadcrumbs */
+.vscode-breadcrumbs {
+  height: 22px;
+  background: #0d0d10;
+  border-bottom: 1px solid var(--vscode-border);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  gap: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.bc-sep {
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+.bc-file {
+  color: var(--text);
+}
+
+/* VS Code Editor Body (Gutter + Textarea) */
+.vscode-editor-body {
+  flex: 1;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  background: var(--vscode-bg);
+}
+
+.vscode-gutter {
+  width: 44px;
+  background: var(--vscode-gutter);
+  border-right: 1px solid var(--vscode-border);
+  padding: 12px 8px 12px 0;
+  font-family: "Cascadia Code", "Fira Code", "JetBrains Mono", Consolas, "SF Mono", monospace;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--vscode-gutter-text);
+  text-align: right;
+  user-select: none;
+  overflow: hidden;
+}
+
+.vscode-textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-family: "Cascadia Code", "Fira Code", "JetBrains Mono", Consolas, "SF Mono", monospace;
+  font-size: 13px;
+  line-height: 1.65;
+  padding: 12px 14px;
+  resize: none;
+  white-space: pre;
+  overflow-y: auto;
+  tab-size: 4;
+  -moz-tab-size: 4;
+}
+
+/* VS Code Status Bar */
+.vscode-status-bar {
+  height: 24px;
+  background: var(--vscode-status);
+  border-top: 1px solid var(--vscode-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  font-size: 11px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.status-left, .status-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+}
+
+.status-item.live-pill {
+  color: #ffffff;
+  font-weight: 600;
 }
 
 /* -------------------------------------------------------------------------
-   5. 3D VISUALIZER PANE (Rock-solid Canvas Layout)
+   5. 3D VISUALIZER PANE (Rock-solid Canvas Layout, Clean & Unobstructed)
    ------------------------------------------------------------------------- */
 .vis-pane {
   flex: 1;
@@ -467,37 +549,6 @@ main {
 
 .canvas-wrap canvas:active {
   cursor: grabbing;
-}
-
-/* Floating HUD (Top Left) */
-.vis-hud-badge {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  background: rgba(9, 9, 11, 0.88);
-  border: 1px solid var(--border-strong);
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-family: "SF Mono", Menlo, Consolas, monospace;
-  font-size: 11px;
-  pointer-events: none;
-  z-index: 25;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.vis-hud-badge strong {
-  display: block;
-  font-size: 11.5px;
-  color: var(--text);
-  margin-bottom: 2px;
-  letter-spacing: 0.3px;
-}
-
-.vis-hud-badge span {
-  color: var(--text-muted);
-  font-size: 10.5px;
 }
 
 /* Modern Frosted Viewport Toolbar (Top Right) */

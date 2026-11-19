@@ -37,10 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabTest = document.getElementById('tabTest');
   const paneGuide = document.getElementById('paneGuide');
   const paneTest = document.getElementById('paneTest');
-  const hudTitle = document.getElementById('hudTitle');
-
-  let currentMode = 'guide';
-
   function switchMode(mode) {
     currentMode = mode;
     if (mode === 'guide') {
@@ -48,14 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
       tabTest.classList.remove('active');
       paneGuide.classList.add('active');
       paneTest.classList.remove('active');
-      if (hudTitle) hudTitle.textContent = 'GUIDE MODE: 3D SIMULATOR';
       buildNetwork([3, 6, 2]);
     } else {
       tabTest.classList.add('active');
       tabGuide.classList.remove('active');
       paneTest.classList.add('active');
       paneGuide.classList.remove('active');
-      if (hudTitle) hudTitle.textContent = 'TEST MODE: ARCHITECTURE LAB';
       syncCodeToNetwork();
     }
     setTimeout(resizeCanvas, 40);
@@ -181,12 +175,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Update Telemetry Displays
-    const hudStats = document.getElementById('hudStats');
+    // Update Telemetry Displays (in VS Code status bar and Guide header)
+    const hudGuideStats = document.getElementById('hudGuideStats');
     const liveThreadCount = document.getElementById('liveThreadCount');
-    const statsText = `${layerSizes.length} Layers (${nodes.length} Neurons • ${threads.length} Synapses)`;
-    if (hudStats) hudStats.textContent = statsText;
-    if (liveThreadCount) liveThreadCount.textContent = `${threads.length} Synaptic Threads • ${nodes.length} Neurons`;
+    const statsText = `${layerSizes.length} Layers • ${nodes.length} Neurons • ${threads.length} Synapses`;
+    if (hudGuideStats) hudGuideStats.textContent = statsText;
+    if (liveThreadCount) liveThreadCount.textContent = statsText;
   }
 
   function project3D(x, y, z, cx, cy) {
@@ -649,9 +643,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------------------------------------------------------------------------
-  // 7. TEST MODE LIVE CODING & SIMULATION (PURE SIMPLE CODE, ZERO INSTRUCTIONS)
+  // 7. TEST MODE LIVE CODING & SIMULATION (VS CODE INTERACTIVE EXPERIENCE)
   // ---------------------------------------------------------------------------
   const studentCode = document.getElementById('studentCode');
+  const lineNumbers = document.getElementById('lineNumbers');
+  const cursorPos = document.getElementById('cursorPos');
   const btnRunCode = document.getElementById('btnRunCode');
   const btnTrainLive = document.getElementById('btnTrainLive');
   const btnResetCode = document.getElementById('btnResetCode');
@@ -660,6 +656,25 @@ document.addEventListener('DOMContentLoaded', () => {
 activation = "relu"
 learning_rate = 0.05
 epochs = 300`;
+
+  function updateLineNumbers() {
+    if (!studentCode || !lineNumbers) return;
+    const count = (studentCode.value.split('\n').length) || 1;
+    let html = '';
+    for (let i = 1; i <= count; i++) {
+      html += `${i}<br>`;
+    }
+    lineNumbers.innerHTML = html;
+  }
+
+  function updateCursorPosition() {
+    if (!studentCode || !cursorPos) return;
+    const text = studentCode.value.substring(0, studentCode.selectionStart);
+    const lines = text.split('\n');
+    const ln = lines.length;
+    const col = lines[lines.length - 1].length + 1;
+    cursorPos.textContent = `Ln ${ln}, Col ${col}`;
+  }
 
   function syncCodeToNetwork() {
     if (!studentCode) return;
@@ -675,7 +690,52 @@ epochs = 300`;
     }
   }
 
-  if (studentCode) studentCode.addEventListener('input', syncCodeToNetwork);
+  if (studentCode) {
+    studentCode.addEventListener('input', () => {
+      updateLineNumbers();
+      updateCursorPosition();
+      syncCodeToNetwork();
+    });
+
+    studentCode.addEventListener('click', updateCursorPosition);
+    studentCode.addEventListener('keyup', updateCursorPosition);
+
+    // Synchronize scrolling between gutter and code
+    studentCode.addEventListener('scroll', () => {
+      if (lineNumbers) lineNumbers.scrollTop = studentCode.scrollTop;
+    });
+
+    // VS Code Tab Key Indentation (4 spaces) & Auto-Close pairs
+    studentCode.addEventListener('keydown', e => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = studentCode.selectionStart;
+        const end = studentCode.selectionEnd;
+        studentCode.value = studentCode.value.substring(0, start) + '    ' + studentCode.value.substring(end);
+        studentCode.selectionStart = studentCode.selectionEnd = start + 4;
+        updateLineNumbers();
+        updateCursorPosition();
+        syncCodeToNetwork();
+      } else if (e.key === '[' || e.key === '(' || e.key === '"' || e.key === "'") {
+        const pairs = { '[': ']', '(': ')', '"': '"', "'": "'" };
+        const closer = pairs[e.key];
+        const start = studentCode.selectionStart;
+        const end = studentCode.selectionEnd;
+        if (start === end) {
+          e.preventDefault();
+          studentCode.value = studentCode.value.substring(0, start) + e.key + closer + studentCode.value.substring(end);
+          studentCode.selectionStart = studentCode.selectionEnd = start + 1;
+          updateLineNumbers();
+          updateCursorPosition();
+          syncCodeToNetwork();
+        }
+      }
+    });
+
+    updateLineNumbers();
+    updateCursorPosition();
+  }
+
   if (btnRunCode) {
     btnRunCode.addEventListener('click', () => {
       syncCodeToNetwork();
@@ -687,6 +747,8 @@ epochs = 300`;
     btnResetCode.addEventListener('click', () => {
       if (studentCode) {
         studentCode.value = defaultStarterCode;
+        updateLineNumbers();
+        updateCursorPosition();
         syncCodeToNetwork();
       }
     });
@@ -695,12 +757,12 @@ epochs = 300`;
   if (btnTrainLive) {
     btnTrainLive.addEventListener('click', () => {
       wavePulseTime += 1.6;
-      const originalText = btnTrainLive.textContent;
-      btnTrainLive.textContent = "Simulating...";
+      const originalHtml = btnTrainLive.innerHTML;
+      btnTrainLive.innerHTML = '<span>Simulating...</span>';
       setTimeout(() => {
-        btnTrainLive.textContent = "Loss: 0.014 (Converged)";
+        btnTrainLive.innerHTML = '<span>Loss: 0.014</span>';
         setTimeout(() => {
-          btnTrainLive.textContent = originalText;
+          btnTrainLive.innerHTML = originalHtml;
         }, 2200);
       }, 900);
     });
