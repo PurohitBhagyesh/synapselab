@@ -61,18 +61,7 @@ epochs = 300`;
 
   function attachTap(el, fn) {
     if (!el) return;
-    let lastTap = 0;
-    const handler = (e) => {
-      const now = Date.now();
-      if (now - lastTap < 250) return;
-      lastTap = now;
-      fn(e);
-    };
-    el.addEventListener('click', handler);
-    el.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      handler(e);
-    }, { passive: false });
+    el.addEventListener('click', fn);
   }
 
   function updateLineNumbers() {
@@ -131,7 +120,7 @@ epochs = 300`;
     const paramStats = document.getElementById('paramStats');
     if (paramStats) {
       const actDisplay = currentModelParams.activation.toUpperCase();
-      paramStats.textContent = `${actDisplay} • lr: ${currentModelParams.learningRate} • ${currentModelParams.epochs} ep`;
+      paramStats.textContent = `${actDisplay} • lr ${currentModelParams.learningRate}`;
     }
   }
 
@@ -298,7 +287,7 @@ epochs = 300`;
 
     // Update Telemetry Displays (in VS Code status bar)
     const liveThreadCount = document.getElementById('liveThreadCount');
-    const statsText = `${layerSizes.length} Layers • ${nodes.length} Neurons • ${threads.length} Synapses`;
+    const statsText = `${nodes.length} Neurons • ${threads.length} Synapses`;
     if (liveThreadCount) liveThreadCount.textContent = statsText;
   }
 
@@ -330,6 +319,13 @@ epochs = 300`;
 
     cx = canvasW / 2;
     cy = canvasH / 2;
+
+    // Responsive FOV scaling so network fits perfectly on any phone, tablet or desktop
+    if (canvasW < 520 || canvasH < 400) {
+      fov = Math.max(280, Math.min(canvasW, canvasH) * 0.95);
+    } else {
+      fov = 480;
+    }
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = canvasW * dpr;
@@ -1050,7 +1046,7 @@ epochs = 300`;
         }
         const liveThreadCount = document.getElementById('liveThreadCount');
         if (liveThreadCount) {
-          liveThreadCount.textContent = `${layerSizes.length} Layers • ${nodes.length} Neurons • ${threads.length} Synapses`;
+          liveThreadCount.textContent = `${nodes.length} Neurons • ${threads.length} Synapses`;
         }
       }
     }

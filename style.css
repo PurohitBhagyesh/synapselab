@@ -507,34 +507,40 @@ main {
 }
 
 .vscode-action-btn {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  font-size: 11px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  font-size: 11.5px;
   font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 4px;
+  padding: 4px 10px;
+  border-radius: 5px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-family: inherit;
   transition: all 0.15s ease;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .vscode-action-btn:hover {
-  border-color: var(--border-strong);
-  color: var(--text);
-  background: var(--surface-hover);
+  border-color: #ffffff;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .vscode-action-btn.primary {
   background: #ffffff;
   color: #000000;
   border-color: #ffffff;
+  font-weight: 700;
 }
 .vscode-action-btn.primary:hover {
-  background: #e4e4e7;
+  background: #f4f4f5;
+  color: #000000;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 .vscode-action-btn.primary.running {
   background: #27272a;
@@ -648,7 +654,7 @@ main {
   -moz-tab-size: 4;
 }
 
-/* VS Code Status Bar */
+/* VS Code Status Bar (Clean Unobstructed Layout, Zero Collision) */
 .vscode-status-bar {
   height: 24px;
   background: var(--vscode-status);
@@ -661,19 +667,26 @@ main {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--text-muted);
   user-select: none;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .status-left, .status-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .status-item {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-family: "SF Mono", Menlo, Consolas, monospace;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
 }
 
 .status-item.live-pill {
@@ -685,10 +698,10 @@ main {
   color: #ffffff !important;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--border-strong);
-  padding: 1px 7px;
+  padding: 1px 6px;
   border-radius: 4px;
   font-weight: 600;
-  font-size: 10.5px;
+  font-size: 10px;
   letter-spacing: 0.02em;
 }
 
@@ -1504,7 +1517,7 @@ main {
 
   .vis-live-badge {
     top: auto;
-    bottom: 8px;
+    bottom: 68px;
     left: 8px;
     max-width: calc(100% - 16px);
     font-size: 9.5px;
@@ -1730,7 +1743,7 @@ main {
 
   .vis-live-badge {
     top: auto;
-    bottom: 8px;
+    bottom: 58px;
     left: 8px;
     max-width: calc(100% - 16px);
     font-size: 9.5px;
@@ -1770,9 +1783,7 @@ main {
     padding: 0 6px;
   }
 
-  .status-left span:nth-child(4),
-  .status-left span:nth-child(5),
-  .status-left span:nth-child(6) {
+  .status-py {
     display: none;
   }
 }
