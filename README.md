@@ -83,10 +83,11 @@ Students can quickly load and explore classic deep learning architectures with a
 ## Core Features
 
 * **Hardware-Accelerated 3D Filaments**: Native cubic Bezier spline evaluation rendered in real-time perspective (`60-120 FPS`), with depth-sorted neurons, radiant halos, and an orientation floor grid.
-* **macOS-Inspired Capsule Mode Switcher**: Placed cleanly in a dedicated strip between the header and body at the top on all devices (`border-radius: 9999px`) with a hardware-accelerated sliding white pill indicator.
+* **macOS-Inspired Capsule Mode Switcher**: Centered in the top header navbar on PC, and pinned as a sleek floating capsule dock at the bottom of the screen on mobile (`border-radius: 9999px`) to maximize workspace height from top to bottom.
+* **Dedicated PC and Mobile UI Architectures**: Custom-tailored layouts for desktop (horizontal split, top-centered mode switcher, bottom status bar with Coffee button) and mobile (vertical stack, top header with Coffee trigger, bottom floating mode dock, zero wasted space).
 * **Capsule Pill Aesthetics Across All Triggers**: All action buttons, navigation triggers, viewport tools, preset chips, and modal actions follow a cohesive, modern capsule pill aesthetic (`border-radius: 9999px`).
 * **Elongated 3D Output & Expansive Perspective**: Increased depth separation between layers and expansive 3D canvas allocation on mobile and desktop so layer cards never collide and the output layer projects forward cleanly.
-* **Prominent Support Developer Access**: Instant access to the Buy me a Coffee modal with live UPI QR code (`Purohit2009@fam`) directly from the top header navigation bar and footer on all devices.
+* **High-Contrast UPI QR Code Card**: Solid white 204px card with 180x180 vector SVG QR code and quiet zone margins (`Purohit2009@fam`) scan-tested for immediate recognition by Google Pay, PhonePe, Paytm, and FamApp camera scanners.
 * **Touchscreen Gestures**: One-finger swipe to rotate with inertial deceleration, and two-finger pinch to zoom in and zoom out smoothly.
 * **Interactive Light-Up Guides**: Touching any curriculum lesson loads that architecture immediately and illuminates the 3D network with forward pass or backpropagation cascades.
 * **Compact Viewport Controls**: Sleek, non-intrusive floating control bar on mobile with essential tools (Auto-Orbit, Center View, Labels Toggle, Snapshot, Fullscreen) that never obstruct network layers.
