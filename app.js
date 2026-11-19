@@ -1,41 +1,33 @@
 /**
  * SynapseLab Application Engine
  * 3D Visualization Simulator for Students
- * Modes: Guide Mode (Interactive Learning) & Test Mode (Clean Code Studio)
- * Moving Cosmic Starfield • Interactive Dot Touch & Synaptic Isolation • Locked 3D White Filaments
+ * Pure Black & White Monochrome Aesthetic • Precision 3D Engine • Comprehensive Sensitivity Controls
  */
 
 document.addEventListener('DOMContentLoaded', () => {
   'use strict';
 
   // ---------------------------------------------------------------------------
-  // 1. OPENLID EYE THEME SWITCHER
+  // 1. SETTINGS & CONFIGURATION (Stored in localStorage)
   // ---------------------------------------------------------------------------
-  const themeToggleBtn = document.getElementById('themeToggleBtn');
-  const themeLabel = document.getElementById('themeLabel');
-  const savedTheme = localStorage.getItem('synapselab_theme') || 'dark';
+  const DEFAULT_SETTINGS = {
+    orbitSensitivity: 1.0,
+    zoomSensitivity: 1.0,
+    orbitSpeed: 1.0,
+    enableStarfield: true,
+    threadLuminosity: 0.55
+  };
 
-  function applyTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('synapselab_theme', theme);
-    if (themeLabel) {
-      themeLabel.textContent = theme === 'dark' ? 'Dark' : 'Light';
-    }
-    resizeCanvas();
-  }
+  let settings = Object.assign({}, DEFAULT_SETTINGS);
+  try {
+    const saved = localStorage.getItem('synapselab_settings');
+    if (saved) settings = Object.assign(settings, JSON.parse(saved));
+  } catch (e) {}
 
-  applyTheme(savedTheme);
-
-  if (themeToggleBtn) {
-    themeToggleBtn.addEventListener('click', () => {
-      const active = document.documentElement.getAttribute('data-theme') || 'dark';
-      const next = active === 'dark' ? 'light' : 'dark';
-      themeToggleBtn.style.transform = 'scale(0.92)';
-      setTimeout(() => {
-        applyTheme(next);
-        themeToggleBtn.style.transform = 'scale(1)';
-      }, 100);
-    });
+  function saveSettings() {
+    try {
+      localStorage.setItem('synapselab_settings', JSON.stringify(settings));
+    } catch (e) {}
   }
 
   // ---------------------------------------------------------------------------
@@ -46,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const paneGuide = document.getElementById('paneGuide');
   const paneTest = document.getElementById('paneTest');
   const hudTitle = document.getElementById('hudTitle');
-  const guidancePill = document.querySelector('.guidance-pill-bottom');
 
   let currentMode = 'guide';
 
@@ -57,8 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tabTest.classList.remove('active');
       paneGuide.classList.add('active');
       paneTest.classList.remove('active');
-      if (hudTitle) hudTitle.textContent = 'GUIDE MODE: 3D NEURAL SIMULATOR';
-      if (guidancePill) guidancePill.style.display = 'block';
+      if (hudTitle) hudTitle.textContent = 'GUIDE MODE: 3D SIMULATOR';
       buildNetwork([3, 6, 2]);
     } else {
       tabTest.classList.add('active');
@@ -66,8 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
       paneTest.classList.add('active');
       paneGuide.classList.remove('active');
       if (hudTitle) hudTitle.textContent = 'TEST MODE: ARCHITECTURE LAB';
-      // Test mode has zero guidance as requested
-      if (guidancePill) guidancePill.style.display = 'none';
       syncCodeToNetwork();
     }
     setTimeout(resizeCanvas, 40);
@@ -77,13 +65,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (tabTest) tabTest.addEventListener('click', () => switchMode('test'));
 
   // ---------------------------------------------------------------------------
-  // 3. 3D VISUALIZER ENGINE & MOVING STARS BACKGROUND
+  // 3. PERSISTENT 3D VISUALIZER ENGINE (MONOCHROME BLACK & WHITE)
   // ---------------------------------------------------------------------------
   const canvas = document.getElementById('canvas3d');
-  if (!canvas) {
-    console.error('Fatal: #canvas3d not found');
-    return;
-  }
+  if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
 
@@ -102,11 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let mouseScreenX = -9999, mouseScreenY = -9999;
   let hoveredNode = null;
 
-  // Settings
-  let enableStarfield = true;
-  let enableUltraGlow = true;
-
-  // Generate 3D Moving Stars Background
+  // 3D Moving Stars Background
   const starCount = 200;
   const stars = [];
   for (let i = 0; i < starCount; i++) {
@@ -114,8 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
       x: (Math.random() - 0.5) * 1600,
       y: (Math.random() - 0.5) * 1200,
       z: (Math.random() - 0.5) * 1600,
-      baseAlpha: 0.2 + Math.random() * 0.6,
-      size: 0.8 + Math.random() * 1.5,
+      baseAlpha: 0.15 + Math.random() * 0.55,
+      size: 0.8 + Math.random() * 1.4,
       phase: Math.random() * Math.PI * 2
     });
   }
@@ -217,9 +198,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------------------------------------------------------------------------
-  // 4. MOUSE / TOUCH INTERACTION & DOT TOUCH DETECTION
+  // 4. MOUSE / TOUCH INTERACTION & TOUCH-TO-LIGHT-UP
   // ---------------------------------------------------------------------------
-  const rotateToggleBtn = document.getElementById('btnRotateToggle');
+  const btnToggleOrbit = document.getElementById('btnToggleOrbit');
 
   function updateHoveredDot(screenX, screenY) {
     const rect = canvas.parentElement.getBoundingClientRect();
@@ -227,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cy = (rect.height || 450) / 2;
 
     let closest = null;
-    let minDist = 22; // 22px touch / hover radius for comfortable selection
+    let minDist = 22; // 22px hit radius
 
     nodes.forEach(n => {
       const p = project3D(n.x, n.y, n.z, cx, cy);
@@ -251,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
     lastX = e.clientX;
     lastY = e.clientY;
     autoRotate = false;
-    if (rotateToggleBtn) rotateToggleBtn.classList.remove('active');
+    if (btnToggleOrbit) btnToggleOrbit.classList.remove('active');
   });
 
   canvas.addEventListener('mousemove', e => {
@@ -260,8 +241,9 @@ document.addEventListener('DOMContentLoaded', () => {
     mouseScreenY = e.clientY - rect.top;
 
     if (isDragging) {
-      targetYaw += (e.clientX - lastX) * 0.007;
-      targetPitch = Math.max(-0.65, Math.min(0.85, targetPitch + (e.clientY - lastY) * 0.007));
+      const sens = settings.orbitSensitivity * 0.007;
+      targetYaw += (e.clientX - lastX) * sens;
+      targetPitch = Math.max(-0.65, Math.min(0.85, targetPitch + (e.clientY - lastY) * sens));
       lastX = e.clientX;
       lastY = e.clientY;
     } else {
@@ -283,17 +265,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   canvas.addEventListener('wheel', e => {
     e.preventDefault();
-    targetCamDist = Math.max(280, Math.min(1200, targetCamDist + e.deltaY * 0.6));
+    const sens = settings.zoomSensitivity * 0.6;
+    targetCamDist = Math.max(260, Math.min(1250, targetCamDist + e.deltaY * sens));
   }, { passive: false });
 
-  // Mobile Touch Support
+  // Touch Support
   canvas.addEventListener('touchstart', e => {
     if (e.touches.length === 1) {
       isDragging = true;
       lastX = e.touches[0].clientX;
       lastY = e.touches[0].clientY;
       autoRotate = false;
-      if (rotateToggleBtn) rotateToggleBtn.classList.remove('active');
+      if (btnToggleOrbit) btnToggleOrbit.classList.remove('active');
 
       const rect = canvas.getBoundingClientRect();
       mouseScreenX = e.touches[0].clientX - rect.left;
@@ -309,8 +292,9 @@ document.addEventListener('DOMContentLoaded', () => {
     mouseScreenY = e.touches[0].clientY - rect.top;
 
     if (isDragging) {
-      targetYaw += (e.touches[0].clientX - lastX) * 0.007;
-      targetPitch = Math.max(-0.65, Math.min(0.85, targetPitch + (e.touches[0].clientY - lastY) * 0.007));
+      const sens = settings.orbitSensitivity * 0.007;
+      targetYaw += (e.touches[0].clientX - lastX) * sens;
+      targetPitch = Math.max(-0.65, Math.min(0.85, targetPitch + (e.touches[0].clientY - lastY) * sens));
       lastX = e.touches[0].clientX;
       lastY = e.touches[0].clientY;
     }
@@ -321,19 +305,19 @@ document.addEventListener('DOMContentLoaded', () => {
     isDragging = false;
   });
 
-  // Zoom Toolbar Buttons
+  // Modern Viewport Toolbar
   const btnZoomIn = document.getElementById('btnZoomIn');
   const btnZoomOut = document.getElementById('btnZoomOut');
   const btnResetView = document.getElementById('btnResetView');
 
   if (btnZoomIn) {
     btnZoomIn.addEventListener('click', () => {
-      targetCamDist = Math.max(300, targetCamDist - 120);
+      targetCamDist = Math.max(280, targetCamDist - 120 * settings.zoomSensitivity);
     });
   }
   if (btnZoomOut) {
     btnZoomOut.addEventListener('click', () => {
-      targetCamDist = Math.min(1150, targetCamDist + 120);
+      targetCamDist = Math.min(1200, targetCamDist + 120 * settings.zoomSensitivity);
     });
   }
   if (btnResetView) {
@@ -342,19 +326,30 @@ document.addEventListener('DOMContentLoaded', () => {
       targetPitch = 0.22;
       targetCamDist = 650;
       autoRotate = true;
-      if (rotateToggleBtn) rotateToggleBtn.classList.add('active');
+      if (btnToggleOrbit) btnToggleOrbit.classList.add('active');
     });
   }
 
-  if (rotateToggleBtn) {
-    rotateToggleBtn.addEventListener('click', () => {
+  if (btnToggleOrbit) {
+    btnToggleOrbit.addEventListener('click', () => {
       autoRotate = !autoRotate;
-      rotateToggleBtn.classList.toggle('active', autoRotate);
+      btnToggleOrbit.classList.toggle('active', autoRotate);
     });
   }
+
+  // Keyboard Navigation
+  window.addEventListener('keydown', e => {
+    if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) return;
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (btnToggleOrbit) btnToggleOrbit.click();
+    } else if (e.code === 'KeyR') {
+      if (btnResetView) btnResetView.click();
+    }
+  });
 
   // ---------------------------------------------------------------------------
-  // 5. 3D RENDER LOOP: MOVING STARS + LOCKED FILAMENTS + TOUCH ISOLATION
+  // 5. 3D RENDER LOOP: PURE BLACK & WHITE + TOUCH LIGHT-UP
   // ---------------------------------------------------------------------------
   function drawPerspectiveScene() {
     if (!canvas || canvas.width === 0 || canvas.height === 0) return;
@@ -364,11 +359,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ctx.clearRect(0, 0, rect.width, rect.height);
 
-    // 1. Moving 3D Cosmic Starfield
-    if (enableStarfield) {
+    // 1. Moving 3D Cosmic Starfield (Monochrome)
+    if (settings.enableStarfield) {
       stars.forEach(s => {
-        // Subtle drift in 3D space
-        s.z -= 0.4;
+        s.z -= 0.35 * settings.orbitSpeed;
         if (s.z < -800) s.z = 800;
 
         const p = project3D(s.x, s.y, s.z, cx, cy);
@@ -383,18 +377,18 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // 2. Perspective Grid Floor
+    // 2. Monochrome Perspective Grid Floor
     const gridY = 210;
     const size = 480;
     const step = 60;
-    ctx.lineWidth = 0.8;
+    ctx.lineWidth = 0.75;
 
     for (let z = -size; z <= size; z += step) {
       const pA = project3D(-size, gridY, z, cx, cy);
       const pB = project3D(size, gridY, z, cx, cy);
       if (pA && pB) {
-        const alpha = Math.max(0, Math.min(0.24, 1 - (pA.depth + pB.depth) / 2200));
-        ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+        const alpha = Math.max(0, Math.min(0.12, 1 - (pA.depth + pB.depth) / 2200));
+        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
         ctx.beginPath();
         ctx.moveTo(pA.x, pA.y);
         ctx.lineTo(pB.x, pB.y);
@@ -405,8 +399,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const pA = project3D(x, gridY, -size, cx, cy);
       const pB = project3D(x, gridY, size, cx, cy);
       if (pA && pB) {
-        const alpha = Math.max(0, Math.min(0.24, 1 - (pA.depth + pB.depth) / 2200));
-        ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+        const alpha = Math.max(0, Math.min(0.12, 1 - (pA.depth + pB.depth) / 2200));
+        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
         ctx.beginPath();
         ctx.moveTo(pA.x, pA.y);
         ctx.lineTo(pB.x, pB.y);
@@ -434,35 +428,29 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cp) ctx.lineTo(cp.x, cp.y);
       }
 
-      // If a dot is hovered: light up connected threads, dim non-connected threads!
+      // Touch / Hover isolation logic
       if (hoveredNode) {
         if (isConnectedToHovered) {
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+          ctx.strokeStyle = '#ffffff';
           ctx.lineWidth = 2.4;
-          if (enableUltraGlow) {
-            ctx.shadowColor = '#38bdf8';
-            ctx.shadowBlur = 10;
-          }
+          ctx.shadowColor = '#ffffff';
+          ctx.shadowBlur = 10;
           ctx.stroke();
           ctx.shadowBlur = 0;
         } else {
-          ctx.strokeStyle = 'rgba(240, 249, 255, 0.09)';
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
           ctx.lineWidth = 0.75;
           ctx.stroke();
         }
       } else {
-        // Normal state: balanced luminous silk filaments
-        ctx.strokeStyle = 'rgba(240, 249, 255, 0.44)';
+        // Normal state: clean white silk filaments
+        const lum = settings.threadLuminosity || 0.55;
+        ctx.strokeStyle = `rgba(255, 255, 255, ${lum})`;
         ctx.lineWidth = 1.25;
-        if (enableUltraGlow) {
-          ctx.shadowColor = 'rgba(56, 189, 248, 0.3)';
-          ctx.shadowBlur = 4;
-        }
         ctx.stroke();
-        ctx.shadowBlur = 0;
       }
 
-      // Optical wave pulse traveling through filament
+      // Optical wave pulse
       const speedMultiplier = (hoveredNode && isConnectedToHovered) ? 1.8 : 1.0;
       const waveProg = (wavePulseTime * speedMultiplier + Math.abs(t.seed) * 2.4) % 1;
       const wx = evalCubic(t.src.x, t.p1.x, t.p2.x, t.dst.x, waveProg);
@@ -473,18 +461,18 @@ document.addEventListener('DOMContentLoaded', () => {
       if (wp) {
         if (!hoveredNode || isConnectedToHovered) {
           ctx.beginPath();
-          const pSize = isConnectedToHovered ? 3.0 : 2.0;
+          const pSize = isConnectedToHovered ? 3.0 : 1.8;
           ctx.arc(wp.x, wp.y, pSize * wp.scale * 1.5, 0, Math.PI * 2);
           ctx.fillStyle = '#ffffff';
-          ctx.shadowColor = '#38bdf8';
-          ctx.shadowBlur = isConnectedToHovered ? 14 : 7;
+          ctx.shadowColor = '#ffffff';
+          ctx.shadowBlur = isConnectedToHovered ? 12 : 5;
           ctx.fill();
           ctx.shadowBlur = 0;
         }
       }
     });
 
-    // 4. Floating Layer Headers (Glass Cards)
+    // 4. Floating Layer Headers (Monochrome Glass Cards)
     layerSizes.forEach((count, lIdx) => {
       const totalDepth = 480;
       const z = -totalDepth / 2 + lIdx * (totalDepth / (layerSizes.length - 1 || 1));
@@ -496,9 +484,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const x = pTop.x - w / 2;
       const y = pTop.y - h;
 
-      ctx.fillStyle = 'rgba(11, 11, 13, 0.9)';
+      ctx.fillStyle = 'rgba(9, 9, 11, 0.92)';
       ctx.fillRect(x, y, w, h);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
       ctx.lineWidth = 1;
       ctx.strokeRect(x, y, w, h);
 
@@ -508,12 +496,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const name = lIdx === 0 ? "Input Layer" : (lIdx === layerSizes.length - 1 ? "Output Layer" : `Hidden ${lIdx}`);
       ctx.fillText(name, pTop.x, y + 12 * pTop.scale * 1.5);
 
-      ctx.fillStyle = '#9a9aa6';
+      ctx.fillStyle = '#8e8e96';
       ctx.font = `${Math.max(7, Math.round(8.5 * pTop.scale * 1.5))}px "SF Mono", monospace`;
       ctx.fillText(`${count} Neurons`, pTop.x, y + 23 * pTop.scale * 1.5);
     });
 
-    // 5. Depth Sorted Luminous White Neurons
+    // 5. Depth Sorted Neurons
     const projNodes = [];
     nodes.forEach(n => {
       const p = project3D(n.x, n.y, n.z, cx, cy);
@@ -525,42 +513,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     projNodes.forEach(({ node, p }) => {
       const isHovered = (hoveredNode === node);
-      const radius = (isHovered ? 6.4 : 4.8) * p.scale * 1.5;
+      const radius = (isHovered ? 6.2 : 4.6) * p.scale * 1.5;
 
       // Glow halo
       ctx.beginPath();
       ctx.arc(p.x, p.y, radius * (isHovered ? 3.0 : 2.2), 0, Math.PI * 2);
-      ctx.fillStyle = isHovered ? 'rgba(56, 189, 248, 0.55)' : 'rgba(255, 255, 255, 0.22)';
+      ctx.fillStyle = isHovered ? 'rgba(255, 255, 255, 0.45)' : 'rgba(255, 255, 255, 0.18)';
       ctx.fill();
 
       // Outer focus ring if hovered
       if (isHovered) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, radius * 1.8, 0, Math.PI * 2);
-        ctx.strokeStyle = '#38bdf8';
-        ctx.lineWidth = 1.8;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
         ctx.stroke();
       }
 
-      // Solid bright white node core
+      // Bright white node core
       ctx.beginPath();
       ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
       ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = isHovered ? '#38bdf8' : '#232329';
+      ctx.strokeStyle = isHovered ? '#ffffff' : '#1c1c20';
       ctx.lineWidth = isHovered ? 2.0 : 1.5;
       ctx.fill();
       ctx.stroke();
 
       // Node label
       if (p.scale > 0.6) {
-        ctx.fillStyle = isHovered ? '#ffffff' : '#9a9aa6';
+        ctx.fillStyle = isHovered ? '#ffffff' : '#8e8e96';
         ctx.font = `${isHovered ? 'bold ' : ''}${Math.max(7, Math.round(8.5 * p.scale))}px "SF Mono", monospace`;
         ctx.textAlign = node.layerIdx === 0 ? 'right' : 'left';
         const offX = node.layerIdx === 0 ? -radius - 6 : radius + 6;
         ctx.fillText(`N${node.nodeIdx + 1}`, p.x + offX, p.y + 3);
       }
 
-      // Prepare Tooltip if hovered
       if (isHovered) {
         const inCount = threads.filter(t => t.dst === node).length;
         const outCount = threads.filter(t => t.src === node).length;
@@ -574,7 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // 6. Draw Interactive Node Tooltip Card
+    // 6. Monochrome Interactive Node Tooltip Card
     if (activeTooltip) {
       const tip = activeTooltip;
       const tw = 165;
@@ -585,10 +572,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (ty + th > rect.height - 10) ty = rect.height - th - 10;
       if (ty < 10) ty = 10;
 
-      ctx.fillStyle = 'rgba(11, 11, 13, 0.94)';
+      ctx.fillStyle = 'rgba(9, 9, 11, 0.95)';
       ctx.fillRect(tx, ty, tw, th);
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.0;
       ctx.strokeRect(tx, ty, tw, th);
 
       ctx.fillStyle = '#ffffff';
@@ -596,18 +583,18 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.textAlign = 'left';
       ctx.fillText(`${tip.node.name} (${tip.node.layerName})`, tx + 8, ty + 16);
 
-      ctx.fillStyle = '#38bdf8';
+      ctx.fillStyle = '#8e8e96';
       ctx.font = '10px "SF Mono", monospace';
       ctx.fillText(`In: ${tip.inCount} syn | Out: ${tip.outCount} syn`, tx + 8, ty + 32);
 
-      ctx.fillStyle = '#9a9aa6';
+      ctx.fillStyle = '#ffffff';
       ctx.font = '10px -apple-system, sans-serif';
-      ctx.fillText('Touch & Threads isolated', tx + 8, ty + 47);
+      ctx.fillText('Connected threads active', tx + 8, ty + 47);
     }
   }
 
   function animationLoop() {
-    if (autoRotate && !isDragging) targetYaw += 0.0022;
+    if (autoRotate && !isDragging) targetYaw += 0.0022 * settings.orbitSpeed;
     currentYaw += (targetYaw - currentYaw) * 0.08;
     currentPitch += (targetPitch - currentPitch) * 0.08;
     camDist += (targetCamDist - camDist) * 0.08;
@@ -721,37 +708,99 @@ print(f"Network initialized: {layers}")
   }
 
   // ---------------------------------------------------------------------------
-  // 8. SETTINGS MODAL & VISUAL CONTROLS
+  // 8. SETTINGS MODAL & SLIDERS (Sensitivity & Visual Tuning)
   // ---------------------------------------------------------------------------
   const settingsModal = document.getElementById('settingsModal');
   const btnOpenSettings = document.getElementById('btnOpenSettings');
   const btnCloseSettings = document.getElementById('btnCloseSettings');
+
+  const sliderOrbitSens = document.getElementById('sliderOrbitSens');
+  const valOrbitSens = document.getElementById('valOrbitSens');
+
+  const sliderZoomSens = document.getElementById('sliderZoomSens');
+  const valZoomSens = document.getElementById('valZoomSens');
+
+  const sliderOrbitSpeed = document.getElementById('sliderOrbitSpeed');
+  const valOrbitSpeed = document.getElementById('valOrbitSpeed');
+
+  const sliderLuminosity = document.getElementById('sliderLuminosity');
+  const valLuminosity = document.getElementById('valLuminosity');
+
   const toggleStars = document.getElementById('toggleStars');
-  const toggleGlow = document.getElementById('toggleGlow');
-  const toggleOrbit = document.getElementById('toggleOrbit');
+  const btnResetSettings = document.getElementById('btnResetSettings');
+
+  function syncSettingsUI() {
+    if (sliderOrbitSens) {
+      sliderOrbitSens.value = settings.orbitSensitivity;
+      if (valOrbitSens) valOrbitSens.textContent = `${Number(settings.orbitSensitivity).toFixed(1)}x`;
+    }
+    if (sliderZoomSens) {
+      sliderZoomSens.value = settings.zoomSensitivity;
+      if (valZoomSens) valZoomSens.textContent = `${Number(settings.zoomSensitivity).toFixed(1)}x`;
+    }
+    if (sliderOrbitSpeed) {
+      sliderOrbitSpeed.value = settings.orbitSpeed;
+      if (valOrbitSpeed) valOrbitSpeed.textContent = `${Number(settings.orbitSpeed).toFixed(1)}x`;
+    }
+    if (sliderLuminosity) {
+      sliderLuminosity.value = Math.round(settings.threadLuminosity * 100);
+      if (valLuminosity) valLuminosity.textContent = `${Math.round(settings.threadLuminosity * 100)}%`;
+    }
+    if (toggleStars) {
+      toggleStars.classList.toggle('active', settings.enableStarfield);
+    }
+  }
+
+  syncSettingsUI();
 
   if (btnOpenSettings) btnOpenSettings.addEventListener('click', () => settingsModal.classList.add('active'));
   if (btnCloseSettings) btnCloseSettings.addEventListener('click', () => settingsModal.classList.remove('active'));
 
+  if (sliderOrbitSens) {
+    sliderOrbitSens.addEventListener('input', () => {
+      settings.orbitSensitivity = parseFloat(sliderOrbitSens.value);
+      if (valOrbitSens) valOrbitSens.textContent = `${settings.orbitSensitivity.toFixed(1)}x`;
+      saveSettings();
+    });
+  }
+
+  if (sliderZoomSens) {
+    sliderZoomSens.addEventListener('input', () => {
+      settings.zoomSensitivity = parseFloat(sliderZoomSens.value);
+      if (valZoomSens) valZoomSens.textContent = `${settings.zoomSensitivity.toFixed(1)}x`;
+      saveSettings();
+    });
+  }
+
+  if (sliderOrbitSpeed) {
+    sliderOrbitSpeed.addEventListener('input', () => {
+      settings.orbitSpeed = parseFloat(sliderOrbitSpeed.value);
+      if (valOrbitSpeed) valOrbitSpeed.textContent = `${settings.orbitSpeed.toFixed(1)}x`;
+      saveSettings();
+    });
+  }
+
+  if (sliderLuminosity) {
+    sliderLuminosity.addEventListener('input', () => {
+      settings.threadLuminosity = parseInt(sliderLuminosity.value, 10) / 100;
+      if (valLuminosity) valLuminosity.textContent = `${sliderLuminosity.value}%`;
+      saveSettings();
+    });
+  }
+
   if (toggleStars) {
     toggleStars.addEventListener('click', () => {
-      enableStarfield = !enableStarfield;
-      toggleStars.classList.toggle('active', enableStarfield);
+      settings.enableStarfield = !settings.enableStarfield;
+      toggleStars.classList.toggle('active', settings.enableStarfield);
+      saveSettings();
     });
   }
 
-  if (toggleGlow) {
-    toggleGlow.addEventListener('click', () => {
-      enableUltraGlow = !enableUltraGlow;
-      toggleGlow.classList.toggle('active', enableUltraGlow);
-    });
-  }
-
-  if (toggleOrbit) {
-    toggleOrbit.addEventListener('click', () => {
-      autoRotate = !autoRotate;
-      toggleOrbit.classList.toggle('active', autoRotate);
-      if (rotateToggleBtn) rotateToggleBtn.classList.toggle('active', autoRotate);
+  if (btnResetSettings) {
+    btnResetSettings.addEventListener('click', () => {
+      settings = Object.assign({}, DEFAULT_SETTINGS);
+      saveSettings();
+      syncSettingsUI();
     });
   }
 
@@ -776,7 +825,6 @@ print(f"Network initialized: {layers}")
 
   if (btnCloseLegal) btnCloseLegal.addEventListener('click', () => legalModal.classList.remove('active'));
 
-  // Legal Modal Triggers (DPDP, Privacy, Terms)
   document.querySelectorAll('.open-legal-trigger').forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
@@ -784,7 +832,6 @@ print(f"Network initialized: {layers}")
     });
   });
 
-  // Close modals on backdrop click or escape
   window.addEventListener('click', (e) => {
     if (e.target === coffeeModal) coffeeModal.classList.remove('active');
     if (e.target === shareModal) shareModal.classList.remove('active');
@@ -833,7 +880,6 @@ print(f"Network initialized: {layers}")
     });
   }
 
-  // Copy UPI
   if (snackUpiCopyBtn && snackUpiText) {
     snackUpiCopyBtn.addEventListener('click', async () => {
       try {
@@ -845,7 +891,6 @@ print(f"Network initialized: {layers}")
     });
   }
 
-  // 1-Click UPI App Launchers
   document.querySelectorAll('.upi-app-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const scheme = btn.dataset.scheme;

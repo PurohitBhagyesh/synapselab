@@ -19,7 +19,7 @@ SynapseLab provides two distinct working environments tailored for learning:
 * **Moving Cosmic Starfield**: Over 200 3D background stars with smooth parallax drifting and twinkle oscillation.
 * **Synaptic Isolation on Touch/Hover**: Touching or hovering any neuron dot immediately lights up its connected threads with intense luminous cyan glow while softly dimming the rest of the network.
 * **Live In-Browser Python Editor**: Instant live synchronization of network geometry when students edit the `layers` array.
-* **OpenLid Architecture**: Clean monochrome palette (`#000000`, `#0b0b0d`, `#151519`, `#232329`), OpenLid Eye theme switcher (Dark / Light mode), clean bottom status bar, and centered modals.
+* **Minimalist Architecture**: Clean monochrome palette (`#000000`, `#09090b`, `#121215`, `#222226`), permanent high-contrast dark theme, clean bottom status bar, and centered modals.
 * **Developer Guidelines & DPDP Compliance**: 100% in-browser client execution, zero tracking cookies, and complete compliance with DPDP Act 2023 principles.
 
 ---

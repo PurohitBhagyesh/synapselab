@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="color-scheme" content="dark light">
+  <meta name="color-scheme" content="dark">
   <title>SynapseLab — 3D Visualization Simulator for Students</title>
   <meta name="description" content="3D Visualization Simulator for Students. Learn neural networks through interactive 3D filaments, layer mechanics, and live in-browser Python coding.">
   <link rel="stylesheet" href="style.css">
@@ -11,7 +11,7 @@
 <body>
 
   <!-- =========================================================================
-       1. NAVIGATION BAR (OpenLid Sticky Style)
+       1. NAVIGATION BAR
        ========================================================================= -->
   <nav class="nav">
     <div class="nav-inner">
@@ -24,7 +24,6 @@
           <span class="brand-title">SynapseLab</span>
           <span class="brand-sub">3D Visualization Simulator for Students</span>
         </div>
-        <span class="brand-version">v1.0</span>
       </a>
 
       <!-- Mode Switcher: Guide Mode vs Test Mode -->
@@ -49,21 +48,12 @@
       <!-- Navigation Right Utilities -->
       <div class="nav-end">
         <!-- Settings Button -->
-        <button class="nav-icon-btn" id="btnOpenSettings" type="button" aria-label="Visualizer Settings">
+        <button class="nav-icon-btn" id="btnOpenSettings" type="button" aria-label="Settings and Sensitivity">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"/>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
           </svg>
           <span>Settings</span>
-        </button>
-
-        <!-- OpenLid Eye Theme Switcher -->
-        <button class="nav-icon-btn" id="themeToggleBtn" type="button" aria-label="Toggle dark and light mode">
-          <svg class="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-            <circle cx="12" cy="12" r="3"/>
-          </svg>
-          <span id="themeLabel">Dark</span>
         </button>
 
         <a href="https://github.com/PurohitBhagyesh" target="_blank" rel="noopener noreferrer" class="btn">
@@ -77,7 +67,7 @@
   </nav>
 
   <!-- =========================================================================
-       2. MAIN WORKSPACE (OpenLid Monitor Architecture)
+       2. MAIN WORKSPACE
        ========================================================================= -->
   <main id="mainWorkspace">
 
@@ -153,9 +143,9 @@
     <aside class="mode-sidebar code-sidebar" id="paneTest">
       <div class="code-header">
         <div class="traffic-dots">
-          <span class="traffic-dot dot-red"></span>
-          <span class="traffic-dot dot-yellow"></span>
-          <span class="traffic-dot dot-green"></span>
+          <span class="traffic-dot"></span>
+          <span class="traffic-dot"></span>
+          <span class="traffic-dot"></span>
         </div>
         <span class="code-title">student_network.py</span>
         <div class="live-badge">
@@ -203,36 +193,49 @@ print(f"Network initialized: {layers}")
 
       <!-- Floating HUD Badge (Top Left) -->
       <div class="vis-hud-badge">
-        <strong id="hudTitle">GUIDE MODE: 3D NEURAL SIMULATOR</strong>
+        <strong id="hudTitle">GUIDE MODE: 3D SIMULATOR</strong>
         <span id="hudStats">3 Layers (11 Neurons &bull; 24 Synapses)</span>
       </div>
 
-      <!-- 3D Toolbar with Rotate Symbol & Zoom Controls (Top Right) -->
-      <div class="vis-toolbar">
-        <button class="rotate-toggle-btn active" id="btnRotateToggle" type="button" title="Toggle 360-degree automatic orbit">
-          <svg class="rotate-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+      <!-- Modern Frosted Viewport Toolbar (Top Right) -->
+      <div class="viewport-toolbar">
+        <button class="vp-btn active" id="btnToggleOrbit" type="button" title="Toggle Auto Orbit (Spacebar)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+            <path d="m21 3-3 4 5 .5"/>
           </svg>
-          <span>360&deg; Orbit</span>
         </button>
 
-        <div class="zoom-btn-group">
-          <button class="tool-btn" id="btnZoomIn" type="button" title="Zoom In">+</button>
-          <button class="tool-btn" id="btnZoomOut" type="button" title="Zoom Out">&minus;</button>
-          <button class="tool-btn" id="btnResetView" type="button" title="Reset Camera" style="font-size:11px;">Reset</button>
-        </div>
-      </div>
+        <div class="vp-divider"></div>
 
-      <!-- 3D Guidance Pill (Visible ONLY in Guide Mode) -->
-      <div class="guidance-pill-bottom">
-        Touch / hover any dot to isolate its threads &bull; Drag to orbit &bull; Scroll to zoom
+        <button class="vp-btn" id="btnZoomIn" type="button" title="Zoom In (+)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+
+        <button class="vp-btn" id="btnZoomOut" type="button" title="Zoom Out (&minus;)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+
+        <div class="vp-divider"></div>
+
+        <button class="vp-btn" id="btnResetView" type="button" title="Center & Reset View (R)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>
+          </svg>
+        </button>
       </div>
     </section>
 
   </main>
 
   <!-- =========================================================================
-       3. GLOBAL BOTTOM BAR (No Floating Overlaps!)
+       3. GLOBAL BOTTOM STATUS & LEGAL BAR
        ========================================================================= -->
   <footer class="bottom-bar">
     <div class="bottom-left">
@@ -271,44 +274,63 @@ print(f"Network initialized: {layers}")
        4. CENTERED MODALS (Settings, Coffee, Share & Legal)
        ========================================================================= -->
 
-  <!-- SETTINGS MODAL -->
+  <!-- SETTINGS MODAL (Sensitivity, Orbit, Stars, Visual Tuning) -->
   <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 class="modal-title" id="settingsModalTitle">Visualizer Settings</h3>
+        <h3 class="modal-title" id="settingsModalTitle">Simulator Settings</h3>
         <button class="modal-close-btn" id="btnCloseSettings" type="button" aria-label="Close modal">&times;</button>
       </div>
 
       <div class="settings-grid">
-        <div class="settings-row">
-          <div class="settings-label">
-            <strong>Moving Starfield</strong>
-            <span>3D cosmic stars moving in background</span>
+        <!-- Orbit Sensitivity -->
+        <div class="settings-control-group">
+          <div class="settings-control-header">
+            <strong>Orbit Sensitivity</strong>
+            <span class="settings-value-badge" id="valOrbitSens">1.0x</span>
+          </div>
+          <input type="range" class="settings-slider" id="sliderOrbitSens" min="0.3" max="2.5" step="0.1" value="1.0">
+        </div>
+
+        <!-- Zoom Sensitivity -->
+        <div class="settings-control-group">
+          <div class="settings-control-header">
+            <strong>Zoom Sensitivity</strong>
+            <span class="settings-value-badge" id="valZoomSens">1.0x</span>
+          </div>
+          <input type="range" class="settings-slider" id="sliderZoomSens" min="0.3" max="2.5" step="0.1" value="1.0">
+        </div>
+
+        <!-- Auto Orbit Speed -->
+        <div class="settings-control-group">
+          <div class="settings-control-header">
+            <strong>Auto Orbit Speed</strong>
+            <span class="settings-value-badge" id="valOrbitSpeed">1.0x</span>
+          </div>
+          <input type="range" class="settings-slider" id="sliderOrbitSpeed" min="0.2" max="3.0" step="0.1" value="1.0">
+        </div>
+
+        <!-- Thread Luminosity -->
+        <div class="settings-control-group">
+          <div class="settings-control-header">
+            <strong>Thread Luminosity</strong>
+            <span class="settings-value-badge" id="valLuminosity">55%</span>
+          </div>
+          <input type="range" class="settings-slider" id="sliderLuminosity" min="20" max="100" step="5" value="55">
+        </div>
+
+        <!-- Moving Starfield Toggle -->
+        <div class="settings-toggle-row">
+          <div>
+            <strong style="font-size:12.5px; display:block;">Moving Starfield</strong>
+            <span style="font-size:11px; color:var(--text-muted);">3D cosmic stars moving in background</span>
           </div>
           <div class="toggle-switch active" id="toggleStars">
             <div class="toggle-thumb"></div>
           </div>
         </div>
 
-        <div class="settings-row">
-          <div class="settings-label">
-            <strong>Filament Ultra Glow</strong>
-            <span>Cyan-tinted luminous halo effects</span>
-          </div>
-          <div class="toggle-switch active" id="toggleGlow">
-            <div class="toggle-thumb"></div>
-          </div>
-        </div>
-
-        <div class="settings-row">
-          <div class="settings-label">
-            <strong>Automatic 360° Orbit</strong>
-            <span>Smooth camera rotation around network</span>
-          </div>
-          <div class="toggle-switch active" id="toggleOrbit">
-            <div class="toggle-thumb"></div>
-          </div>
-        </div>
+        <button type="button" class="btn" id="btnResetSettings" style="margin-top:4px; font-size:11.5px;">Reset to Defaults</button>
       </div>
     </div>
   </div>
@@ -327,7 +349,7 @@ print(f"Network initialized: {layers}")
 
       <div class="snack-upi-copy" id="snackUpiCopyBtn" title="Click to copy UPI ID">
         <span id="snackUpiText">Purohit2009@fam</span>
-        <span style="font-size:10px; color:var(--accent-cyan); font-weight:600;">COPY</span>
+        <span style="font-size:10px; color:#ffffff; font-weight:600;">COPY</span>
       </div>
 
       <div class="snack-input-wrap" style="display:flex; align-items:center; background:var(--surface-alt); border:1px solid var(--border); border-radius:6px; padding:6px 10px; gap:6px;">
@@ -344,19 +366,19 @@ print(f"Network initialized: {layers}")
 
       <div class="upi-apps-grid">
         <button type="button" class="upi-app-btn" data-scheme="famapp">
-          <span class="upi-app-badge fam-badge">Fam</span>
+          <span class="upi-app-badge">Fam</span>
           <span>FamApp</span>
         </button>
         <button type="button" class="upi-app-btn" data-scheme="gpay">
-          <span class="upi-app-badge gpay-badge">G</span>
+          <span class="upi-app-badge">G</span>
           <span>GPay</span>
         </button>
         <button type="button" class="upi-app-btn" data-scheme="phonepe">
-          <span class="upi-app-badge pe-badge">Pe</span>
+          <span class="upi-app-badge">Pe</span>
           <span>PhonePe</span>
         </button>
         <button type="button" class="upi-app-btn" data-scheme="paytm">
-          <span class="upi-app-badge paytm-badge">Pay</span>
+          <span class="upi-app-badge">Pay</span>
           <span>Paytm</span>
         </button>
       </div>
@@ -380,7 +402,7 @@ print(f"Network initialized: {layers}")
           <div style="font-weight:600;">Copy Direct Link</div>
           <div style="font-size:11px; color:var(--text-muted);">Share with students and peers</div>
         </div>
-        <span style="font-size:11px; color:var(--accent-cyan); font-weight:700;" id="shareCopyBadge">Copy</span>
+        <span style="font-size:11px; color:#ffffff; font-weight:700;" id="shareCopyBadge">Copy</span>
       </button>
 
       <button type="button" class="share-action-btn" id="btnNativeShare">
@@ -414,7 +436,7 @@ print(f"Network initialized: {layers}")
 
         <h3>Cookies & Digital Personal Data Protection (DPDP) Act Compliance</h3>
         <p>
-          We do not use tracking cookies, advertising identifiers, or analytics trackers. The only stored data is your local preference for Dark or Light theme saved in standard browser localStorage.
+          We do not use tracking cookies, advertising identifiers, or analytics trackers. Local user preferences such as camera sensitivity and visual controls are saved strictly in standard browser localStorage.
         </p>
 
         <h3>Terms of Use</h3>
