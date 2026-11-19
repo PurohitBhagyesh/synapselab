@@ -59,6 +59,21 @@ epochs = 300`;
     layers: [3, 8, 4, 1]
   };
 
+  let activeGuideConfig = {
+    layers: [3, 6, 2],
+    activation: 'relu',
+    learningRate: 0.05,
+    epochs: 200
+  };
+
+  function formatPythonCode(config) {
+    const layerStr = JSON.stringify(config.layers || [3, 6, 2]);
+    return `layers = ${layerStr}
+activation = "${config.activation || 'relu'}"
+learning_rate = ${config.learningRate || 0.05}
+epochs = ${config.epochs || 300}`;
+  }
+
   function attachTap(el, fn) {
     if (!el) return;
     el.addEventListener('click', fn);
@@ -87,19 +102,41 @@ epochs = 300`;
 
   function syncCodeToNetwork() {
     if (!studentCode) return;
-    const code = studentCode.value;
+    const code = studentCode.value.trim();
+
+    // If user writes nothing or clears the code, render plain background with no network
+    if (!code) {
+      currentModelParams.layers = [];
+      buildNetwork([]);
+      return;
+    }
 
     const layersMatch = code.match(/layers\s*=\s*\[([\s\S]*?)\]/);
-    if (layersMatch && layersMatch[1]) {
-      const cleanLayersStr = layersMatch[1].replace(/#.*$/gm, '');
+    if (layersMatch) {
+      const cleanLayersStr = layersMatch[1].replace(/#.*$/gm, '').trim();
+      if (!cleanLayersStr) {
+        // User wrote layers = []
+        currentModelParams.layers = [];
+        buildNetwork([]);
+        return;
+      }
+
       const parsed = cleanLayersStr.split(',')
         .map(n => parseInt(n.trim(), 10))
-        .filter(n => !isNaN(n) && n > 0 && n <= 24);
+        .filter(n => !isNaN(n) && n > 0 && n <= 32);
 
       if (parsed.length >= 2) {
         currentModelParams.layers = parsed;
         buildNetwork(parsed);
+      } else {
+        // Empty or 1 layer: clear network to plain background
+        currentModelParams.layers = [];
+        buildNetwork([]);
       }
+    } else {
+      // No layers = [...] defined: clear network to plain background
+      currentModelParams.layers = [];
+      buildNetwork([]);
     }
 
     const actMatch = code.match(/activation\s*=\s*["']([a-zA-Z0-9_\-]+)["']/i);
@@ -115,12 +152,6 @@ epochs = 300`;
     const epMatch = code.match(/epochs\s*=\s*(\d+)/i);
     if (epMatch && epMatch[1]) {
       currentModelParams.epochs = parseInt(epMatch[1], 10);
-    }
-
-    const paramStats = document.getElementById('paramStats');
-    if (paramStats) {
-      const actDisplay = currentModelParams.activation.toUpperCase();
-      paramStats.textContent = `${actDisplay} • lr ${currentModelParams.learningRate}`;
     }
   }
 
@@ -142,7 +173,7 @@ epochs = 300`;
       }
       if (paneGuide) paneGuide.classList.add('active');
       if (paneTest) paneTest.classList.remove('active');
-      buildNetwork([3, 6, 2]);
+      buildNetwork(activeGuideConfig.layers || [3, 6, 2]);
       triggerLiveForwardPass();
     } else {
       if (tabTest) {
@@ -155,6 +186,10 @@ epochs = 300`;
       }
       if (paneTest) paneTest.classList.add('active');
       if (paneGuide) paneGuide.classList.remove('active');
+      // Load current guide lesson code into Test Mode editor
+      if (studentCode) {
+        studentCode.value = formatPythonCode(activeGuideConfig);
+      }
       updateLineNumbers();
       updateCursorPosition();
       syncCodeToNetwork();
@@ -217,10 +252,15 @@ epochs = 300`;
   let threads = [];
 
   function buildNetwork(sizes) {
-    layerSizes = sizes;
+    layerSizes = sizes || [];
     nodes = [];
     threads = [];
     hoveredNode = null;
+
+    if (!layerSizes || layerSizes.length === 0) {
+      drawPerspectiveScene();
+      return;
+    }
 
     const numLayers = layerSizes.length;
     const totalDepth = 480;
@@ -1066,18 +1106,23 @@ epochs = 300`;
 
       const lessonIdx = parseInt(card.dataset.lesson, 10);
       if (lessonIdx === 0) {
+        activeGuideConfig = { layers: [3, 6, 2], activation: 'relu', learningRate: 0.05, epochs: 200 };
         buildNetwork([3, 6, 2]);
         targetCamDist = 650;
       } else if (lessonIdx === 1) {
+        activeGuideConfig = { layers: [3, 8, 3], activation: 'relu', learningRate: 0.05, epochs: 250 };
         buildNetwork([3, 8, 3]);
         targetCamDist = 650;
       } else if (lessonIdx === 2) {
+        activeGuideConfig = { layers: [2, 5, 2], activation: 'relu', learningRate: 0.05, epochs: 200 };
         buildNetwork([2, 5, 2]);
         targetCamDist = 620;
       } else if (lessonIdx === 3) {
+        activeGuideConfig = { layers: [3, 8, 6, 2], activation: 'relu', learningRate: 0.03, epochs: 400 };
         buildNetwork([3, 8, 6, 2]);
         targetCamDist = 700;
       } else if (lessonIdx === 4) {
+        activeGuideConfig = { layers: [3, 6, 4, 2], activation: 'relu', learningRate: 0.05, epochs: 300 };
         buildNetwork([3, 6, 4, 2]);
         targetCamDist = 680;
       } else if (lessonIdx === 5) {
@@ -1092,6 +1137,7 @@ epochs = 300`;
   if (btnLesson1Starter) {
     btnLesson1Starter.addEventListener('click', (e) => {
       e.stopPropagation();
+      activeGuideConfig = { layers: [2, 2], activation: 'relu', learningRate: 0.05, epochs: 150 };
       buildNetwork([2, 2]);
       targetCamDist = 580;
       triggerLiveForwardPass();
@@ -1102,6 +1148,7 @@ epochs = 300`;
   if (btnLesson1Standard) {
     btnLesson1Standard.addEventListener('click', (e) => {
       e.stopPropagation();
+      activeGuideConfig = { layers: [3, 6, 2], activation: 'relu', learningRate: 0.05, epochs: 200 };
       buildNetwork([3, 6, 2]);
       targetCamDist = 650;
       triggerLiveForwardPass();
@@ -1112,6 +1159,7 @@ epochs = 300`;
   if (btnPulseGuide) {
     btnPulseGuide.addEventListener('click', (e) => {
       e.stopPropagation();
+      activeGuideConfig = { layers: [3, 8, 3], activation: 'relu', learningRate: 0.05, epochs: 250 };
       triggerLiveForwardPass();
     });
   }
@@ -1120,6 +1168,7 @@ epochs = 300`;
   if (btnLesson3Inspect) {
     btnLesson3Inspect.addEventListener('click', (e) => {
       e.stopPropagation();
+      activeGuideConfig = { layers: [2, 5, 2], activation: 'relu', learningRate: 0.05, epochs: 200 };
       buildNetwork([2, 5, 2]);
       triggerLiveForwardPass();
     });
@@ -1129,6 +1178,7 @@ epochs = 300`;
   if (btnLesson4Deep) {
     btnLesson4Deep.addEventListener('click', (e) => {
       e.stopPropagation();
+      activeGuideConfig = { layers: [3, 8, 6, 2], activation: 'relu', learningRate: 0.03, epochs: 400 };
       buildNetwork([3, 8, 6, 2]);
       triggerLiveForwardPass();
     });
@@ -1138,6 +1188,7 @@ epochs = 300`;
   if (btnLesson5Train) {
     btnLesson5Train.addEventListener('click', (e) => {
       e.stopPropagation();
+      activeGuideConfig = { layers: [3, 6, 4, 2], activation: 'relu', learningRate: 0.05, epochs: 300 };
       buildNetwork([3, 6, 4, 2]);
       triggerLiveForwardPass();
     });
