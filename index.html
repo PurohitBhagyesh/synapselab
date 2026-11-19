@@ -522,8 +522,9 @@ epochs = 300</textarea>
       </div>
 
       <!-- Live UPI QR Code -->
-      <div class="snack-qr-pad" style="display:flex; justify-content:center; align-items:center; padding:12px; background:var(--surface-alt); border:1px solid var(--border); border-radius:8px; margin-bottom:12px;">
-        <img id="snackQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&amp;format=svg&amp;data=upi%3A%2F%2Fpay%3Fpa%3DPurohit2009%40fam%26pn%3DShivam%26am%3D50%26cu%3DINR" alt="UPI Payment QR Code" width="136" height="136" style="border-radius:4px; background:#ffffff; padding:6px; display:block;">
+      <div class="snack-qr-pad">
+        <img id="snackQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&amp;format=svg&amp;qzone=2&amp;data=upi%3A%2F%2Fpay%3Fpa%3DPurohit2009%40fam%26pn%3DShivam%26am%3D50%26cu%3DINR%26tn%3DSynapseLab" alt="UPI Payment QR Code" width="180" height="180">
+        <span class="snack-qr-caption">Scan with GPay, PhonePe, Paytm, or FamApp</span>
       </div>
 
       <div class="snack-upi-copy" id="snackUpiCopyBtn" title="Click to copy UPI ID">

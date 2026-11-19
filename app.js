@@ -1562,9 +1562,9 @@ epochs = ${config.epochs || 300}`;
 
   function updateCoffeeQr(amt) {
     const val = Math.max(1, parseInt(amt, 10) || 50);
-    const uri = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${val}&cu=INR`;
+    const uri = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${val}&cu=INR&tn=SynapseLab`;
     if (snackQrImg) {
-      snackQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&format=svg&data=${encodeURIComponent(uri)}`;
+      snackQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&format=svg&qzone=2&data=${encodeURIComponent(uri)}`;
     }
   }
 

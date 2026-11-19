@@ -111,31 +111,37 @@ body {
   letter-spacing: 0.1px;
 }
 
-/* Mode Header Strip: Clean horizontal container between Header and Body */
+/* Mode Header Strip: Integrated in top navbar on PC (0 extra height) */
 .mode-header-strip {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #000000;
-  border-bottom: 1px solid var(--border);
-  padding: 6px 12px;
+  height: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
   flex-shrink: 0;
-  z-index: 40;
 }
 
-/* Mode Switcher Segmented Control (macOS Pill Capsule Aesthetic Inspired by Image 2) */
+/* Mode Switcher Segmented Control (Centered in 44px top navbar on PC) */
 .mode-segmented {
-  position: relative;
+  position: fixed;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1005;
   display: inline-flex;
   align-items: center;
   background: #000000;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 9999px;
   padding: 3px;
-  height: 36px;
-  min-width: 220px;
+  height: 34px;
+  min-width: 210px;
   gap: 0;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+/* On PC, Buy me a Coffee is in bottom bar, so hide duplicate in top navbar */
+#btnOpenCoffeeNav {
+  display: none;
 }
 
 .slider-pill {
@@ -1367,18 +1373,31 @@ main {
 /* Buy Me a Coffee QR & UPI Layout */
 .snack-qr-pad {
   background: #ffffff;
-  border-radius: 8px;
-  padding: 8px;
+  border-radius: 12px;
+  padding: 14px 12px 10px 12px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 140px;
-  height: 140px;
-  margin: 0 auto;
+  width: 204px;
+  margin: 0 auto 12px auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
+
 .snack-qr-pad img {
-  max-width: 100%;
+  width: 180px;
+  height: 180px;
   display: block;
+  border-radius: 4px;
+}
+
+.snack-qr-caption {
+  font-size: 10px;
+  font-weight: 600;
+  color: #52525b;
+  text-align: center;
+  margin-top: 6px;
+  letter-spacing: 0.02em;
 }
 
 .snack-upi-copy {
@@ -1560,9 +1579,17 @@ main {
   }
 
   .mode-header-strip {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
     height: 44px;
     padding: 4px 10px;
     background: #000000;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #btnOpenCoffeeNav {
+    display: inline-flex !important;
   }
 
   .coffee-full-text {
