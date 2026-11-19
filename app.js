@@ -183,7 +183,7 @@ epochs = 300`;
   let cx = 300;
   let cy = 225;
 
-  // Camera State with Smooth Inertial Lerping
+  // Camera State with Smooth Inertial Lerping & Velocity Damping
   let targetYaw = -0.38;
   let targetPitch = 0.22;
   let currentYaw = -0.38;
@@ -195,6 +195,9 @@ epochs = 300`;
   let wavePulseTime = 0;
   let isDragging = false;
   let lastX = 0, lastY = 0;
+  let velYaw = 0;
+  let velPitch = 0;
+  let showLabels = true;
   let mouseScreenX = -9999, mouseScreenY = -9999;
   let hoveredNode = null;
   let hoverCheckPending = false;
@@ -358,6 +361,8 @@ epochs = 300`;
     isDragging = true;
     lastX = e.clientX;
     lastY = e.clientY;
+    velYaw = 0;
+    velPitch = 0;
     autoRotate = false;
     if (btnToggleOrbit) btnToggleOrbit.classList.remove('active');
   });
@@ -368,9 +373,13 @@ epochs = 300`;
     mouseScreenY = e.clientY - rect.top;
 
     if (isDragging) {
-      const sens = settings.orbitSensitivity * 0.007;
-      targetYaw += (e.clientX - lastX) * sens;
-      targetPitch = Math.max(-0.65, Math.min(0.85, targetPitch + (e.clientY - lastY) * sens));
+      const sens = 0.007;
+      const dx = (e.clientX - lastX) * sens;
+      const dy = (e.clientY - lastY) * sens;
+      velYaw = dx;
+      velPitch = dy;
+      targetYaw += dx;
+      targetPitch = Math.max(-0.65, Math.min(0.85, targetPitch + dy));
       lastX = e.clientX;
       lastY = e.clientY;
     } else if (!hoverCheckPending) {
@@ -396,16 +405,18 @@ epochs = 300`;
 
   canvas.addEventListener('wheel', e => {
     e.preventDefault();
-    const sens = settings.zoomSensitivity * 0.6;
+    const sens = 0.6;
     targetCamDist = Math.max(260, Math.min(1250, targetCamDist + e.deltaY * sens));
   }, { passive: false });
 
-  // Touch Support
+  // Touch Support with Fluid Swipe Physics
   canvas.addEventListener('touchstart', e => {
     if (e.touches.length === 1) {
       isDragging = true;
       lastX = e.touches[0].clientX;
       lastY = e.touches[0].clientY;
+      velYaw = 0;
+      velPitch = 0;
       autoRotate = false;
       if (btnToggleOrbit) btnToggleOrbit.classList.remove('active');
 
@@ -423,9 +434,13 @@ epochs = 300`;
     mouseScreenY = e.touches[0].clientY - rect.top;
 
     if (isDragging) {
-      const sens = settings.orbitSensitivity * 0.007;
-      targetYaw += (e.touches[0].clientX - lastX) * sens;
-      targetPitch = Math.max(-0.65, Math.min(0.85, targetPitch + (e.touches[0].clientY - lastY) * sens));
+      const sens = 0.007;
+      const dx = (e.touches[0].clientX - lastX) * sens;
+      const dy = (e.touches[0].clientY - lastY) * sens;
+      velYaw = dx;
+      velPitch = dy;
+      targetYaw += dx;
+      targetPitch = Math.max(-0.65, Math.min(0.85, targetPitch + dy));
       lastX = e.touches[0].clientX;
       lastY = e.touches[0].clientY;
     }
@@ -507,36 +522,50 @@ epochs = 300`;
   }
 
   if (btnFullscreen) {
-    btnFullscreen.addEventListener('click', () => toggleFullscreen());
+    attachTap(btnFullscreen, () => toggleFullscreen());
   }
 
   if (btnExitFullscreen) {
-    btnExitFullscreen.addEventListener('click', () => toggleFullscreen(false));
+    attachTap(btnExitFullscreen, () => toggleFullscreen(false));
   }
 
   if (btnZoomIn) {
-    btnZoomIn.addEventListener('click', () => {
-      targetCamDist = Math.max(280, targetCamDist - 120 * settings.zoomSensitivity);
+    attachTap(btnZoomIn, () => {
+      targetCamDist = Math.max(280, targetCamDist - 120);
     });
   }
   if (btnZoomOut) {
-    btnZoomOut.addEventListener('click', () => {
-      targetCamDist = Math.min(1200, targetCamDist + 120 * settings.zoomSensitivity);
+    attachTap(btnZoomOut, () => {
+      targetCamDist = Math.min(1200, targetCamDist + 120);
     });
   }
   if (btnResetView) {
-    btnResetView.addEventListener('click', () => {
+    attachTap(btnResetView, () => {
       targetYaw = -0.38;
       targetPitch = 0.22;
+      velYaw = 0;
+      velPitch = 0;
       targetCamDist = 650;
       autoRotate = true;
       if (btnToggleOrbit) btnToggleOrbit.classList.add('active');
     });
   }
 
+  const btnToggleLabels = document.getElementById('btnToggleLabels');
+  if (btnToggleLabels) {
+    attachTap(btnToggleLabels, () => {
+      showLabels = !showLabels;
+      btnToggleLabels.classList.toggle('active', showLabels);
+      btnToggleLabels.setAttribute('data-tooltip', showLabels ? 'Toggle Labels (H)' : 'Show Labels (H)');
+      drawPerspectiveScene();
+    });
+  }
+
   if (btnToggleOrbit) {
-    btnToggleOrbit.addEventListener('click', () => {
+    attachTap(btnToggleOrbit, () => {
       autoRotate = !autoRotate;
+      velYaw = 0;
+      velPitch = 0;
       btnToggleOrbit.classList.toggle('active', autoRotate);
     });
   }
@@ -555,6 +584,8 @@ epochs = 300`;
       if (btnToggleOrbit) btnToggleOrbit.click();
     } else if (e.code === 'KeyR') {
       if (btnResetView) btnResetView.click();
+    } else if (e.code === 'KeyH') {
+      if (btnToggleLabels) btnToggleLabels.click();
     } else if (e.code === 'KeyF') {
       e.preventDefault();
       toggleFullscreen();
@@ -790,34 +821,57 @@ epochs = 300`;
       });
     });
 
-    // 4. Floating Layer Headers (Monochrome Glass Cards)
-    layerSizes.forEach((count, lIdx) => {
-      const totalDepth = 480;
-      const z = -totalDepth / 2 + lIdx * (totalDepth / (layerSizes.length - 1 || 1));
-      const pTop = project3D(0, -180, z, cx, cy);
-      if (!pTop) return;
+    // 4. Floating Layer Headers (Monochrome Glass Cards with Dynamic Text Fitting)
+    if (showLabels) {
+      layerSizes.forEach((count, lIdx) => {
+        const totalDepth = 480;
+        const z = -totalDepth / 2 + lIdx * (totalDepth / (layerSizes.length - 1 || 1));
+        const pTop = project3D(0, -180, z, cx, cy);
+        if (!pTop) return;
 
-      const w = 84 * pTop.scale * 1.5;
-      const h = 28 * pTop.scale * 1.5;
-      const x = pTop.x - w / 2;
-      const y = pTop.y - h;
+        const name = lIdx === 0 ? "Input Layer" : (lIdx === layerSizes.length - 1 ? "Endpoint (Output)" : `Hidden ${lIdx}`);
+        const countText = `${count} ${count === 1 ? 'Neuron' : 'Neurons'}`;
 
-      ctx.fillStyle = 'rgba(9, 9, 11, 0.92)';
-      ctx.fillRect(x, y, w, h);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(x, y, w, h);
+        const titleSize = Math.max(9, Math.round(11 * pTop.scale * 1.4));
+        const subSize = Math.max(8, Math.round(9 * pTop.scale * 1.4));
 
-      ctx.fillStyle = '#ffffff';
-      ctx.font = `600 ${Math.max(8, Math.round(10.5 * pTop.scale * 1.5))}px -apple-system, sans-serif`;
-      ctx.textAlign = 'center';
-      const name = lIdx === 0 ? "Input Layer" : (lIdx === layerSizes.length - 1 ? "Endpoint (Output)" : `Hidden ${lIdx}`);
-      ctx.fillText(name, pTop.x, y + 12 * pTop.scale * 1.5);
+        ctx.font = `600 ${titleSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+        const titleW = ctx.measureText(name).width;
 
-      ctx.fillStyle = '#8e8e96';
-      ctx.font = `${Math.max(7, Math.round(8.5 * pTop.scale * 1.5))}px "SF Mono", monospace`;
-      ctx.fillText(`${count} Neurons`, pTop.x, y + 23 * pTop.scale * 1.5);
-    });
+        ctx.font = `${subSize}px "SF Mono", monospace`;
+        const subW = ctx.measureText(countText).width;
+
+        const padX = 16 * pTop.scale * 1.4;
+        const w = Math.max(80 * pTop.scale * 1.4, Math.max(titleW, subW) + padX * 2);
+        const h = 34 * pTop.scale * 1.4;
+        const x = pTop.x - w / 2;
+        const y = pTop.y - h;
+
+        ctx.fillStyle = 'rgba(9, 9, 11, 0.94)';
+        if (ctx.roundRect) {
+          ctx.beginPath();
+          ctx.roundRect(x, y, w, h, 4);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        } else {
+          ctx.fillRect(x, y, w, h);
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x, y, w, h);
+        }
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `600 ${titleSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(name, pTop.x, y + 14 * pTop.scale * 1.4);
+
+        ctx.fillStyle = '#8e8e96';
+        ctx.font = `${subSize}px "SF Mono", monospace`;
+        ctx.fillText(countText, pTop.x, y + 26 * pTop.scale * 1.4);
+      });
+    }
 
     // 5. Depth Sorted Neurons
     const projNodes = [];
@@ -858,8 +912,8 @@ epochs = 300`;
       ctx.fill();
       ctx.stroke();
 
-      // Node label
-      if (p.scale > 0.6) {
+      // Node label (only displayed when showLabels is active)
+      if (showLabels && p.scale > 0.6) {
         ctx.fillStyle = isHovered ? '#ffffff' : '#8e8e96';
         ctx.font = `${isHovered ? 'bold ' : ''}${Math.max(7, Math.round(8.5 * p.scale))}px "SF Mono", monospace`;
         ctx.textAlign = node.layerIdx === 0 ? 'right' : 'left';
@@ -920,8 +974,20 @@ epochs = 300`;
   }
 
   function animationLoop() {
-    if (autoRotate && !isDragging) targetYaw += 0.0022 * settings.orbitSpeed;
+    if (!isDragging) {
+      if (Math.abs(velYaw) > 0.0001 || Math.abs(velPitch) > 0.0001) {
+        targetYaw += velYaw;
+        targetPitch = Math.max(-0.65, Math.min(0.85, targetPitch + velPitch));
+        velYaw *= 0.92;
+        velPitch *= 0.92;
+      } else if (autoRotate) {
+        targetYaw += 0.0022;
+      }
+    }
     currentYaw += (targetYaw - currentYaw) * 0.08;
+    currentPitch += (targetPitch - currentPitch) * 0.08;
+    camDist += (targetCamDist - camDist) * 0.08;
+    wavePulseTime += 0.024;
     currentPitch += (targetPitch - currentPitch) * 0.08;
     camDist += (targetCamDist - camDist) * 0.08;
     wavePulseTime += 0.024;
@@ -1209,101 +1275,14 @@ epochs = 300`;
   }
 
   // ---------------------------------------------------------------------------
-  // 8. SETTINGS MODAL & SLIDERS (Sensitivity & Visual Tuning)
+  // 8. SETTINGS & REPORT ISSUE MODAL (Minimal One-Click Design)
   // ---------------------------------------------------------------------------
   const settingsModal = document.getElementById('settingsModal');
   const btnOpenSettings = document.getElementById('btnOpenSettings');
   const btnCloseSettings = document.getElementById('btnCloseSettings');
 
-  const sliderOrbitSens = document.getElementById('sliderOrbitSens');
-  const valOrbitSens = document.getElementById('valOrbitSens');
-
-  const sliderZoomSens = document.getElementById('sliderZoomSens');
-  const valZoomSens = document.getElementById('valZoomSens');
-
-  const sliderOrbitSpeed = document.getElementById('sliderOrbitSpeed');
-  const valOrbitSpeed = document.getElementById('valOrbitSpeed');
-
-  const sliderLuminosity = document.getElementById('sliderLuminosity');
-  const valLuminosity = document.getElementById('valLuminosity');
-
-  const toggleStars = document.getElementById('toggleStars');
-  const btnResetSettings = document.getElementById('btnResetSettings');
-
-  function syncSettingsUI() {
-    if (sliderOrbitSens) {
-      sliderOrbitSens.value = settings.orbitSensitivity;
-      if (valOrbitSens) valOrbitSens.textContent = `${Number(settings.orbitSensitivity).toFixed(1)}x`;
-    }
-    if (sliderZoomSens) {
-      sliderZoomSens.value = settings.zoomSensitivity;
-      if (valZoomSens) valZoomSens.textContent = `${Number(settings.zoomSensitivity).toFixed(1)}x`;
-    }
-    if (sliderOrbitSpeed) {
-      sliderOrbitSpeed.value = settings.orbitSpeed;
-      if (valOrbitSpeed) valOrbitSpeed.textContent = `${Number(settings.orbitSpeed).toFixed(1)}x`;
-    }
-    if (sliderLuminosity) {
-      sliderLuminosity.value = Math.round(settings.threadLuminosity * 100);
-      if (valLuminosity) valLuminosity.textContent = `${Math.round(settings.threadLuminosity * 100)}%`;
-    }
-    if (toggleStars) {
-      toggleStars.classList.toggle('active', settings.enableStarfield);
-    }
-  }
-
-  syncSettingsUI();
-
-  if (btnOpenSettings) btnOpenSettings.addEventListener('click', () => settingsModal.classList.add('active'));
-  if (btnCloseSettings) btnCloseSettings.addEventListener('click', () => settingsModal.classList.remove('active'));
-
-  if (sliderOrbitSens) {
-    sliderOrbitSens.addEventListener('input', () => {
-      settings.orbitSensitivity = parseFloat(sliderOrbitSens.value);
-      if (valOrbitSens) valOrbitSens.textContent = `${settings.orbitSensitivity.toFixed(1)}x`;
-      saveSettings();
-    });
-  }
-
-  if (sliderZoomSens) {
-    sliderZoomSens.addEventListener('input', () => {
-      settings.zoomSensitivity = parseFloat(sliderZoomSens.value);
-      if (valZoomSens) valZoomSens.textContent = `${settings.zoomSensitivity.toFixed(1)}x`;
-      saveSettings();
-    });
-  }
-
-  if (sliderOrbitSpeed) {
-    sliderOrbitSpeed.addEventListener('input', () => {
-      settings.orbitSpeed = parseFloat(sliderOrbitSpeed.value);
-      if (valOrbitSpeed) valOrbitSpeed.textContent = `${settings.orbitSpeed.toFixed(1)}x`;
-      saveSettings();
-    });
-  }
-
-  if (sliderLuminosity) {
-    sliderLuminosity.addEventListener('input', () => {
-      settings.threadLuminosity = parseInt(sliderLuminosity.value, 10) / 100;
-      if (valLuminosity) valLuminosity.textContent = `${sliderLuminosity.value}%`;
-      saveSettings();
-    });
-  }
-
-  if (toggleStars) {
-    toggleStars.addEventListener('click', () => {
-      settings.enableStarfield = !settings.enableStarfield;
-      toggleStars.classList.toggle('active', settings.enableStarfield);
-      saveSettings();
-    });
-  }
-
-  if (btnResetSettings) {
-    btnResetSettings.addEventListener('click', () => {
-      settings = Object.assign({}, DEFAULT_SETTINGS);
-      saveSettings();
-      syncSettingsUI();
-    });
-  }
+  if (btnOpenSettings) attachTap(btnOpenSettings, () => settingsModal && settingsModal.classList.add('active'));
+  if (btnCloseSettings) attachTap(btnCloseSettings, () => settingsModal && settingsModal.classList.remove('active'));
 
   // ---------------------------------------------------------------------------
   // 9. BUY ME A COFFEE & SHARE MODALS
@@ -1441,12 +1420,15 @@ epochs = 300`;
   // Settings Modal: Share Simulator Controls
   const btnSettingsShareLink = document.getElementById('btnSettingsShareLink');
   const settingsShareCopyText = document.getElementById('settingsShareCopyText');
-  const btnSettingsShareSheet = document.getElementById('btnSettingsShareSheet');
 
+
+  // Settings Modal: Share Simulator Direct Link
+  const btnSettingsShareLink = document.getElementById('btnSettingsShareLink');
+  const settingsShareCopyText = document.getElementById('settingsShareCopyText');
   if (btnSettingsShareLink) {
-    btnSettingsShareLink.addEventListener('click', async () => {
+    attachTap(btnSettingsShareLink, async () => {
       try {
-        await navigator.clipboard.writeText(window.location.href);
+        await navigator.clipboard.writeText('https://synapselab.devs.li');
         if (settingsShareCopyText) {
           const original = settingsShareCopyText.textContent;
           settingsShareCopyText.textContent = 'Link Copied!';
@@ -1456,46 +1438,29 @@ epochs = 300`;
     });
   }
 
-  if (btnSettingsShareSheet) {
-    btnSettingsShareSheet.addEventListener('click', async () => {
-      const shareData = {
-        title: 'SynapseLab: 3D Visualization Simulator for Students',
-        text: 'Interactive 3D neural network simulator with luminous white filaments!',
-        url: window.location.href
-      };
-      if (navigator.share) {
-        try { await navigator.share(shareData); } catch (err) {}
-      } else if (shareModal) {
-        shareModal.classList.add('active');
+  // Settings Modal: Report an Issue / Feedback (One-Click Minimal Action)
+  const btnCopyDevEmail = document.getElementById('btnCopyDevEmail');
+  const btnSendIssueEmail = document.getElementById('btnSendIssueEmail');
+  const DEV_EMAIL = 'Purohitunofficialbhagyesh@gmail.com';
+
+  if (btnCopyDevEmail) {
+    attachTap(btnCopyDevEmail, async () => {
+      try {
+        await navigator.clipboard.writeText(DEV_EMAIL);
+        btnCopyDevEmail.textContent = 'Copied!';
+        setTimeout(() => { btnCopyDevEmail.textContent = 'Copy'; }, 1800);
+      } catch (err) {
+        btnCopyDevEmail.textContent = 'Copied!';
+        setTimeout(() => { btnCopyDevEmail.textContent = 'Copy'; }, 1800);
       }
     });
   }
 
-  // Settings Modal: Report an Issue / Feedback
-  const btnCopyDevEmail = document.getElementById('btnCopyDevEmail');
-  const btnSendIssueEmail = document.getElementById('btnSendIssueEmail');
-  const issueSubjectInput = document.getElementById('issueSubjectInput');
-  const issueBodyInput = document.getElementById('issueBodyInput');
-  const DEV_EMAIL = 'Purohitunofficialbhagyesh@gmail.com';
-
-  if (btnCopyDevEmail) {
-    btnCopyDevEmail.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(DEV_EMAIL);
-        const orig = btnCopyDevEmail.textContent;
-        btnCopyDevEmail.textContent = 'Copied!';
-        setTimeout(() => { btnCopyDevEmail.textContent = orig; }, 1500);
-      } catch (err) {}
-    });
-  }
-
   if (btnSendIssueEmail) {
-    btnSendIssueEmail.addEventListener('click', () => {
-      const topic = (issueSubjectInput && issueSubjectInput.value.trim()) || 'SynapseLab Issue Report';
-      const userText = (issueBodyInput && issueBodyInput.value.trim()) || 'Describe your issue or suggestion here...';
-      const sysInfo = `System Info: ${navigator.userAgent} (${window.innerWidth}x${window.innerHeight})`;
-      const fullBody = `${userText}\n\n---\n${sysInfo}`;
-      const mailtoUrl = `mailto:${DEV_EMAIL}?subject=${encodeURIComponent(topic)}&body=${encodeURIComponent(fullBody)}`;
+    attachTap(btnSendIssueEmail, () => {
+      const topic = 'SynapseLab Feedback / Issue Report';
+      const userText = 'Hi Bhagyesh,\n\nI am reporting an issue / sharing feedback on SynapseLab:\n\n[Describe issue here]\n\n---\nPlatform: https://synapselab.devs.li\nUser-Agent: ' + navigator.userAgent;
+      const mailtoUrl = `mailto:${DEV_EMAIL}?subject=${encodeURIComponent(topic)}&body=${encodeURIComponent(userText)}`;
       window.location.href = mailtoUrl;
     });
   }

@@ -18,6 +18,7 @@
   <meta property="og:description" content="Free interactive 3D neural network visualizer and Python code studio for students. Explore synaptic filaments, forward pass propagation, backpropagation, and deep learning architectures in real-time.">
   <meta property="og:image" content="https://synapselab.devs.li/neural_network_threads.png">
   <meta property="og:site_name" content="SynapseLab">
+  <meta name="google-site-verification" content="google5fefb455a4f252a7">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
@@ -98,13 +99,12 @@
 
       <!-- Navigation Right Utilities -->
       <div class="nav-end">
-        <!-- Settings Button -->
-        <button class="nav-icon-btn" id="btnOpenSettings" type="button" aria-label="Settings and Sensitivity">
+        <!-- Report Issue / Settings Button -->
+        <button class="nav-icon-btn" id="btnOpenSettings" type="button" aria-label="Report Issue and Feedback">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
-          <span>Settings</span>
+          <span>Report Issue</span>
         </button>
 
         <a href="https://github.com/PurohitBhagyesh" target="_blank" rel="noopener noreferrer" class="btn">
@@ -343,7 +343,7 @@ epochs = 300</textarea>
 
       <!-- Modern Frosted Viewport Toolbar (Top Right) -->
       <div class="viewport-toolbar">
-        <button class="vp-btn active" id="btnToggleOrbit" type="button" title="Toggle Auto Orbit (Spacebar)">
+        <button class="vp-btn active" id="btnToggleOrbit" type="button" data-tooltip="Auto Orbit (Space)" title="Auto Orbit (Space)">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
             <path d="m21 3-3 4 5 .5"/>
@@ -352,14 +352,14 @@ epochs = 300</textarea>
 
         <div class="vp-divider"></div>
 
-        <button class="vp-btn" id="btnZoomIn" type="button" title="Zoom In (+)">
+        <button class="vp-btn" id="btnZoomIn" type="button" data-tooltip="Zoom In (+)" title="Zoom In (+)">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19"/>
             <line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
         </button>
 
-        <button class="vp-btn" id="btnZoomOut" type="button" title="Zoom Out (&minus;)">
+        <button class="vp-btn" id="btnZoomOut" type="button" data-tooltip="Zoom Out (-)" title="Zoom Out (-)">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
@@ -367,16 +367,23 @@ epochs = 300</textarea>
 
         <div class="vp-divider"></div>
 
-        <button class="vp-btn" id="btnResetView" type="button" title="Center & Reset View (R)">
+        <button class="vp-btn" id="btnResetView" type="button" data-tooltip="Reset View (R)" title="Reset View (R)">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"/>
             <path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>
           </svg>
         </button>
 
+        <button class="vp-btn active" id="btnToggleLabels" type="button" data-tooltip="Toggle Labels (H)" title="Toggle Labels (H)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+
         <div class="vp-divider"></div>
 
-        <button class="vp-btn" id="btnFullscreen" type="button" title="Toggle Fullscreen (F)" aria-label="Toggle Fullscreen">
+        <button class="vp-btn" id="btnFullscreen" type="button" data-tooltip="Fullscreen (F)" title="Toggle Fullscreen (F)" aria-label="Toggle Fullscreen">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
           </svg>
@@ -415,129 +422,48 @@ epochs = 300</textarea>
        4. CENTERED MODALS (Settings, Coffee, Share & Legal)
        ========================================================================= -->
 
-  <!-- SETTINGS MODAL (Sensitivity, Orbit, Stars, Visual Tuning) -->
+  <!-- SETTINGS / REPORT ISSUE MODAL (Minimal One-Click Design) -->
   <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 class="modal-title" id="settingsModalTitle">Simulator Settings</h3>
+        <h3 class="modal-title" id="settingsModalTitle">Report an Issue / Support</h3>
         <button class="modal-close-btn" id="btnCloseSettings" type="button" aria-label="Close modal">&times;</button>
       </div>
 
-      <div class="settings-grid">
-        <!-- Orbit Sensitivity -->
-        <div class="settings-control-group">
-          <div class="settings-control-header">
-            <strong>Orbit Sensitivity</strong>
-            <span class="settings-value-badge" id="valOrbitSens">1.0x</span>
-          </div>
-          <input type="range" class="settings-slider" id="sliderOrbitSens" min="0.3" max="2.5" step="0.1" value="1.0">
+      <div class="settings-issue-box" style="margin-top: 4px;">
+        <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+          Have a question, feedback, or found an issue? Report directly to the developer with one click.
+        </p>
+
+        <div class="issue-developer-info" style="margin-bottom: 16px;">
+          <span class="issue-label">Email:</span>
+          <span class="issue-email-value" id="developerEmail">Purohitunofficialbhagyesh@gmail.com</span>
+          <button type="button" class="btn-micro" id="btnCopyDevEmail" title="Copy developer email">Copy</button>
         </div>
 
-        <!-- Zoom Sensitivity -->
-        <div class="settings-control-group">
-          <div class="settings-control-header">
-            <strong>Zoom Sensitivity</strong>
-            <span class="settings-value-badge" id="valZoomSens">1.0x</span>
-          </div>
-          <input type="range" class="settings-slider" id="sliderZoomSens" min="0.3" max="2.5" step="0.1" value="1.0">
+        <div class="settings-btn-row">
+          <button type="button" class="btn btn-report-warning" id="btnSendIssueEmail" style="flex: 1; justify-content: center;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            <span>Report an Issue (Email)</span>
+          </button>
+          <a href="https://github.com/PurohitBhagyesh/synapselab/issues/new" target="_blank" rel="noopener noreferrer" class="btn" style="flex: 1; justify-content: center;">
+            <span>GitHub Issues &rarr;</span>
+          </a>
         </div>
 
-        <!-- Auto Orbit Speed -->
-        <div class="settings-control-group">
-          <div class="settings-control-header">
-            <strong>Auto Orbit Speed</strong>
-            <span class="settings-value-badge" id="valOrbitSpeed">1.0x</span>
-          </div>
-          <input type="range" class="settings-slider" id="sliderOrbitSpeed" min="0.2" max="3.0" step="0.1" value="1.0">
-        </div>
+        <div class="settings-divider" style="margin: 16px 0;"></div>
 
-        <!-- Thread Luminosity -->
-        <div class="settings-control-group">
-          <div class="settings-control-header">
-            <strong>Thread Luminosity</strong>
-            <span class="settings-value-badge" id="valLuminosity">55%</span>
-          </div>
-          <input type="range" class="settings-slider" id="sliderLuminosity" min="20" max="100" step="5" value="55">
-        </div>
-
-        <!-- Moving Starfield Toggle -->
-        <div class="settings-toggle-row">
-          <div>
-            <strong style="font-size:12.5px; display:block;">Moving Starfield</strong>
-            <span style="font-size:11px; color:var(--text-muted);">3D cosmic stars moving in background</span>
-          </div>
-          <div class="toggle-switch active" id="toggleStars">
-            <div class="toggle-thumb"></div>
-          </div>
-        </div>
-
-        <button type="button" class="btn" id="btnResetSettings" style="margin-top:4px; font-size:11.5px;">Reset to Defaults</button>
-
-        <!-- Divider -->
-        <div class="settings-divider"></div>
-
-        <!-- Share Simulator (Moved from Bottom Bar) -->
-        <div class="settings-section">
-          <div class="settings-section-header">
-            <strong>Share Simulator</strong>
-            <span class="settings-hint">Direct link or system sheet</span>
-          </div>
-          <div class="settings-btn-row">
-            <button type="button" class="btn" id="btnSettingsShareLink">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
-              </svg>
-              <span id="settingsShareCopyText">Copy Direct Link</span>
-            </button>
-            <button type="button" class="btn" id="btnSettingsShareSheet">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="18" cy="5" r="3"/>
-                <circle cx="6" cy="12" r="3"/>
-                <circle cx="18" cy="19" r="3"/>
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-              </svg>
-              <span>Share Sheet</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Divider -->
-        <div class="settings-divider"></div>
-
-        <!-- Report an Issue / Feedback (Prefilled with Developer Email) -->
-        <div class="settings-section">
-          <div class="settings-section-header">
-            <strong>Report an Issue / Feedback</strong>
-            <span class="settings-hint">Bug, UI glitch, or suggestion</span>
-          </div>
-          
-          <div class="settings-issue-box">
-            <div class="issue-developer-info">
-              <span class="issue-label">Developer:</span>
-              <span class="issue-email-value" id="developerEmail">Purohitunofficialbhagyesh@gmail.com</span>
-              <button type="button" class="btn-micro" id="btnCopyDevEmail" title="Copy developer email">Copy</button>
-            </div>
-
-            <div class="issue-form-group">
-              <input type="text" id="issueSubjectInput" class="issue-input" placeholder="Topic (e.g. Mobile Layout Glitch, Feature Request)" value="SynapseLab Feedback">
-              <textarea id="issueBodyInput" class="issue-textarea" rows="2" placeholder="Describe the issue, device type, or ideas..."></textarea>
-            </div>
-
-            <div class="settings-btn-row">
-              <button type="button" class="btn btn-report-warning" id="btnSendIssueEmail">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                  <polyline points="22,6 12,13 2,6"/>
-                </svg>
-                <span>Send Report via Email</span>
-              </button>
-              <a href="https://github.com/PurohitBhagyesh/synapselab/issues" target="_blank" rel="noopener noreferrer" class="btn">
-                <span>GitHub Issues &rarr;</span>
-              </a>
-            </div>
-          </div>
+        <div class="settings-btn-row">
+          <button type="button" class="btn" id="btnSettingsShareLink" style="width: 100%; justify-content: center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+            </svg>
+            <span id="settingsShareCopyText">Copy Simulator Link</span>
+          </button>
         </div>
       </div>
     </div>
