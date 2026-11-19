@@ -60,7 +60,7 @@ synapselab/
 
 SynapseLab provides two distinct working environments tailored for learning, designed to maintain complete independence without overwriting student work:
 
-* **Guide Mode (Interactive Curriculum &bull; Read-Only)**: A structured step-by-step visual syllabus explaining artificial neural networks, synaptic filaments, numeric weights, ReLU activation functions, deep representations, and backpropagation. Students touch and hover neurons to isolate incoming and outgoing connections without worrying about code syntax. Lesson 5 features a full interactive Backpropagation & Gradient Descent simulation cascade showing error flows in reverse.
+* **Guide Mode (Interactive Curriculum &bull; Read-Only)**: A structured 6-lesson visual syllabus explaining artificial neural networks, synaptic filaments, numeric weights, ReLU activation functions, deep representations, loss functions, and backpropagation. Students touch and hover neurons to isolate incoming and outgoing connections without worrying about code syntax.
 * **Test Mode (Code Lab &bull; Write Mode)**: A full VS Code-inspired laboratory (`network_threads.py`). Students can write custom Python code from scratch or load one of several real-world architecture examples using quick-load capsule chips. The student code remains persistent and is never overwritten when switching modes.
 
 ---
