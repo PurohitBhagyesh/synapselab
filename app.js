@@ -1285,6 +1285,71 @@ epochs = 300`;
   }
 
   // ---------------------------------------------------------------------------
+  // 7b. EXPORT & DOWNLOAD HELPERS (Python Script & 3D Screen Image)
+  // ---------------------------------------------------------------------------
+  function downloadCodeFile() {
+    const code = studentCode ? studentCode.value : '';
+    const blob = new Blob([code], { type: 'text/x-python;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'network_threads.py';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    if (visLiveBadge && visLiveText) {
+      visLiveBadge.style.display = 'inline-flex';
+      visLiveBadge.style.borderColor = '#ffffff';
+      visLiveText.textContent = 'DOWNLOADED: network_threads.py (Python script)';
+      setTimeout(() => {
+        if (visLiveBadge && !isForwardPassRunning && !isTrainingSimulation) {
+          visLiveBadge.style.display = 'none';
+        }
+      }, 2500);
+    }
+  }
+
+  function downloadNetworkImage() {
+    if (!canvas) return;
+    drawPerspectiveScene();
+    const dataUrl = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'synapselab_network.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    if (visLiveBadge && visLiveText) {
+      visLiveBadge.style.display = 'inline-flex';
+      visLiveBadge.style.borderColor = '#ffffff';
+      visLiveText.textContent = 'SAVED: synapselab_network.png (3D Screen Snapshot)';
+      setTimeout(() => {
+        if (visLiveBadge && !isForwardPassRunning && !isTrainingSimulation) {
+          visLiveBadge.style.display = 'none';
+        }
+      }, 2500);
+    }
+  }
+
+  const btnDownloadCodeTab = document.getElementById('btnDownloadCodeTab');
+  if (btnDownloadCodeTab) attachTap(btnDownloadCodeTab, downloadCodeFile);
+
+  const btnDownloadCode = document.getElementById('btnDownloadCode');
+  if (btnDownloadCode) attachTap(btnDownloadCode, downloadCodeFile);
+
+  const btnSaveImage = document.getElementById('btnSaveImage');
+  if (btnSaveImage) attachTap(btnSaveImage, downloadNetworkImage);
+
+  const btnSettingsDownloadCode = document.getElementById('btnSettingsDownloadCode');
+  if (btnSettingsDownloadCode) attachTap(btnSettingsDownloadCode, downloadCodeFile);
+
+  const btnSettingsSaveImage = document.getElementById('btnSettingsSaveImage');
+  if (btnSettingsSaveImage) attachTap(btnSettingsSaveImage, downloadNetworkImage);
+
+  // ---------------------------------------------------------------------------
   // 8. SETTINGS & REPORT ISSUE MODAL (Minimal One-Click Design)
   // ---------------------------------------------------------------------------
   const settingsModal = document.getElementById('settingsModal');

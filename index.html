@@ -272,6 +272,14 @@
             </svg>
             <span>Simulate</span>
           </button>
+          <button class="vscode-action-btn" id="btnDownloadCodeTab" type="button" title="Download Python Script (network_threads.py)">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            <span>Download</span>
+          </button>
         </div>
       </div>
 
@@ -291,27 +299,6 @@
 activation = "relu"
 learning_rate = 0.05
 epochs = 300</textarea>
-      </div>
-
-      <!-- VS Code Status Bar (Clean Unobstructed Layout) -->
-      <div class="vscode-status-bar">
-        <div class="status-left">
-          <span class="status-item">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="6" y1="3" x2="6" y2="15"/>
-              <circle cx="18" cy="6" r="3"/>
-              <circle cx="6" cy="18" r="3"/>
-              <path d="M18 9a9 9 0 0 1-9 9"/>
-            </svg>
-            main*
-          </span>
-          <span class="status-item" id="cursorPos">Ln 1, Col 1</span>
-          <span class="status-item status-py">Python 3.12</span>
-        </div>
-        <div class="status-right">
-          <span class="status-item param-pill" id="paramStats">RELU &bull; lr 0.05</span>
-          <span class="status-item live-pill" id="liveThreadCount">16 Neurons &bull; 60 Synapses</span>
-        </div>
       </div>
     </aside>
 
@@ -374,6 +361,23 @@ epochs = 300</textarea>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
             <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+
+        <div class="vp-divider"></div>
+
+        <button class="vp-btn" id="btnSaveImage" type="button" data-tooltip="Save 3D Image (.png)" title="Save 3D Image (.png)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+        </button>
+
+        <button class="vp-btn" id="btnDownloadCode" type="button" data-tooltip="Download Python Script (.py)" title="Download Python Script (.py)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
           </svg>
         </button>
 
@@ -511,6 +515,34 @@ epochs = 300</textarea>
                 <span>GitHub Issues &rarr;</span>
               </a>
             </div>
+          </div>
+        </div>
+
+        <div class="settings-divider"></div>
+
+        <!-- Export & Downloads -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <strong>Export &amp; Downloads</strong>
+            <span class="settings-hint">Python script &amp; 3D network snapshot</span>
+          </div>
+
+          <div class="settings-btn-row">
+            <button type="button" class="btn" id="btnSettingsDownloadCode" style="flex:1; justify-content:center; gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>Download Code (.py)</span>
+            </button>
+            <button type="button" class="btn" id="btnSettingsSaveImage" style="flex:1; justify-content:center; gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+              <span>Save Screen Image (.png)</span>
+            </button>
           </div>
         </div>
 
