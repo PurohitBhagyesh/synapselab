@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="dark light">
-  <title>SynapseLab — Interactive Neural Network Studio for Students</title>
+  <title>SynapseLab — Interactive 3D Neural Network Studio for Students</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Navigation (OpenLid Style) -->
+  <!-- OpenLid Sticky Navigation -->
   <nav class="nav">
     <div class="nav-inner">
       <a href="#" class="brand">
@@ -21,15 +21,15 @@
         <span class="brand-version">v1.0</span>
       </a>
 
-      <!-- Mobile Tab Switcher -->
+      <!-- Mobile Screen Switcher -->
       <div class="mobile-tab-switch">
-        <button class="mobile-tab-btn active" id="btnMobCode">Code</button>
-        <button class="mobile-tab-btn" id="btnMobVis">3D Threads</button>
+        <button class="mobile-tab-btn active" id="btnMobCode" type="button">Code</button>
+        <button class="mobile-tab-btn" id="btnMobVis" type="button">3D Threads</button>
       </div>
 
-      <!-- Nav End Actions -->
+      <!-- Navigation End -->
       <div class="nav-end">
-        <!-- The Eye Theme Switcher from OpenLid -->
+        <!-- OpenLid Eye Theme Switcher -->
         <button class="theme-toggle" id="themeToggleBtn" type="button" aria-label="Toggle light and dark mode">
           <svg class="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
@@ -38,27 +38,29 @@
           <span id="themeLabel">Dark</span>
         </button>
 
-        <button class="btn btn-secondary" id="btnRunCode" type="button">Run Code</button>
-        <button class="btn btn-primary" id="btnFireSignal" type="button">Fire Signals</button>
+        <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size:12px; padding:6px 12px;">GitHub</a>
       </div>
     </div>
   </nav>
 
-  <!-- Guided Instruction Bar (Follow the Instruction) -->
-  <div class="instruction-bar">
-    <div class="instruction-text">
-      <span class="step-badge" id="stepBadge">STEP 1 OF 3</span>
-      <span class="instruction-desc" id="stepInstruction">
-        Start here: Click or hover on any of the <strong>4 dots</strong> to see what task each neuron performs.
+  <!-- Student Interactive Guidance Banner -->
+  <div class="guidance-banner">
+    <div class="guidance-left">
+      <span class="live-beacon"></span>
+      <span class="guide-step-tag" id="guideStepTag">GUIDE 1/3</span>
+      <span class="guide-message" id="guideMessage">
+        Welcome Student! Look at the <strong>white curved filaments</strong>: they carry data signals from layer to layer in 3D.
       </span>
     </div>
-    <button class="btn-step" id="btnNextStep" type="button">Next Task &rarr;</button>
+    <div class="guide-actions">
+      <button class="btn-step" id="btnNextGuide" type="button">Next Guide &rarr;</button>
+    </div>
   </div>
 
   <!-- Main Split-Screen Workspace (OpenLid Monitor Style) -->
   <main id="mainWorkspace">
 
-    <!-- LEFT PANE: Student Code Editor -->
+    <!-- LEFT PANE: Live Student Code Editor -->
     <section class="monitor-pane code-pane">
       <div class="pane-header">
         <div class="traffic-dots">
@@ -67,62 +69,67 @@
           <span class="traffic-dot dot-green"></span>
         </div>
         <span class="code-title">student_network.py</span>
-        <span style="font-size:11px; color:var(--text-dim);">Python 3</span>
+        <span class="live-indicator">
+          <span class="live-dot"></span> Live Sync
+        </span>
       </div>
 
       <textarea class="code-textarea" id="studentCode" spellcheck="false">
 # ==========================================================
-# SynapseLab: The 4-Dot Starter Network
+# 🧠 SynapseLab: Student Neural Network
+# Live Coding: Edit layers below and watch threads update!
 # ==========================================================
-# 2 Layers with exactly 4 dots:
-# Layer 1 (Input):  2 dots [Study Hours, Practice Tests]
-# Layer 2 (Output): 2 dots [Pass Chance, Distinction Score]
 
-layers = [2, 2]
+# 1. Define Architecture: [Input, Hidden1, Hidden2, Output]
+layers = [3, 8, 4, 1]
 
-# Hyperparameters
-activation = "relu"
-learning_rate = 0.05
+# 2. Hyperparameters
+activation = "relu"     # Non-linear activation for neurons
+learning_rate = 0.05    # Gradient descent step size
+epochs = 300            # Training iterations
 
-print(f"Network initialized: {layers[0]} inputs -> {layers[1]} outputs")
+print(f"Network initialized: {layers}")
 
-# TASK 3 INSTRUCTION:
-# Change layers above to:
-# layers = [2, 3, 2]
-# to add a hidden layer with 3 dots!
+# STUDENT CHALLENGE:
+# Try typing layers = [4, 10, 6, 2] above.
+# The 3D white threads will immediately re-draw in real time!
 </textarea>
 
       <div class="pane-footer">
-        <span>2 Layers &bull; 4 Dots &bull; 4 Synapses</span>
-        <span style="color:var(--text-dim);">Auto-syncs on edit</span>
+        <span id="liveThreadCount">56 Synaptic Threads</span>
+        <button id="btnResetCode" type="button" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-family:inherit; font-size:11px;">Reset Code</button>
       </div>
     </section>
 
-    <!-- RIGHT PANE: 3D Thread Visualizer -->
+    <!-- RIGHT PANE: 3D White Filaments Visualizer -->
     <section class="monitor-pane vis-pane">
       <canvas id="canvas3d"></canvas>
 
       <!-- HUD Top Left -->
       <div class="vis-hud">
-        <strong>STARTER NETWORK (4 DOTS)</strong>
-        <span id="hudTopology">Layer 1: 2 Dots &bull; Layer 2: 2 Dots</span>
+        <strong>LOCKED 3D WHITE FILAMENTS</strong>
+        <span id="hudLayerInfo">4 Layers (16 Neurons)</span>
       </div>
 
-      <!-- On-Screen Zoom / Rotate Controls -->
-      <div class="zoom-controls">
-        <button class="tool-btn" id="btnZoomIn" type="button" title="Zoom In">+</button>
-        <button class="tool-btn" id="btnZoomOut" type="button" title="Zoom Out">&minus;</button>
-        <button class="tool-btn" id="btnRotate" type="button" title="Toggle Auto-Rotate">&#x21bb;</button>
-        <button class="tool-btn" id="btnReset" type="button" title="Reset View" style="font-size:10px;">Reset</button>
+      <!-- Rotate Symbol & Orbit Controls (Top Right) -->
+      <div class="rotate-gizmo-box">
+        <button class="rotate-symbol-btn active" id="btnRotateToggle" type="button" title="Toggle 360-degree orbit">
+          <svg class="rotate-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          </svg>
+          <span>⟳ Orbit 360°</span>
+        </button>
+
+        <div class="zoom-btn-group">
+          <button class="zoom-btn" id="btnZoomIn" type="button" title="Zoom In">+</button>
+          <button class="zoom-btn" id="btnZoomOut" type="button" title="Zoom Out">&minus;</button>
+          <button class="zoom-btn" id="btnResetView" type="button" title="Reset Camera" style="font-size:11px;">Reset</button>
+        </div>
       </div>
 
-      <!-- Floating Task Card on Hover -->
-      <div class="dot-task-card" id="dotTaskCard">
-        <span style="color:var(--amber); font-weight:600;" id="dotCardTitle">Input 1</span>
-        <span style="color:var(--text-dim);">|</span>
-        <span style="color:var(--text);" id="dotCardTask">Task: Reads Study Hours</span>
-        <span style="color:var(--text-dim);">|</span>
-        <span style="color:var(--accent-brand);" id="dotCardFormula">x1 = 6.5h</span>
+      <!-- 3D Guidance Pill (Bottom Center) -->
+      <div class="guidance-pill-bottom">
+        Drag to orbit in 3D &bull; Scroll / Pinch to zoom &bull; Signals flowing live
       </div>
     </section>
 
@@ -159,7 +166,7 @@ print(f"Network initialized: {layers[0]} inputs -> {layers[1]} outputs")
           <div class="snack-qr-pad">
             <img id="snackQrImg" src="" alt="UPI QR Code" width="124" height="124">
           </div>
-          <span class="snack-qr-caption">Scan with GPay, PhonePe, or Paytm</span>
+          <span style="font-size:11px; color:var(--text-muted); text-align:center;">Scan with GPay, PhonePe, or Paytm</span>
         </div>
 
         <div class="snack-input-wrap">
@@ -175,27 +182,27 @@ print(f"Network initialized: {layers[0]} inputs -> {layers[1]} outputs")
         </div>
 
         <div class="upi-apps-grid">
-          <button type="button" class="upi-app-btn" data-scheme="famapp">
+          <button type="button" class="upi-app-btn" data-scheme="famapp" type="button">
             <span class="upi-app-badge fam-badge">Fam</span>
             <span>FamApp</span>
           </button>
-          <button type="button" class="upi-app-btn" data-scheme="gpay">
+          <button type="button" class="upi-app-btn" data-scheme="gpay" type="button">
             <span class="upi-app-badge gpay-badge">G</span>
             <span>GPay</span>
           </button>
-          <button type="button" class="upi-app-btn" data-scheme="phonepe">
+          <button type="button" class="upi-app-btn" data-scheme="phonepe" type="button">
             <span class="upi-app-badge pe-badge">Pe</span>
             <span>PhonePe</span>
           </button>
-          <button type="button" class="upi-app-btn" data-scheme="paytm">
+          <button type="button" class="upi-app-btn" data-scheme="paytm" type="button">
             <span class="upi-app-badge paytm-badge">Pay</span>
             <span>Paytm</span>
           </button>
-          <button type="button" class="upi-app-btn" data-scheme="amazonpay">
+          <button type="button" class="upi-app-btn" data-scheme="amazonpay" type="button">
             <span class="upi-app-badge amz-badge">a</span>
             <span>Amazon</span>
           </button>
-          <button type="button" class="upi-app-btn" data-scheme="whatsapp">
+          <button type="button" class="upi-app-btn" data-scheme="whatsapp" type="button">
             <span class="upi-app-badge wa-badge">WA</span>
             <span>WhatsApp</span>
           </button>
@@ -209,7 +216,7 @@ print(f"Network initialized: {layers[0]} inputs -> {layers[1]} outputs")
        ========================================================================= -->
   <div class="share-widget" id="shareWidget">
     <button class="share-pill" id="sharePillBtn" aria-label="Share SynapseLab" aria-expanded="false" type="button">
-      <svg class="brand-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="18" cy="5" r="3"/>
         <circle cx="6" cy="12" r="3"/>
         <circle cx="18" cy="19" r="3"/>
