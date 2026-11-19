@@ -1,7 +1,7 @@
 /* ==========================================================================
    SynapseLab Design System — OpenLid UI/UX (openlid.devs.li)
+   3D Visualization Simulator for Students
    Strict Unslop: No purple gradients, high contrast, zero floating collisions
-   Modes: Guide Mode (Learn Neural Concepts) & Test Mode (Code Studio & Lab)
    ========================================================================== */
 
 :root, [data-theme="dark"] {
@@ -101,15 +101,34 @@ body {
 .brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: var(--text);
   text-decoration: none;
-  font-weight: 600;
-  font-size: 15px;
 }
 
 .brand-icon {
   color: var(--text);
+  flex-shrink: 0;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.brand-sub {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.2px;
 }
 
 .brand-version {
@@ -162,17 +181,17 @@ body {
 .nav-end {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
-/* OpenLid Eye Theme Switcher */
-.theme-toggle {
+/* Icon Buttons in Nav */
+.nav-icon-btn {
   background: transparent;
   border: 1px solid var(--border);
   color: var(--text-muted);
   font-size: 12px;
   font-weight: 500;
-  padding: 6px 11px;
+  padding: 6px 10px;
   border-radius: 6px;
   cursor: pointer;
   display: inline-flex;
@@ -182,9 +201,10 @@ body {
   font-family: inherit;
 }
 
-.theme-toggle:hover {
+.nav-icon-btn:hover {
   color: var(--text);
   border-color: var(--border-strong);
+  background: var(--surface-alt);
 }
 
 .btn {
@@ -757,6 +777,64 @@ main {
 
 .modal-close-btn:hover {
   color: var(--text);
+}
+
+/* Settings Modal Specific */
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.settings-label strong {
+  display: block;
+  font-size: 12.5px;
+  color: var(--text);
+}
+
+.settings-label span {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.toggle-switch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  background: var(--border-strong);
+  border-radius: 11px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+}
+
+.toggle-switch.active {
+  background: var(--accent-cyan);
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+
+.toggle-switch.active .toggle-thumb {
+  transform: translateX(18px);
 }
 
 /* Buy Me a Coffee QR & UPI Layout */

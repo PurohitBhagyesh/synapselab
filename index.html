@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="dark light">
-  <title>SynapseLab — Interactive 3D Neural Network Studio for Students</title>
-  <meta name="description" content="Learn neural networks through 3D visualization and live code. Explore neurons, synaptic threads, forward propagation, and activations.">
+  <title>SynapseLab — 3D Visualization Simulator for Students</title>
+  <meta name="description" content="3D Visualization Simulator for Students. Learn neural networks through interactive 3D filaments, layer mechanics, and live in-browser Python coding.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,11 +16,14 @@
   <nav class="nav">
     <div class="nav-inner">
       <a href="#" class="brand">
-        <svg class="brand-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="brand-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="3"/>
           <path d="M3 12h3m12 0h3M12 3v3m0 12v3"/>
         </svg>
-        <span>SynapseLab</span>
+        <div class="brand-text">
+          <span class="brand-title">SynapseLab</span>
+          <span class="brand-sub">3D Visualization Simulator for Students</span>
+        </div>
         <span class="brand-version">v1.0</span>
       </a>
 
@@ -45,8 +48,17 @@
 
       <!-- Navigation Right Utilities -->
       <div class="nav-end">
+        <!-- Settings Button -->
+        <button class="nav-icon-btn" id="btnOpenSettings" type="button" aria-label="Visualizer Settings">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span>Settings</span>
+        </button>
+
         <!-- OpenLid Eye Theme Switcher -->
-        <button class="theme-toggle" id="themeToggleBtn" type="button" aria-label="Toggle dark and light mode">
+        <button class="nav-icon-btn" id="themeToggleBtn" type="button" aria-label="Toggle dark and light mode">
           <svg class="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
             <circle cx="12" cy="12" r="3"/>
@@ -54,7 +66,7 @@
           <span id="themeLabel">Dark</span>
         </button>
 
-        <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" rel="noopener noreferrer" class="btn">
+        <a href="https://github.com/PurohitBhagyesh" target="_blank" rel="noopener noreferrer" class="btn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
           </svg>
@@ -90,7 +102,7 @@
           <div class="lesson-tag">LESSON 01 &bull; ANATOMY</div>
           <h3 class="lesson-title">What is a Neural Network?</h3>
           <p class="lesson-desc">
-            An artificial neural network organizes compute into distinct layers. Data enters through the <strong>Input Layer</strong>, transforms through intermediate <strong>Hidden Layers</strong>, and arrives at the <strong>Output Layer</strong>.
+            An artificial neural network organizes compute into distinct layers. Data enters through the <strong>Input Layer</strong>, transforms through intermediate <strong>Hidden Layers</strong>, and arrives at the <strong>Output Layer</strong>. Touch or hover any dot to isolate its synapses.
           </p>
           <button class="lesson-action" type="button">
             <span>&bull; View 3-Layer Network [3, 6, 2]</span>
@@ -102,7 +114,7 @@
           <div class="lesson-tag">LESSON 02 &bull; SYNAPSES</div>
           <h3 class="lesson-title">The Threads (Synapses & Weights)</h3>
           <p class="lesson-desc">
-            The luminous white curves connecting dots are <strong>synapses</strong>. Each thread carries a mathematical weight <em>w</em> that amplifies or dampens data flowing between neurons.
+            The luminous white curves connecting dots are <strong>synapses</strong>. Each thread carries a mathematical weight <em>w</em> that amplifies or dampens data flowing between neurons. Touching a dot highlights all incoming and outgoing connections.
           </p>
           <button class="lesson-action" id="btnPulseGuide" type="button">
             <span>&bull; Pulse Synaptic Signal Waves</span>
@@ -136,7 +148,7 @@
     </aside>
 
     <!-- ---------------------------------------------------------------------
-         LEFT PANE 2: TEST MODE (Live Code Studio & Lab)
+         LEFT PANE 2: TEST MODE (Live Code Studio & Lab - Zero Guidance)
          --------------------------------------------------------------------- -->
     <aside class="mode-sidebar code-sidebar" id="paneTest">
       <div class="code-header">
@@ -153,7 +165,7 @@
       </div>
 
       <textarea class="code-textarea" id="studentCode" spellcheck="false"># ==========================================================
-# 🧠 SynapseLab: Student Code & Architecture Lab
+# SynapseLab: Student Code & Architecture Lab
 # Type or edit layers below to see 3D threads update live!
 # ==========================================================
 
@@ -182,7 +194,7 @@ print(f"Network initialized: {layers}")
     </aside>
 
     <!-- ---------------------------------------------------------------------
-         RIGHT PANE: PERSISTENT 3D WHITE FILAMENTS VISUALIZER
+         RIGHT PANE: PERSISTENT 3D WHITE FILAMENTS & STARFIELD VISUALIZER
          --------------------------------------------------------------------- -->
     <section class="vis-pane">
       <div class="canvas-wrap">
@@ -191,7 +203,7 @@ print(f"Network initialized: {layers}")
 
       <!-- Floating HUD Badge (Top Left) -->
       <div class="vis-hud-badge">
-        <strong id="hudTitle">GUIDE MODE: 3D NEURAL VISUALIZER</strong>
+        <strong id="hudTitle">GUIDE MODE: 3D NEURAL SIMULATOR</strong>
         <span id="hudStats">3 Layers (11 Neurons &bull; 24 Synapses)</span>
       </div>
 
@@ -211,9 +223,9 @@ print(f"Network initialized: {layers}")
         </div>
       </div>
 
-      <!-- 3D Guidance Pill (Bottom Center) -->
+      <!-- 3D Guidance Pill (Visible ONLY in Guide Mode) -->
       <div class="guidance-pill-bottom">
-        Drag to rotate 3D view &bull; Scroll to zoom &bull; Signals flowing live
+        Touch / hover any dot to isolate its threads &bull; Drag to orbit &bull; Scroll to zoom
       </div>
     </section>
 
@@ -224,7 +236,7 @@ print(f"Network initialized: {layers}")
        ========================================================================= -->
   <footer class="bottom-bar">
     <div class="bottom-left">
-      <span>SynapseLab v1.0 &bull; OpenLid Engine</span>
+      <span>SynapseLab &bull; 3D Visualization Simulator for Students</span>
       <button class="legal-link open-legal-trigger" id="btnOpenPrivacy" type="button">Privacy Policy</button>
       <button class="legal-link open-legal-trigger" id="btnOpenTerms" type="button">Terms</button>
       <button class="legal-link open-legal-trigger" id="btnOpenCookies" type="button">Cookies & DPDP Act</button>
@@ -256,8 +268,50 @@ print(f"Network initialized: {layers}")
   </footer>
 
   <!-- =========================================================================
-       4. CENTERED MODALS (Coffee, Share & Legal)
+       4. CENTERED MODALS (Settings, Coffee, Share & Legal)
        ========================================================================= -->
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="settingsModalTitle">Visualizer Settings</h3>
+        <button class="modal-close-btn" id="btnCloseSettings" type="button" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="settings-grid">
+        <div class="settings-row">
+          <div class="settings-label">
+            <strong>Moving Starfield</strong>
+            <span>3D cosmic stars moving in background</span>
+          </div>
+          <div class="toggle-switch active" id="toggleStars">
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-label">
+            <strong>Filament Ultra Glow</strong>
+            <span>Cyan-tinted luminous halo effects</span>
+          </div>
+          <div class="toggle-switch active" id="toggleGlow">
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-label">
+            <strong>Automatic 360° Orbit</strong>
+            <span>Smooth camera rotation around network</span>
+          </div>
+          <div class="toggle-switch active" id="toggleOrbit">
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- BUY ME A COFFEE MODAL (UPI Purohit2009@fam) -->
   <div class="modal-overlay" id="coffeeModal" role="dialog" aria-modal="true" aria-labelledby="coffeeModalTitle">

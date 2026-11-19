@@ -1,7 +1,8 @@
 /**
  * SynapseLab Application Engine
- * Modes: Guide Mode (Interactive Learning) & Test Mode (Code Studio & Lab)
- * Locked 3D Luminous White Filaments • 60 FPS Orbit Canvas • OpenLid Design Architecture
+ * 3D Visualization Simulator for Students
+ * Modes: Guide Mode (Interactive Learning) & Test Mode (Clean Code Studio)
+ * Moving Cosmic Starfield • Interactive Dot Touch & Synaptic Isolation • Locked 3D White Filaments
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -45,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const paneGuide = document.getElementById('paneGuide');
   const paneTest = document.getElementById('paneTest');
   const hudTitle = document.getElementById('hudTitle');
+  const guidancePill = document.querySelector('.guidance-pill-bottom');
 
   let currentMode = 'guide';
 
@@ -55,14 +57,17 @@ document.addEventListener('DOMContentLoaded', () => {
       tabTest.classList.remove('active');
       paneGuide.classList.add('active');
       paneTest.classList.remove('active');
-      if (hudTitle) hudTitle.textContent = 'GUIDE MODE: 3D NEURAL VISUALIZER';
+      if (hudTitle) hudTitle.textContent = 'GUIDE MODE: 3D NEURAL SIMULATOR';
+      if (guidancePill) guidancePill.style.display = 'block';
       buildNetwork([3, 6, 2]);
     } else {
       tabTest.classList.add('active');
       tabGuide.classList.remove('active');
       paneTest.classList.add('active');
       paneGuide.classList.remove('active');
-      if (hudTitle) hudTitle.textContent = 'TEST MODE: ARCHITECTURE STUDIO';
+      if (hudTitle) hudTitle.textContent = 'TEST MODE: ARCHITECTURE LAB';
+      // Test mode has zero guidance as requested
+      if (guidancePill) guidancePill.style.display = 'none';
       syncCodeToNetwork();
     }
     setTimeout(resizeCanvas, 40);
@@ -72,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (tabTest) tabTest.addEventListener('click', () => switchMode('test'));
 
   // ---------------------------------------------------------------------------
-  // 3. PERSISTENT 3D VISUALIZER ENGINE (LOCKED LUMINOUS WHITE THREADS)
+  // 3. 3D VISUALIZER ENGINE & MOVING STARS BACKGROUND
   // ---------------------------------------------------------------------------
   const canvas = document.getElementById('canvas3d');
   if (!canvas) {
@@ -94,6 +99,26 @@ document.addEventListener('DOMContentLoaded', () => {
   let wavePulseTime = 0;
   let isDragging = false;
   let lastX = 0, lastY = 0;
+  let mouseScreenX = -9999, mouseScreenY = -9999;
+  let hoveredNode = null;
+
+  // Settings
+  let enableStarfield = true;
+  let enableUltraGlow = true;
+
+  // Generate 3D Moving Stars Background
+  const starCount = 200;
+  const stars = [];
+  for (let i = 0; i < starCount; i++) {
+    stars.push({
+      x: (Math.random() - 0.5) * 1600,
+      y: (Math.random() - 0.5) * 1200,
+      z: (Math.random() - 0.5) * 1600,
+      baseAlpha: 0.2 + Math.random() * 0.6,
+      size: 0.8 + Math.random() * 1.5,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
 
   let layerSizes = [3, 6, 2];
   let nodes = [];
@@ -103,6 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
     layerSizes = sizes;
     nodes = [];
     threads = [];
+    hoveredNode = null;
 
     const numLayers = layerSizes.length;
     const totalDepth = 480;
@@ -121,7 +147,8 @@ document.addEventListener('DOMContentLoaded', () => {
           z: z,
           layerIdx: lIdx,
           nodeIdx: i,
-          name: lIdx === 0 ? `Input ${i+1}` : (lIdx === numLayers - 1 ? `Output ${i+1}` : `Hidden ${lIdx}_${i+1}`)
+          layerName: lIdx === 0 ? "Input Layer" : (lIdx === numLayers - 1 ? "Output Layer" : `Hidden Layer ${lIdx}`),
+          name: lIdx === 0 ? `Input N${i+1}` : (lIdx === numLayers - 1 ? `Output N${i+1}` : `Hidden N${i+1}`)
         });
       }
     });
@@ -190,9 +217,34 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------------------------------------------------------------------------
-  // 4. MOUSE / TOUCH INTERACTION & ORBIT
+  // 4. MOUSE / TOUCH INTERACTION & DOT TOUCH DETECTION
   // ---------------------------------------------------------------------------
   const rotateToggleBtn = document.getElementById('btnRotateToggle');
+
+  function updateHoveredDot(screenX, screenY) {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const cx = (rect.width || 600) / 2;
+    const cy = (rect.height || 450) / 2;
+
+    let closest = null;
+    let minDist = 22; // 22px touch / hover radius for comfortable selection
+
+    nodes.forEach(n => {
+      const p = project3D(n.x, n.y, n.z, cx, cy);
+      if (p) {
+        const dx = screenX - p.x;
+        const dy = screenY - p.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < minDist) {
+          minDist = d;
+          closest = n;
+        }
+      }
+    });
+
+    hoveredNode = closest;
+    canvas.style.cursor = hoveredNode ? 'pointer' : (isDragging ? 'grabbing' : 'grab');
+  }
 
   canvas.addEventListener('mousedown', e => {
     isDragging = true;
@@ -203,21 +255,38 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   canvas.addEventListener('mousemove', e => {
-    if (!isDragging) return;
-    targetYaw += (e.clientX - lastX) * 0.007;
-    targetPitch = Math.max(-0.65, Math.min(0.85, targetPitch + (e.clientY - lastY) * 0.007));
-    lastX = e.clientX;
-    lastY = e.clientY;
+    const rect = canvas.getBoundingClientRect();
+    mouseScreenX = e.clientX - rect.left;
+    mouseScreenY = e.clientY - rect.top;
+
+    if (isDragging) {
+      targetYaw += (e.clientX - lastX) * 0.007;
+      targetPitch = Math.max(-0.65, Math.min(0.85, targetPitch + (e.clientY - lastY) * 0.007));
+      lastX = e.clientX;
+      lastY = e.clientY;
+    } else {
+      updateHoveredDot(mouseScreenX, mouseScreenY);
+    }
   });
 
-  window.addEventListener('mouseup', () => isDragging = false);
+  canvas.addEventListener('mouseleave', () => {
+    mouseScreenX = -9999;
+    mouseScreenY = -9999;
+    hoveredNode = null;
+    canvas.style.cursor = 'grab';
+  });
+
+  window.addEventListener('mouseup', () => {
+    isDragging = false;
+    canvas.style.cursor = hoveredNode ? 'pointer' : 'grab';
+  });
 
   canvas.addEventListener('wheel', e => {
     e.preventDefault();
     targetCamDist = Math.max(280, Math.min(1200, targetCamDist + e.deltaY * 0.6));
   }, { passive: false });
 
-  // Touch controls
+  // Mobile Touch Support
   canvas.addEventListener('touchstart', e => {
     if (e.touches.length === 1) {
       isDragging = true;
@@ -225,18 +294,32 @@ document.addEventListener('DOMContentLoaded', () => {
       lastY = e.touches[0].clientY;
       autoRotate = false;
       if (rotateToggleBtn) rotateToggleBtn.classList.remove('active');
+
+      const rect = canvas.getBoundingClientRect();
+      mouseScreenX = e.touches[0].clientX - rect.left;
+      mouseScreenY = e.touches[0].clientY - rect.top;
+      updateHoveredDot(mouseScreenX, mouseScreenY);
     }
   }, { passive: true });
 
   canvas.addEventListener('touchmove', e => {
-    if (!isDragging || e.touches.length !== 1) return;
-    targetYaw += (e.touches[0].clientX - lastX) * 0.007;
-    targetPitch = Math.max(-0.65, Math.min(0.85, targetPitch + (e.touches[0].clientY - lastY) * 0.007));
-    lastX = e.touches[0].clientX;
-    lastY = e.touches[0].clientY;
+    if (e.touches.length !== 1) return;
+    const rect = canvas.getBoundingClientRect();
+    mouseScreenX = e.touches[0].clientX - rect.left;
+    mouseScreenY = e.touches[0].clientY - rect.top;
+
+    if (isDragging) {
+      targetYaw += (e.touches[0].clientX - lastX) * 0.007;
+      targetPitch = Math.max(-0.65, Math.min(0.85, targetPitch + (e.touches[0].clientY - lastY) * 0.007));
+      lastX = e.touches[0].clientX;
+      lastY = e.touches[0].clientY;
+    }
+    updateHoveredDot(mouseScreenX, mouseScreenY);
   }, { passive: true });
 
-  canvas.addEventListener('touchend', () => isDragging = false);
+  canvas.addEventListener('touchend', () => {
+    isDragging = false;
+  });
 
   // Zoom Toolbar Buttons
   const btnZoomIn = document.getElementById('btnZoomIn');
@@ -271,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------------------------------------------------------------------------
-  // 5. 3D RENDER LOOP
+  // 5. 3D RENDER LOOP: MOVING STARS + LOCKED FILAMENTS + TOUCH ISOLATION
   // ---------------------------------------------------------------------------
   function drawPerspectiveScene() {
     if (!canvas || canvas.width === 0 || canvas.height === 0) return;
@@ -281,7 +364,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ctx.clearRect(0, 0, rect.width, rect.height);
 
-    // 1. Perspective Grid Floor
+    // 1. Moving 3D Cosmic Starfield
+    if (enableStarfield) {
+      stars.forEach(s => {
+        // Subtle drift in 3D space
+        s.z -= 0.4;
+        if (s.z < -800) s.z = 800;
+
+        const p = project3D(s.x, s.y, s.z, cx, cy);
+        if (p && p.x >= 0 && p.x <= rect.width && p.y >= 0 && p.y <= rect.height) {
+          const twinkle = 0.6 + 0.4 * Math.sin(wavePulseTime * 2.5 + s.phase);
+          const alpha = s.baseAlpha * twinkle * Math.max(0, Math.min(1, 1 - p.depth / 2200));
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, s.size * Math.max(0.5, p.scale), 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${alpha.toFixed(2)})`;
+          ctx.fill();
+        }
+      });
+    }
+
+    // 2. Perspective Grid Floor
     const gridY = 210;
     const size = 480;
     const step = 60;
@@ -312,8 +414,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // 2. LOCKED LUMINOUS WHITE FILAMENTS
+    // 3. 3D WHITE FILAMENTS & TOUCH ISOLATION LIGHTING
     threads.forEach(t => {
+      const isConnectedToHovered = hoveredNode ? (t.src === hoveredNode || t.dst === hoveredNode) : false;
+
       const segments = 12;
       let prevP = project3D(t.src.x, t.src.y, t.src.z, cx, cy);
       if (!prevP) return;
@@ -330,30 +434,57 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cp) ctx.lineTo(cp.x, cp.y);
       }
 
-      // Bright, luminous white silk filaments
-      ctx.strokeStyle = 'rgba(240, 249, 255, 0.44)';
-      ctx.lineWidth = 1.25;
-      ctx.stroke();
+      // If a dot is hovered: light up connected threads, dim non-connected threads!
+      if (hoveredNode) {
+        if (isConnectedToHovered) {
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+          ctx.lineWidth = 2.4;
+          if (enableUltraGlow) {
+            ctx.shadowColor = '#38bdf8';
+            ctx.shadowBlur = 10;
+          }
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        } else {
+          ctx.strokeStyle = 'rgba(240, 249, 255, 0.09)';
+          ctx.lineWidth = 0.75;
+          ctx.stroke();
+        }
+      } else {
+        // Normal state: balanced luminous silk filaments
+        ctx.strokeStyle = 'rgba(240, 249, 255, 0.44)';
+        ctx.lineWidth = 1.25;
+        if (enableUltraGlow) {
+          ctx.shadowColor = 'rgba(56, 189, 248, 0.3)';
+          ctx.shadowBlur = 4;
+        }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
 
       // Optical wave pulse traveling through filament
-      const waveProg = (wavePulseTime + Math.abs(t.seed) * 2.4) % 1;
+      const speedMultiplier = (hoveredNode && isConnectedToHovered) ? 1.8 : 1.0;
+      const waveProg = (wavePulseTime * speedMultiplier + Math.abs(t.seed) * 2.4) % 1;
       const wx = evalCubic(t.src.x, t.p1.x, t.p2.x, t.dst.x, waveProg);
       const wy = evalCubic(t.src.y, t.p1.y, t.p2.y, t.dst.y, waveProg);
       const wz = evalCubic(t.src.z, t.p1.z, t.p2.z, t.dst.z, waveProg);
       const wp = project3D(wx, wy, wz, cx, cy);
 
       if (wp) {
-        ctx.beginPath();
-        ctx.arc(wp.x, wp.y, 2.0 * wp.scale * 1.5, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
-        ctx.shadowColor = '#38bdf8';
-        ctx.shadowBlur = 8;
-        ctx.fill();
-        ctx.shadowBlur = 0;
+        if (!hoveredNode || isConnectedToHovered) {
+          ctx.beginPath();
+          const pSize = isConnectedToHovered ? 3.0 : 2.0;
+          ctx.arc(wp.x, wp.y, pSize * wp.scale * 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = isConnectedToHovered ? 14 : 7;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
       }
     });
 
-    // 3. Floating Layer Headers (Glass Cards)
+    // 4. Floating Layer Headers (Glass Cards)
     layerSizes.forEach((count, lIdx) => {
       const totalDepth = 480;
       const z = -totalDepth / 2 + lIdx * (totalDepth / (layerSizes.length - 1 || 1));
@@ -382,7 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.fillText(`${count} Neurons`, pTop.x, y + 23 * pTop.scale * 1.5);
     });
 
-    // 4. Depth Sorted Luminous White Neurons
+    // 5. Depth Sorted Luminous White Neurons
     const projNodes = [];
     nodes.forEach(n => {
       const p = project3D(n.x, n.y, n.z, cx, cy);
@@ -390,37 +521,93 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     projNodes.sort((a, b) => b.p.depth - a.p.depth);
 
+    let activeTooltip = null;
+
     projNodes.forEach(({ node, p }) => {
-      const radius = 4.8 * p.scale * 1.5;
+      const isHovered = (hoveredNode === node);
+      const radius = (isHovered ? 6.4 : 4.8) * p.scale * 1.5;
 
       // Glow halo
       ctx.beginPath();
-      ctx.arc(p.x, p.y, radius * 2.2, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+      ctx.arc(p.x, p.y, radius * (isHovered ? 3.0 : 2.2), 0, Math.PI * 2);
+      ctx.fillStyle = isHovered ? 'rgba(56, 189, 248, 0.55)' : 'rgba(255, 255, 255, 0.22)';
       ctx.fill();
+
+      // Outer focus ring if hovered
+      if (isHovered) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, radius * 1.8, 0, Math.PI * 2);
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+      }
 
       // Solid bright white node core
       ctx.beginPath();
       ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
       ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = '#232329';
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = isHovered ? '#38bdf8' : '#232329';
+      ctx.lineWidth = isHovered ? 2.0 : 1.5;
       ctx.fill();
       ctx.stroke();
 
       // Node label
       if (p.scale > 0.6) {
-        ctx.fillStyle = '#9a9aa6';
-        ctx.font = `${Math.max(7, Math.round(8.5 * p.scale))}px "SF Mono", monospace`;
+        ctx.fillStyle = isHovered ? '#ffffff' : '#9a9aa6';
+        ctx.font = `${isHovered ? 'bold ' : ''}${Math.max(7, Math.round(8.5 * p.scale))}px "SF Mono", monospace`;
         ctx.textAlign = node.layerIdx === 0 ? 'right' : 'left';
         const offX = node.layerIdx === 0 ? -radius - 6 : radius + 6;
         ctx.fillText(`N${node.nodeIdx + 1}`, p.x + offX, p.y + 3);
       }
+
+      // Prepare Tooltip if hovered
+      if (isHovered) {
+        const inCount = threads.filter(t => t.dst === node).length;
+        const outCount = threads.filter(t => t.src === node).length;
+        activeTooltip = {
+          x: p.x + 14,
+          y: p.y - 12,
+          node,
+          inCount,
+          outCount
+        };
+      }
     });
+
+    // 6. Draw Interactive Node Tooltip Card
+    if (activeTooltip) {
+      const tip = activeTooltip;
+      const tw = 165;
+      const th = 56;
+      let tx = tip.x;
+      let ty = tip.y;
+      if (tx + tw > rect.width - 10) tx = tip.x - tw - 24;
+      if (ty + th > rect.height - 10) ty = rect.height - th - 10;
+      if (ty < 10) ty = 10;
+
+      ctx.fillStyle = 'rgba(11, 11, 13, 0.94)';
+      ctx.fillRect(tx, ty, tw, th);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(tx, ty, tw, th);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '600 11px -apple-system, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${tip.node.name} (${tip.node.layerName})`, tx + 8, ty + 16);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '10px "SF Mono", monospace';
+      ctx.fillText(`In: ${tip.inCount} syn | Out: ${tip.outCount} syn`, tx + 8, ty + 32);
+
+      ctx.fillStyle = '#9a9aa6';
+      ctx.font = '10px -apple-system, sans-serif';
+      ctx.fillText('Touch & Threads isolated', tx + 8, ty + 47);
+    }
   }
 
   function animationLoop() {
-    if (autoRotate) targetYaw += 0.0022;
+    if (autoRotate && !isDragging) targetYaw += 0.0022;
     currentYaw += (targetYaw - currentYaw) * 0.08;
     currentPitch += (targetPitch - currentPitch) * 0.08;
     camDist += (targetCamDist - camDist) * 0.08;
@@ -457,7 +644,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnPulseGuide) {
     btnPulseGuide.addEventListener('click', (e) => {
       e.stopPropagation();
-      wavePulseTime += 1.2;
+      wavePulseTime += 1.4;
     });
   }
 
@@ -470,7 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnResetCode = document.getElementById('btnResetCode');
 
   const defaultStarterCode = `# ==========================================================
-# 🧠 SynapseLab: Student Code & Architecture Lab
+# SynapseLab: Student Code & Architecture Lab
 # Type or edit layers below to see 3D threads update live!
 # ==========================================================
 
@@ -521,7 +708,7 @@ print(f"Network initialized: {layers}")
 
   if (btnTrainLive) {
     btnTrainLive.addEventListener('click', () => {
-      wavePulseTime += 1.5;
+      wavePulseTime += 1.6;
       const originalText = btnTrainLive.textContent;
       btnTrainLive.textContent = "Simulating...";
       setTimeout(() => {
@@ -534,7 +721,42 @@ print(f"Network initialized: {layers}")
   }
 
   // ---------------------------------------------------------------------------
-  // 8. BUY ME A COFFEE & SHARE MODALS
+  // 8. SETTINGS MODAL & VISUAL CONTROLS
+  // ---------------------------------------------------------------------------
+  const settingsModal = document.getElementById('settingsModal');
+  const btnOpenSettings = document.getElementById('btnOpenSettings');
+  const btnCloseSettings = document.getElementById('btnCloseSettings');
+  const toggleStars = document.getElementById('toggleStars');
+  const toggleGlow = document.getElementById('toggleGlow');
+  const toggleOrbit = document.getElementById('toggleOrbit');
+
+  if (btnOpenSettings) btnOpenSettings.addEventListener('click', () => settingsModal.classList.add('active'));
+  if (btnCloseSettings) btnCloseSettings.addEventListener('click', () => settingsModal.classList.remove('active'));
+
+  if (toggleStars) {
+    toggleStars.addEventListener('click', () => {
+      enableStarfield = !enableStarfield;
+      toggleStars.classList.toggle('active', enableStarfield);
+    });
+  }
+
+  if (toggleGlow) {
+    toggleGlow.addEventListener('click', () => {
+      enableUltraGlow = !enableUltraGlow;
+      toggleGlow.classList.toggle('active', enableUltraGlow);
+    });
+  }
+
+  if (toggleOrbit) {
+    toggleOrbit.addEventListener('click', () => {
+      autoRotate = !autoRotate;
+      toggleOrbit.classList.toggle('active', autoRotate);
+      if (rotateToggleBtn) rotateToggleBtn.classList.toggle('active', autoRotate);
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // 9. BUY ME A COFFEE & SHARE MODALS
   // ---------------------------------------------------------------------------
   const coffeeModal = document.getElementById('coffeeModal');
   const shareModal = document.getElementById('shareModal');
@@ -567,6 +789,7 @@ print(f"Network initialized: {layers}")
     if (e.target === coffeeModal) coffeeModal.classList.remove('active');
     if (e.target === shareModal) shareModal.classList.remove('active');
     if (e.target === legalModal) legalModal.classList.remove('active');
+    if (e.target === settingsModal) settingsModal.classList.remove('active');
   });
 
   window.addEventListener('keydown', (e) => {
@@ -574,6 +797,7 @@ print(f"Network initialized: {layers}")
       if (coffeeModal) coffeeModal.classList.remove('active');
       if (shareModal) shareModal.classList.remove('active');
       if (legalModal) legalModal.classList.remove('active');
+      if (settingsModal) settingsModal.classList.remove('active');
     }
   });
 
@@ -658,8 +882,8 @@ print(f"Network initialized: {layers}")
   if (btnNativeShare) {
     btnNativeShare.addEventListener('click', async () => {
       const shareData = {
-        title: 'SynapseLab — Interactive Neural Network Studio for Students',
-        text: 'Learn neural networks in 3D with luminous white filaments!',
+        title: 'SynapseLab — 3D Visualization Simulator for Students',
+        text: 'Interactive 3D neural network simulator with luminous white filaments!',
         url: window.location.href
       };
       if (navigator.share) {
@@ -671,7 +895,7 @@ print(f"Network initialized: {layers}")
   }
 
   // ---------------------------------------------------------------------------
-  // 9. INITIALIZATION
+  // 10. INITIALIZATION
   // ---------------------------------------------------------------------------
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
