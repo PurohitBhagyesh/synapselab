@@ -595,6 +595,64 @@ main {
   color: var(--text);
 }
 
+/* Test Mode Examples Selector Strip (Capsule Chips) */
+.test-examples-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #08080a;
+  border-bottom: 1px solid var(--vscode-border);
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  flex-shrink: 0;
+}
+
+.test-examples-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.test-examples-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.test-example-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 3px 11px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.test-example-chip:hover {
+  border-color: #71717a;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.test-example-chip.active {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+  font-weight: 700;
+}
+
 /* VS Code Editor Body (Gutter + Textarea) */
 .vscode-editor-body {
   flex: 1;

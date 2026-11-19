@@ -186,13 +186,11 @@ epochs = ${config.epochs || 300}`;
       }
       if (paneTest) paneTest.classList.add('active');
       if (paneGuide) paneGuide.classList.remove('active');
-      // Load current guide lesson code into Test Mode editor
-      if (studentCode) {
-        studentCode.value = formatPythonCode(activeGuideConfig);
-      }
+      // Keep Test Mode independent - compile and render student's existing code
       updateLineNumbers();
       updateCursorPosition();
       syncCodeToNetwork();
+      triggerLiveForwardPass();
     }
     setTimeout(resizeCanvas, 40);
   }
@@ -683,6 +681,8 @@ epochs = ${config.epochs || 300}`;
   const visLiveBadge = document.getElementById('visLiveBadge');
   const visLiveText = document.getElementById('visLiveText');
   let isForwardPassRunning = false;
+  let isBackpropRunning = false;
+  let backpropStage = 0;
   let forwardPassStartTime = 0;
   let forwardPassStage = 0;
   const STAGE_DURATION_MS = 450;
@@ -690,6 +690,42 @@ epochs = ${config.epochs || 300}`;
   let calculatedLoss = 0.0124;
   let pausedAtBreakpoint = false;
   let pausedBreakpointLine = 0;
+
+  function triggerBackpropAnimation() {
+    isBackpropRunning = true;
+    isForwardPassRunning = false;
+    backpropStage = Math.max(0, layerSizes.length - 2);
+
+    if (visLiveBadge) {
+      visLiveBadge.style.display = 'inline-flex';
+      visLiveBadge.style.borderColor = '#ffffff';
+    }
+
+    const stageMs = 520;
+    const totalSteps = [
+      { t: 0, text: 'LESSON 05 • LOSS EVALUATION • ERROR GRADIENT DETECTED AT OUTPUT LAYER' },
+      { t: stageMs, text: 'LESSON 05 • BACKPROPAGATION • CALCULATING PARTIAL DERIVATIVES dL/dw VIA CHAIN RULE' },
+      { t: stageMs * 2, text: 'LESSON 05 • GRADIENT DESCENT • UPDATING WEIGHTS w <- w - lr*(dL/dw) • LOSS: 0.0124' },
+      { t: stageMs * 3, text: 'LESSON 05 • OPTIMIZATION CONVERGED • WEIGHTS UPDATED ACROSS ALL SYNAPSES' }
+    ];
+
+    totalSteps.forEach(({ t, text }, i) => {
+      setTimeout(() => {
+        if (!isBackpropRunning) return;
+        wavePulseTime += 2.2;
+        backpropStage = Math.max(0, (layerSizes.length - 2) - i);
+        if (visLiveText) visLiveText.textContent = text;
+        if (i === totalSteps.length - 1) {
+          setTimeout(() => {
+            isBackpropRunning = false;
+            if (visLiveBadge && !isForwardPassRunning && !isTrainingSimulation) {
+              visLiveBadge.style.display = 'none';
+            }
+          }, 2400);
+        }
+      }, t);
+    });
+  }
 
   function calculateLayerActivations() {
     if (!nodes || nodes.length === 0) return;
@@ -836,7 +872,8 @@ epochs = ${config.epochs || 300}`;
 
     threads.forEach(t => {
       const isConnectedToHovered = hoveredNode ? (t.src === hoveredNode || t.dst === hoveredNode) : false;
-      const isSurging = isSurgingStage && (t.src.layerIdx === activeStageLayer);
+      const isSurging = (isSurgingStage && (t.src.layerIdx === activeStageLayer)) ||
+                        (isBackpropRunning && (t.src.layerIdx === backpropStage));
 
       // Project the 4 Bezier control points directly
       const pSrc = project3D(t.src.x, t.src.y, t.src.z, cx, cy);
@@ -968,7 +1005,8 @@ epochs = ${config.epochs || 300}`;
 
     projNodes.forEach(({ node, p }) => {
       const isHovered = (hoveredNode === node);
-      const isCurrentLayerActive = isForwardPassRunning && (node.layerIdx === activeStageLayer);
+      const isCurrentLayerActive = (isForwardPassRunning && (node.layerIdx === activeStageLayer)) ||
+                                   (isBackpropRunning && (node.layerIdx === backpropStage + 1));
       const radius = (isHovered || isCurrentLayerActive ? 6.2 : 4.6) * p.scale * 1.5;
 
       // Glow halo
@@ -1174,13 +1212,94 @@ epochs = ${config.epochs || 300}`;
         activeGuideConfig = { layers: [3, 6, 4, 2], activation: 'relu', learningRate: 0.05, epochs: 300 };
         buildNetwork([3, 6, 4, 2]);
         targetCamDist = 680;
-        triggerSimulateTraining();
+        triggerBackpropAnimation();
       } else if (lessonIdx === 5) {
         // Lesson 6: Transition directly into Test Mode Code Lab
         switchMode('test');
       }
     });
   });
+
+  const btnLesson5Animate = document.getElementById('btnLesson5Animate');
+  if (btnLesson5Animate) {
+    attachTap(btnLesson5Animate, (e) => {
+      e.stopPropagation();
+      activeGuideConfig = { layers: [3, 6, 4, 2], activation: 'relu', learningRate: 0.05, epochs: 300 };
+      buildNetwork([3, 6, 4, 2]);
+      targetCamDist = 680;
+      triggerBackpropAnimation();
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // 6b. TEST MODE ARCHITECTURE EXAMPLES & PRESETS
+  // ---------------------------------------------------------------------------
+  const architecturePresets = {
+    classifier: {
+      layers: [3, 8, 4, 1],
+      activation: 'relu',
+      learningRate: 0.05,
+      epochs: 300,
+      comment: '# Example: Standard Multi-Layer Classifier\n# 3 inputs -> 2 hidden representation layers -> 1 output decision'
+    },
+    perceptron: {
+      layers: [2, 1],
+      activation: 'sigmoid',
+      learningRate: 0.1,
+      epochs: 150,
+      comment: '# Example: Minimal Perceptron (Linear Boundary)\n# 2 input sensor features -> single decision node (hyperplane / logic gate)'
+    },
+    vision: {
+      layers: [8, 16, 12, 6, 2],
+      activation: 'relu',
+      learningRate: 0.03,
+      epochs: 400,
+      comment: '# Example: Deep Vision Feature Extractor\n# 8 low-level edge inputs -> hierarchical representations -> 2 target classes'
+    },
+    autoencoder: {
+      layers: [6, 3, 2, 3, 6],
+      activation: 'relu',
+      learningRate: 0.02,
+      epochs: 500,
+      comment: '# Example: Symmetric Bottleneck Autoencoder\n# 6 inputs compressed into 2D latent space and reconstructed at output'
+    },
+    wide: {
+      layers: [2, 24, 1],
+      activation: 'relu',
+      learningRate: 0.04,
+      epochs: 250,
+      comment: '# Example: Wide Shallow Network (Universal Approximator)\n# High-capacity single hidden layer with 24 neurons'
+    },
+    deep: {
+      layers: [4, 4, 4, 4, 1],
+      activation: 'relu',
+      learningRate: 0.02,
+      epochs: 350,
+      comment: '# Example: Deep Narrow Chain Network\n# Uniform 4-neuron blocks for gradient flow and depth dynamics analysis'
+    }
+  };
+
+  const testExamplesBar = document.getElementById('testExamplesBar');
+  if (testExamplesBar) {
+    testExamplesBar.addEventListener('click', (e) => {
+      const chip = e.target.closest('.test-example-chip');
+      if (!chip) return;
+      const key = chip.dataset.example;
+      const preset = architecturePresets[key];
+      if (!preset) return;
+
+      testExamplesBar.querySelectorAll('.test-example-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+
+      if (studentCode) {
+        studentCode.value = `${preset.comment}\nlayers = ${JSON.stringify(preset.layers)}\nactivation = "${preset.activation}"\nlearning_rate = ${preset.learningRate}\nepochs = ${preset.epochs}`;
+      }
+      updateLineNumbers();
+      updateCursorPosition();
+      syncCodeToNetwork();
+      triggerLiveForwardPass();
+    });
+  }
 
   // ---------------------------------------------------------------------------
   // 7. TEST MODE LIVE CODING & SIMULATION (VS CODE INTERACTIVE EXPERIENCE)

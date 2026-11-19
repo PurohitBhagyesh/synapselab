@@ -38,22 +38,31 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
+    "@type": ["SoftwareApplication", "WebApplication", "EducationalApplication"],
     "name": "SynapseLab",
     "applicationCategory": "EducationalApplication",
-    "operatingSystem": "All",
+    "applicationSubCategory": "Machine Learning Simulation",
+    "operatingSystem": "All modern web browsers",
     "url": "https://synapselab.devs.li",
-    "description": "Interactive 3D neural network visualizer and Python code lab for students.",
+    "description": "Interactive 3D neural network visualizer and Python code studio for students. Explore synaptic filaments, forward pass propagation, backpropagation, and deep learning architectures in real-time.",
     "author": {
       "@type": "Person",
       "name": "Bhagyesh Purohit",
       "url": "https://github.com/PurohitBhagyesh"
     },
+    "license": "https://opensource.org/licenses/MIT",
     "offers": {
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "USD"
-    }
+    },
+    "featureList": [
+      "Hardware-accelerated 3D neural network filament simulation",
+      "Interactive curriculum Guide Mode with backpropagation animation",
+      "Real-time Python Code Studio Test Mode with architecture presets",
+      "Instant Forward Pass and Backpropagation Cascades",
+      "Full touch gesture support with one-finger orbit and two-finger zoom"
+    ]
   }
   </script>
 
@@ -213,6 +222,15 @@
             <li><strong>Backpropagation</strong>: Computes analytical partial derivatives <em>&part;&Lscr;/&part;w</em> for every weight via the calculus chain rule.</li>
             <li><strong>Gradient Descent</strong>: Updates weights opposite the error gradient: <em>w &larr; w - &eta; &part;&Lscr;/&part;w</em>, where <em>&eta;</em> is the learning rate.</li>
           </ul>
+          <div class="lesson-action-wrap" style="margin-top: 10px;">
+            <button class="btn lesson-action" id="btnLesson5Animate" type="button">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 19 2 12 11 5 11 19"/>
+                <polygon points="22 19 13 12 22 5 22 19"/>
+              </svg>
+              <span>Simulate Backprop &amp; Gradient Descent</span>
+            </button>
+          </div>
         </article>
 
         <!-- Lesson 6: Transition to Code -->
@@ -265,6 +283,17 @@
         <span>src</span>
         <span class="bc-sep">&rsaquo;</span>
         <span class="bc-file">network_threads.py</span>
+      </div>
+
+      <!-- Test Mode Architecture Presets / Examples -->
+      <div class="test-examples-bar" id="testExamplesBar">
+        <span class="test-examples-title">Examples:</span>
+        <button class="test-example-chip active" type="button" data-example="classifier">Classifier [3, 8, 4, 1]</button>
+        <button class="test-example-chip" type="button" data-example="perceptron">Perceptron [2, 1]</button>
+        <button class="test-example-chip" type="button" data-example="vision">Deep Vision [8, 16, 12, 6, 2]</button>
+        <button class="test-example-chip" type="button" data-example="autoencoder">Autoencoder [6, 3, 2, 3, 6]</button>
+        <button class="test-example-chip" type="button" data-example="wide">Wide [2, 24, 1]</button>
+        <button class="test-example-chip" type="button" data-example="deep">Deep Chain [4, 4, 4, 4, 1]</button>
       </div>
 
       <!-- VS Code Editor Body (Gutter + Textarea) -->

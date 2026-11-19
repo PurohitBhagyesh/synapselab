@@ -30,11 +30,16 @@ synapselab/
 ├── app.js                       # 3D math projection engine & interactive editor
 ├── banner.png                   # High-resolution social media card (1200x630, og:image)
 ├── network_threads.py           # Starter Python code for students
+├── LICENSE                      # MIT Open Source License
+├── CONTRIBUTING.md              # Open source contribution guidelines
+├── SECURITY.md                  # Security and privacy policy
 ├── google5fefb455a4f252a7.html  # Google Search Console domain verification
 ├── robots.txt                   # Search crawler directives
 ├── sitemap.xml                  # Search engine XML sitemap
 ├── vercel.json                  # Production headers & clean routing config
 ├── README.md                    # Project documentation
+├── .github/                     # GitHub automated workflows
+│   └── workflows/ci.yml         # Continuous integration validation pipeline
 ├── python/                      # Standalone Python neural network scripts
 │   ├── network_threads.py       # Architecture specification
 │   ├── neural_network_from_scratch.py  # Pure NumPy forward & backpropagation
@@ -53,10 +58,25 @@ synapselab/
 
 ## Overview: Two Complementary Student Modes
 
-SynapseLab provides two distinct working environments tailored for learning:
+SynapseLab provides two distinct working environments tailored for learning, designed to maintain complete independence without overwriting student work:
 
-* **Guide Mode (Interactive Curriculum &bull; Read-Only)**: A structured step-by-step visual syllabus explaining artificial neural networks, synaptic filaments, numeric weights, ReLU activation functions, deep representations, and backpropagation. Students touch and hover neurons to isolate incoming and outgoing connections without worrying about code syntax.
-* **Test Mode (Code Lab &bull; Write Mode)**: A full VS Code-inspired laboratory (`network_threads.py`). Students edit custom Python layer architecture (`layers = [3, 8, 4, 1]`), adjust hyperparameters, simulate training, and click **Run** to execute live multi-stage signal cascades across all 3D threads.
+* **Guide Mode (Interactive Curriculum &bull; Read-Only)**: A structured step-by-step visual syllabus explaining artificial neural networks, synaptic filaments, numeric weights, ReLU activation functions, deep representations, and backpropagation. Students touch and hover neurons to isolate incoming and outgoing connections without worrying about code syntax. Lesson 5 features a full interactive Backpropagation & Gradient Descent simulation cascade showing error flows in reverse.
+* **Test Mode (Code Lab &bull; Write Mode)**: A full VS Code-inspired laboratory (`network_threads.py`). Students can write custom Python code from scratch or load one of several real-world architecture examples using quick-load capsule chips. The student code remains persistent and is never overwritten when switching modes.
+
+---
+
+## Test Mode Architecture Examples
+
+Students can quickly load and explore classic deep learning architectures with a single click:
+
+| Preset Name | Architecture | Purpose & Learning Concept |
+| :--- | :--- | :--- |
+| **Classifier** | `[3, 8, 4, 1]` | Standard multi-layer perceptron for tabular classification & regression |
+| **Perceptron** | `[2, 1]` | Minimal single-layer linear classifier (decision hyperplane & logic gates) |
+| **Deep Vision** | `[8, 16, 12, 6, 2]` | Deep hierarchical feature extraction for multi-class computer vision |
+| **Autoencoder** | `[6, 3, 2, 3, 6]` | Symmetric compression bottleneck for 2D latent representation learning |
+| **Wide Network** | `[2, 24, 1]` | High-capacity shallow hidden layer demonstrating universal approximation |
+| **Deep Chain** | `[4, 4, 4, 4, 1]` | Uniform residual-style chain for gradient flow and depth dynamics analysis |
 
 ---
 
@@ -98,6 +118,13 @@ SynapseLab provides two distinct working environments tailored for learning:
 
 ---
 
+## Contributing & Security
+
+* **Contribution Guidelines**: Please review [CONTRIBUTING.md](CONTRIBUTING.md) for code style, development guidelines, and pull request procedures.
+* **Security & Privacy**: Read our [SECURITY.md](SECURITY.md) policy detailing zero-cookie client-side isolation and disclosure guidelines.
+
+---
+
 ## License
 
-MIT License. Designed and engineered by [Bhagyesh Purohit](https://github.com/PurohitBhagyesh).
+[MIT License](LICENSE). Copyright (c) 2026 [Bhagyesh Purohit](https://github.com/PurohitBhagyesh).

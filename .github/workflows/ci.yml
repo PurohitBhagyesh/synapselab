@@ -1,0 +1,52 @@
+name: SynapseLab Continuous Integration
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate JavaScript Syntax
+        run: node --check app.js
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate Python Syntax
+        run: |
+          python3 -m py_compile network_threads.py
+          python3 -m py_compile python/*.py
+
+      - name: Verify Editorial Quality (Zero Em-Dashes and Zero Emojis)
+        run: |
+          python3 -c "
+          import re, sys
+          files = ['index.html', 'style.css', 'app.js', 'README.md', 'CONTRIBUTING.md', 'SECURITY.md']
+          errors = 0
+          for f in files:
+              with open(f, 'r', encoding='utf-8') as fp:
+                  text = fp.read()
+              if '\u2014' in text:
+                  print(f'ERROR: Found em-dash in {f}')
+                  errors += 1
+              if re.search(r'[\U00010000-\U0010ffff]', text):
+                  print(f'ERROR: Found emoji in {f}')
+                  errors += 1
+          if errors > 0:
+              sys.exit(1)
+          print('Quality checks passed cleanly: Zero em-dashes and zero emojis.')
+          "
