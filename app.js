@@ -1,6 +1,7 @@
 /**
- * SynapseLab Core Engine
- * Locked Luminous White Threads • Realtime Live Coding • OpenLid Design Architecture
+ * SynapseLab Application Engine
+ * Modes: Guide Mode (Interactive Learning) & Test Mode (Code Studio & Lab)
+ * Locked 3D Luminous White Filaments • 60 FPS Orbit Canvas • OpenLid Design Architecture
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -19,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (themeLabel) {
       themeLabel.textContent = theme === 'dark' ? 'Dark' : 'Light';
     }
+    resizeCanvas();
   }
 
   applyTheme(savedTheme);
@@ -36,94 +38,68 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------------------------------------------------------------------------
-  // 2. MOBILE RESPONSIVE SWITCHER
+  // 2. MODE SWITCHER: GUIDE MODE vs TEST MODE
   // ---------------------------------------------------------------------------
-  const mainWorkspace = document.getElementById('mainWorkspace');
-  const btnMobCode = document.getElementById('btnMobCode');
-  const btnMobVis = document.getElementById('btnMobVis');
+  const tabGuide = document.getElementById('tabGuide');
+  const tabTest = document.getElementById('tabTest');
+  const paneGuide = document.getElementById('paneGuide');
+  const paneTest = document.getElementById('paneTest');
+  const hudTitle = document.getElementById('hudTitle');
 
-  if (btnMobCode && btnMobVis) {
-    btnMobCode.addEventListener('click', () => {
-      btnMobCode.classList.add('active');
-      btnMobVis.classList.remove('active');
-      mainWorkspace.classList.remove('show-vis');
-    });
+  let currentMode = 'guide';
 
-    btnMobVis.addEventListener('click', () => {
-      btnMobVis.classList.add('active');
-      btnMobCode.classList.remove('active');
-      mainWorkspace.classList.add('show-vis');
-      resizeCanvas();
-    });
-  }
-
-  // ---------------------------------------------------------------------------
-  // 3. STUDENT GUIDANCE SYSTEM
-  // ---------------------------------------------------------------------------
-  const guideStepTag = document.getElementById('guideStepTag');
-  const guideMessage = document.getElementById('guideMessage');
-  const btnNextGuide = document.getElementById('btnNextGuide');
-
-  let currentGuide = 1;
-  const guideSteps = [
-    {
-      tag: "GUIDE 1/3",
-      msg: "Welcome Student! Look at the <strong>white curved filaments</strong>: they carry data signals from layer to layer in 3D.",
-      btn: "Next Guide &rarr;"
-    },
-    {
-      tag: "GUIDE 2/3",
-      msg: "Notice the moving pulses: that is <strong>Forward Propagation</strong> running in real time!",
-      btn: "Next Guide &rarr;"
-    },
-    {
-      tag: "GUIDE 3/3",
-      msg: "Try <strong>Live Coding</strong>: Edit <code>layers = [3, 8, 4, 1]</code> on the left to watch new threads appear live!",
-      btn: "Restart &orarr;"
+  function switchMode(mode) {
+    currentMode = mode;
+    if (mode === 'guide') {
+      tabGuide.classList.add('active');
+      tabTest.classList.remove('active');
+      paneGuide.classList.add('active');
+      paneTest.classList.remove('active');
+      if (hudTitle) hudTitle.textContent = 'GUIDE MODE: 3D NEURAL VISUALIZER';
+      buildNetwork([3, 6, 2]);
+    } else {
+      tabTest.classList.add('active');
+      tabGuide.classList.remove('active');
+      paneTest.classList.add('active');
+      paneGuide.classList.remove('active');
+      if (hudTitle) hudTitle.textContent = 'TEST MODE: ARCHITECTURE STUDIO';
+      syncCodeToNetwork();
     }
-  ];
-
-  function updateGuideUI() {
-    const g = guideSteps[currentGuide - 1];
-    if (guideStepTag) guideStepTag.textContent = g.tag;
-    if (guideMessage) guideMessage.innerHTML = g.msg;
-    if (btnNextGuide) btnNextGuide.innerHTML = g.btn;
+    setTimeout(resizeCanvas, 40);
   }
 
-  if (btnNextGuide) {
-    btnNextGuide.addEventListener('click', () => {
-      currentGuide = (currentGuide % guideSteps.length) + 1;
-      updateGuideUI();
-    });
-  }
+  if (tabGuide) tabGuide.addEventListener('click', () => switchMode('guide'));
+  if (tabTest) tabTest.addEventListener('click', () => switchMode('test'));
 
   // ---------------------------------------------------------------------------
-  // 4. LOCKED 3D WHITE THREADS VISUALIZER (Realtime Running)
+  // 3. PERSISTENT 3D VISUALIZER ENGINE (LOCKED LUMINOUS WHITE THREADS)
   // ---------------------------------------------------------------------------
   const canvas = document.getElementById('canvas3d');
-  const ctx = canvas.getContext('2d');
-  const hudLayerInfo = document.getElementById('hudLayerInfo');
-  const liveThreadCount = document.getElementById('liveThreadCount');
+  if (!canvas) {
+    console.error('Fatal: #canvas3d not found');
+    return;
+  }
 
-  // Camera state with smooth inertial lerp
-  let targetYaw = -0.36;
-  let targetPitch = 0.26;
-  let currentYaw = -0.36;
-  let currentPitch = 0.26;
-  let camDist = 680;
-  let targetCamDist = 680;
+  const ctx = canvas.getContext('2d');
+
+  // Camera State with Smooth Inertial Lerping
+  let targetYaw = -0.38;
+  let targetPitch = 0.22;
+  let currentYaw = -0.38;
+  let currentPitch = 0.22;
+  let camDist = 650;
+  let targetCamDist = 650;
   let fov = 480;
-  let autoRotate = true; // Rotates smoothly by default
+  let autoRotate = true;
   let wavePulseTime = 0;
   let isDragging = false;
   let lastX = 0, lastY = 0;
 
-  // Simple, elegant, student-friendly starting network: [3, 8, 4, 1]
-  let layerSizes = [3, 8, 4, 1];
+  let layerSizes = [3, 6, 2];
   let nodes = [];
   let threads = [];
 
-  function build3DNetwork(sizes) {
+  function buildNetwork(sizes) {
     layerSizes = sizes;
     nodes = [];
     threads = [];
@@ -134,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     layerSizes.forEach((count, lIdx) => {
       const z = -totalDepth / 2 + lIdx * zStep;
-      const totalH = Math.min(340, count * 42);
+      const totalH = Math.min(340, count * 44);
       const startY = -totalH / 2;
       const stepY = count > 1 ? totalH / (count - 1) : 0;
 
@@ -145,12 +121,12 @@ document.addEventListener('DOMContentLoaded', () => {
           z: z,
           layerIdx: lIdx,
           nodeIdx: i,
-          layerName: lIdx === 0 ? "Input" : (lIdx === numLayers - 1 ? "Output" : `Hidden ${lIdx}`)
+          name: lIdx === 0 ? `Input ${i+1}` : (lIdx === numLayers - 1 ? `Output ${i+1}` : `Hidden ${lIdx}_${i+1}`)
         });
       }
     });
 
-    // Generate sweeping, curved white filaments
+    // Generate sweeping, organic 3D curved white filaments
     for (let l = 0; l < numLayers - 1; l++) {
       const srcNodes = nodes.filter(n => n.layerIdx === l);
       const dstNodes = nodes.filter(n => n.layerIdx === l + 1);
@@ -173,12 +149,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    if (hudLayerInfo) {
-      hudLayerInfo.textContent = `${layerSizes.length} Layers (${nodes.length} Neurons)`;
-    }
-    if (liveThreadCount) {
-      liveThreadCount.textContent = `${threads.length} Synaptic Threads`;
-    }
+    // Update Telemetry Displays
+    const hudStats = document.getElementById('hudStats');
+    const liveThreadCount = document.getElementById('liveThreadCount');
+    const statsText = `${layerSizes.length} Layers (${nodes.length} Neurons • ${threads.length} Synapses)`;
+    if (hudStats) hudStats.textContent = statsText;
+    if (liveThreadCount) liveThreadCount.textContent = `${threads.length} Synaptic Threads • ${nodes.length} Neurons`;
   }
 
   function project3D(x, y, z, cx, cy) {
@@ -201,61 +177,30 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function resizeCanvas() {
-    const rect = canvas.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
+    if (!canvas || !canvas.parentElement) return;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const w = rect.width || canvas.parentElement.clientWidth || 600;
+    const h = rect.height || canvas.parentElement.clientHeight || 450;
+    if (w <= 0 || h <= 0) return;
+
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
   // ---------------------------------------------------------------------------
-  // 5. ROTATE SYMBOL & ZOOM CONTROLS
+  // 4. MOUSE / TOUCH INTERACTION & ORBIT
   // ---------------------------------------------------------------------------
-  const btnRotateToggle = document.getElementById('btnRotateToggle');
-  const btnZoomIn = document.getElementById('btnZoomIn');
-  const btnZoomOut = document.getElementById('btnZoomOut');
-  const btnResetView = document.getElementById('btnResetView');
+  const rotateToggleBtn = document.getElementById('btnRotateToggle');
 
-  if (btnRotateToggle) {
-    btnRotateToggle.addEventListener('click', () => {
-      autoRotate = !autoRotate;
-      btnRotateToggle.classList.toggle('active', autoRotate);
-    });
-  }
-
-  if (btnZoomIn) {
-    btnZoomIn.addEventListener('click', () => {
-      targetCamDist = Math.max(300, targetCamDist - 120);
-    });
-  }
-
-  if (btnZoomOut) {
-    btnZoomOut.addEventListener('click', () => {
-      targetCamDist = Math.min(1150, targetCamDist + 120);
-    });
-  }
-
-  if (btnResetView) {
-    btnResetView.addEventListener('click', () => {
-      targetYaw = -0.36;
-      targetPitch = 0.26;
-      targetCamDist = 680;
-      autoRotate = true;
-      if (btnRotateToggle) btnRotateToggle.classList.add('active');
-    });
-  }
-
-  // Mouse / Touch Drag Orbit
   canvas.addEventListener('mousedown', e => {
     isDragging = true;
     lastX = e.clientX;
     lastY = e.clientY;
     autoRotate = false;
-    if (btnRotateToggle) btnRotateToggle.classList.remove('active');
+    if (rotateToggleBtn) rotateToggleBtn.classList.remove('active');
   });
-
-  window.addEventListener('mouseup', () => isDragging = false);
 
   canvas.addEventListener('mousemove', e => {
     if (!isDragging) return;
@@ -265,19 +210,21 @@ document.addEventListener('DOMContentLoaded', () => {
     lastY = e.clientY;
   });
 
+  window.addEventListener('mouseup', () => isDragging = false);
+
   canvas.addEventListener('wheel', e => {
     e.preventDefault();
     targetCamDist = Math.max(280, Math.min(1200, targetCamDist + e.deltaY * 0.6));
   }, { passive: false });
 
-  // Mobile Touch Support
+  // Touch controls
   canvas.addEventListener('touchstart', e => {
     if (e.touches.length === 1) {
       isDragging = true;
       lastX = e.touches[0].clientX;
       lastY = e.touches[0].clientY;
       autoRotate = false;
-      if (btnRotateToggle) btnRotateToggle.classList.remove('active');
+      if (rotateToggleBtn) rotateToggleBtn.classList.remove('active');
     }
   }, { passive: true });
 
@@ -291,10 +238,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
   canvas.addEventListener('touchend', () => isDragging = false);
 
+  // Zoom Toolbar Buttons
+  const btnZoomIn = document.getElementById('btnZoomIn');
+  const btnZoomOut = document.getElementById('btnZoomOut');
+  const btnResetView = document.getElementById('btnResetView');
+
+  if (btnZoomIn) {
+    btnZoomIn.addEventListener('click', () => {
+      targetCamDist = Math.max(300, targetCamDist - 120);
+    });
+  }
+  if (btnZoomOut) {
+    btnZoomOut.addEventListener('click', () => {
+      targetCamDist = Math.min(1150, targetCamDist + 120);
+    });
+  }
+  if (btnResetView) {
+    btnResetView.addEventListener('click', () => {
+      targetYaw = -0.38;
+      targetPitch = 0.22;
+      targetCamDist = 650;
+      autoRotate = true;
+      if (rotateToggleBtn) rotateToggleBtn.classList.add('active');
+    });
+  }
+
+  if (rotateToggleBtn) {
+    rotateToggleBtn.addEventListener('click', () => {
+      autoRotate = !autoRotate;
+      rotateToggleBtn.classList.toggle('active', autoRotate);
+    });
+  }
+
   // ---------------------------------------------------------------------------
-  // 6. PERSPECTIVE 3D RENDER LOOP (LOCKED WHITE THREADS)
+  // 5. 3D RENDER LOOP
   // ---------------------------------------------------------------------------
-  function drawGridFloor(cx, cy) {
+  function drawPerspectiveScene() {
+    if (!canvas || canvas.width === 0 || canvas.height === 0) return;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const cx = (rect.width || 600) / 2;
+    const cy = (rect.height || 450) / 2;
+
+    ctx.clearRect(0, 0, rect.width, rect.height);
+
+    // 1. Perspective Grid Floor
     const gridY = 210;
     const size = 480;
     const step = 60;
@@ -324,25 +311,8 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.stroke();
       }
     }
-  }
 
-  function renderLoop() {
-    if (autoRotate) targetYaw += 0.0022;
-    currentYaw += (targetYaw - currentYaw) * 0.08;
-    currentPitch += (targetPitch - currentPitch) * 0.08;
-    camDist += (targetCamDist - camDist) * 0.08;
-    wavePulseTime += 0.024; // Realtime continuous signal flow
-
-    const rect = canvas.getBoundingClientRect();
-    const cx = rect.width / 2;
-    const cy = rect.height / 2;
-
-    ctx.clearRect(0, 0, rect.width, rect.height);
-
-    // 1. Grid Floor
-    drawGridFloor(cx, cy);
-
-    // 2. LOCKED WHITE CURVED FILAMENTS (Luminous Silk Fibers)
+    // 2. LOCKED LUMINOUS WHITE FILAMENTS
     threads.forEach(t => {
       const segments = 12;
       let prevP = project3D(t.src.x, t.src.y, t.src.z, cx, cy);
@@ -360,12 +330,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cp) ctx.lineTo(cp.x, cp.y);
       }
 
-      // Pure glowing white threads with subtle ethereal translucency
-      ctx.strokeStyle = 'rgba(240, 249, 255, 0.42)';
-      ctx.lineWidth = 1.2;
+      // Bright, luminous white silk filaments
+      ctx.strokeStyle = 'rgba(240, 249, 255, 0.44)';
+      ctx.lineWidth = 1.25;
       ctx.stroke();
 
-      // Realtime Optical Wave Pulse traveling across the thread
+      // Optical wave pulse traveling through filament
       const waveProg = (wavePulseTime + Math.abs(t.seed) * 2.4) % 1;
       const wx = evalCubic(t.src.x, t.p1.x, t.p2.x, t.dst.x, waveProg);
       const wy = evalCubic(t.src.y, t.p1.y, t.p2.y, t.dst.y, waveProg);
@@ -377,13 +347,13 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.arc(wp.x, wp.y, 2.0 * wp.scale * 1.5, 0, Math.PI * 2);
         ctx.fillStyle = '#ffffff';
         ctx.shadowColor = '#38bdf8';
-        ctx.shadowBlur = 6;
+        ctx.shadowBlur = 8;
         ctx.fill();
         ctx.shadowBlur = 0;
       }
     });
 
-    // 3. Floating Layer Indicator Banners (Glassmorphism)
+    // 3. Floating Layer Headers (Glass Cards)
     layerSizes.forEach((count, lIdx) => {
       const totalDepth = 480;
       const z = -totalDepth / 2 + lIdx * (totalDepth / (layerSizes.length - 1 || 1));
@@ -395,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const x = pTop.x - w / 2;
       const y = pTop.y - h;
 
-      ctx.fillStyle = 'rgba(11, 11, 13, 0.88)';
+      ctx.fillStyle = 'rgba(11, 11, 13, 0.9)';
       ctx.fillRect(x, y, w, h);
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
       ctx.lineWidth = 1;
@@ -412,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.fillText(`${count} Neurons`, pTop.x, y + 23 * pTop.scale * 1.5);
     });
 
-    // 4. Depth Sorted Glowing White Nodes
+    // 4. Depth Sorted Luminous White Neurons
     const projNodes = [];
     nodes.forEach(n => {
       const p = project3D(n.x, n.y, n.z, cx, cy);
@@ -426,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Glow halo
       ctx.beginPath();
       ctx.arc(p.x, p.y, radius * 2.2, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
       ctx.fill();
 
       // Solid bright white node core
@@ -447,17 +417,79 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillText(`N${node.nodeIdx + 1}`, p.x + offX, p.y + 3);
       }
     });
+  }
 
-    requestAnimationFrame(renderLoop);
+  function animationLoop() {
+    if (autoRotate) targetYaw += 0.0022;
+    currentYaw += (targetYaw - currentYaw) * 0.08;
+    currentPitch += (targetPitch - currentPitch) * 0.08;
+    camDist += (targetCamDist - camDist) * 0.08;
+    wavePulseTime += 0.024;
+
+    drawPerspectiveScene();
+    requestAnimationFrame(animationLoop);
   }
 
   // ---------------------------------------------------------------------------
-  // 7. LIVE CODING ENGINE (Instant Realtime Synchronisation)
+  // 6. GUIDE MODE INTERACTIVE LESSONS
+  // ---------------------------------------------------------------------------
+  const lessonCards = document.querySelectorAll('.lesson-card');
+  lessonCards.forEach((card, idx) => {
+    card.addEventListener('click', () => {
+      lessonCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+
+      if (idx === 0) {
+        buildNetwork([3, 6, 2]);
+        targetCamDist = 650;
+      } else if (idx === 1) {
+        buildNetwork([3, 8, 3]);
+        wavePulseTime += 1.0;
+      } else if (idx === 2) {
+        buildNetwork([2, 5, 2]);
+      } else if (idx === 3) {
+        buildNetwork([3, 8, 6, 2]);
+      }
+    });
+  });
+
+  const btnPulseGuide = document.getElementById('btnPulseGuide');
+  if (btnPulseGuide) {
+    btnPulseGuide.addEventListener('click', (e) => {
+      e.stopPropagation();
+      wavePulseTime += 1.2;
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // 7. TEST MODE LIVE CODING & SIMULATION
   // ---------------------------------------------------------------------------
   const studentCode = document.getElementById('studentCode');
+  const btnRunCode = document.getElementById('btnRunCode');
+  const btnTrainLive = document.getElementById('btnTrainLive');
   const btnResetCode = document.getElementById('btnResetCode');
 
-  function parseAndSyncCode() {
+  const defaultStarterCode = `# ==========================================================
+# 🧠 SynapseLab: Student Code & Architecture Lab
+# Type or edit layers below to see 3D threads update live!
+# ==========================================================
+
+# 1. Define Layer Architecture [Input, Hidden..., Output]
+layers = [3, 8, 4, 1]
+
+# 2. Hyperparameters
+activation = "relu"     # Non-linear activation for neurons
+learning_rate = 0.05    # Gradient descent step size
+epochs = 300            # Training iterations
+
+print(f"Network initialized: {layers}")
+
+# STUDENT EXPERIMENT:
+# Change layers above to [4, 10, 6, 2] or [2, 6, 6, 1]
+# The 3D filaments and neuron nodes will rebuild immediately!`;
+
+  function syncCodeToNetwork() {
+    if (!studentCode) return;
     const match = studentCode.value.match(/layers\s*=\s*\[(.*?)\]/);
     if (match && match[1]) {
       const parsed = match[1].split(',')
@@ -465,103 +497,121 @@ document.addEventListener('DOMContentLoaded', () => {
         .filter(n => !isNaN(n) && n > 0 && n <= 18);
 
       if (parsed.length >= 2) {
-        build3DNetwork(parsed);
+        buildNetwork(parsed);
       }
     }
   }
 
-  // Synchronizes on every single keystroke live
-  studentCode.addEventListener('input', parseAndSyncCode);
+  if (studentCode) studentCode.addEventListener('input', syncCodeToNetwork);
+  if (btnRunCode) {
+    btnRunCode.addEventListener('click', () => {
+      syncCodeToNetwork();
+      wavePulseTime += 1.0;
+    });
+  }
 
   if (btnResetCode) {
     btnResetCode.addEventListener('click', () => {
-      studentCode.value = `# ==========================================================
-# SynapseLab: Student Neural Network
-# Live Coding: Edit layers below and watch threads update!
-# ==========================================================
+      if (studentCode) {
+        studentCode.value = defaultStarterCode;
+        syncCodeToNetwork();
+      }
+    });
+  }
 
-layers = [3, 8, 4, 1]
-activation = "relu"
-learning_rate = 0.05
-epochs = 300
-
-print(f"Network initialized: {layers}")
-`;
-      parseAndSyncCode();
+  if (btnTrainLive) {
+    btnTrainLive.addEventListener('click', () => {
+      wavePulseTime += 1.5;
+      const originalText = btnTrainLive.textContent;
+      btnTrainLive.textContent = "Simulating...";
+      setTimeout(() => {
+        btnTrainLive.textContent = "Loss: 0.014 (Converged)";
+        setTimeout(() => {
+          btnTrainLive.textContent = originalText;
+        }, 2200);
+      }, 900);
     });
   }
 
   // ---------------------------------------------------------------------------
-  // 8. BUY ME A COFFEE (From openlid)
+  // 8. BUY ME A COFFEE & SHARE MODALS
   // ---------------------------------------------------------------------------
-  const snackWidget = document.getElementById('snackWidget');
-  const snackPillBtn = document.getElementById('snackPillBtn');
-  const snackCard = document.getElementById('snackCard');
-  const snackCloseBtn = document.getElementById('snackCloseBtn');
+  const coffeeModal = document.getElementById('coffeeModal');
+  const shareModal = document.getElementById('shareModal');
+  const legalModal = document.getElementById('legalModal');
+
+  const btnOpenCoffee = document.getElementById('btnOpenCoffee');
+  const btnOpenShare = document.getElementById('btnOpenShare');
+  const btnCloseCoffee = document.getElementById('btnCloseCoffee');
+  const btnCloseShare = document.getElementById('btnCloseShare');
+  const btnCloseLegal = document.getElementById('btnCloseLegal');
+
+  if (btnOpenCoffee) btnOpenCoffee.addEventListener('click', () => coffeeModal.classList.add('active'));
+  if (btnCloseCoffee) btnCloseCoffee.addEventListener('click', () => coffeeModal.classList.remove('active'));
+
+  if (btnOpenShare) btnOpenShare.addEventListener('click', () => shareModal.classList.add('active'));
+  if (btnCloseShare) btnCloseShare.addEventListener('click', () => shareModal.classList.remove('active'));
+
+  if (btnCloseLegal) btnCloseLegal.addEventListener('click', () => legalModal.classList.remove('active'));
+
+  // Legal Modal Triggers (DPDP, Privacy, Terms)
+  document.querySelectorAll('.open-legal-trigger').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (legalModal) legalModal.classList.add('active');
+    });
+  });
+
+  // Close modals on backdrop click or escape
+  window.addEventListener('click', (e) => {
+    if (e.target === coffeeModal) coffeeModal.classList.remove('active');
+    if (e.target === shareModal) shareModal.classList.remove('active');
+    if (e.target === legalModal) legalModal.classList.remove('active');
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (coffeeModal) coffeeModal.classList.remove('active');
+      if (shareModal) shareModal.classList.remove('active');
+      if (legalModal) legalModal.classList.remove('active');
+    }
+  });
+
+  // Coffee QR Code generator
+  const snackQrImg = document.getElementById('snackQrImg');
   const snackAmountInput = document.getElementById('snackAmountInput');
   const snackPresets = document.getElementById('snackPresets');
-  const snackQrImg = document.getElementById('snackQrImg');
-  const snackUpiCopyBtn = document.getElementById('snackUpiCopyBtn');
   const snackUpiText = document.getElementById('snackUpiText');
-
+  const snackUpiCopyBtn = document.getElementById('snackUpiCopyBtn');
   const UPI_ID = 'Purohit2009@fam';
   const PAYEE_NAME = 'Shivam';
 
-  function updateSnackQr(amount) {
-    const amt = Math.max(1, parseInt(amount, 10) || 50);
-    const uri = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`;
+  function updateCoffeeQr(amt) {
+    const val = Math.max(1, parseInt(amt, 10) || 50);
+    const uri = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${val}&cu=INR`;
     if (snackQrImg) {
       snackQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&format=svg&data=${encodeURIComponent(uri)}`;
     }
   }
 
-  if (snackPillBtn && snackCard) {
-    snackPillBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const active = snackCard.classList.toggle('active');
-      snackPillBtn.setAttribute('aria-expanded', String(active));
-      if (active && snackAmountInput) updateSnackQr(snackAmountInput.value || 50);
-    });
-
-    if (snackCloseBtn) {
-      snackCloseBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        snackCard.classList.remove('active');
-        snackPillBtn.setAttribute('aria-expanded', 'false');
-      });
-    }
-
-    document.addEventListener('click', (e) => {
-      if (snackWidget && !snackWidget.contains(e.target) && snackCard.classList.contains('active')) {
-        snackCard.classList.remove('active');
-        snackPillBtn.setAttribute('aria-expanded', 'false');
-      }
-    });
+  if (snackAmountInput) {
+    snackAmountInput.addEventListener('input', () => updateCoffeeQr(snackAmountInput.value));
   }
-
-  if (snackPresets && snackAmountInput) {
+  if (snackPresets) {
     snackPresets.addEventListener('click', (e) => {
       const chip = e.target.closest('.preset-chip');
       if (!chip) return;
-      const amt = chip.getAttribute('data-amt');
-      snackAmountInput.value = amt;
-      snackPresets.querySelectorAll('.preset-chip').forEach(b => b.classList.remove('active'));
+      const val = chip.dataset.amt;
+      if (snackAmountInput) snackAmountInput.value = val;
+      snackPresets.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
-      updateSnackQr(amt);
-    });
-
-    snackAmountInput.addEventListener('input', () => {
-      const val = snackAmountInput.value;
-      snackPresets.querySelectorAll('.preset-chip').forEach(b => {
-        b.classList.toggle('active', b.getAttribute('data-amt') === val);
-      });
-      updateSnackQr(val);
+      updateCoffeeQr(val);
     });
   }
 
+  // Copy UPI
   if (snackUpiCopyBtn && snackUpiText) {
-    snackUpiCopyBtn.addEventListener('click', async (e) => {
-      e.stopPropagation();
+    snackUpiCopyBtn.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(UPI_ID);
         const orig = snackUpiText.textContent;
@@ -571,8 +621,8 @@ print(f"Network initialized: {layers}")
     });
   }
 
-  const upiAppButtons = document.querySelectorAll('.upi-app-btn');
-  upiAppButtons.forEach(btn => {
+  // 1-Click UPI App Launchers
+  document.querySelectorAll('.upi-app-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const scheme = btn.dataset.scheme;
       const amt = Math.max(1, parseInt(snackAmountInput ? snackAmountInput.value : 50, 10) || 50);
@@ -582,60 +632,24 @@ print(f"Network initialized: {layers}")
       else if (scheme === 'gpay') uri = `tez://upi/pay?${query}`;
       else if (scheme === 'phonepe') uri = `phonepe://pay?${query}`;
       else if (scheme === 'paytm') uri = `paytmmp://pay?${query}`;
-      else if (scheme === 'amazonpay') uri = `amazonpay://upi/pay?${query}`;
-      else if (scheme === 'whatsapp') uri = `whatsapp://pay?${query}`;
       window.location.href = uri;
     });
   });
 
-  updateSnackQr(50);
+  updateCoffeeQr(50);
 
-  // ---------------------------------------------------------------------------
-  // 9. SHARE WIDGET (From openlid)
-  // ---------------------------------------------------------------------------
-  const shareWidget = document.getElementById('shareWidget');
-  const sharePillBtn = document.getElementById('sharePillBtn');
-  const shareCard = document.getElementById('shareCard');
-  const shareCloseBtn = document.getElementById('shareCloseBtn');
+  // Share Actions
   const btnShareCopy = document.getElementById('btnShareCopy');
   const shareCopyBadge = document.getElementById('shareCopyBadge');
   const btnNativeShare = document.getElementById('btnNativeShare');
-
-  if (sharePillBtn && shareCard) {
-    sharePillBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const active = shareCard.classList.toggle('active');
-      sharePillBtn.setAttribute('aria-expanded', String(active));
-    });
-
-    if (shareCloseBtn) {
-      shareCloseBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        shareCard.classList.remove('active');
-        sharePillBtn.setAttribute('aria-expanded', 'false');
-      });
-    }
-
-    document.addEventListener('click', (e) => {
-      if (shareWidget && !shareWidget.contains(e.target) && shareCard.classList.contains('active')) {
-        shareCard.classList.remove('active');
-        sharePillBtn.setAttribute('aria-expanded', 'false');
-      }
-    });
-  }
 
   if (btnShareCopy) {
     btnShareCopy.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(window.location.href);
         if (shareCopyBadge) {
-          const orig = shareCopyBadge.textContent;
           shareCopyBadge.textContent = 'Copied!';
-          shareCopyBadge.style.color = 'var(--emerald)';
-          setTimeout(() => {
-            shareCopyBadge.textContent = orig;
-            shareCopyBadge.style.color = '';
-          }, 1800);
+          setTimeout(() => shareCopyBadge.textContent = 'Copy', 1800);
         }
       } catch (err) {}
     });
@@ -644,26 +658,23 @@ print(f"Network initialized: {layers}")
   if (btnNativeShare) {
     btnNativeShare.addEventListener('click', async () => {
       const shareData = {
-        title: 'SynapseLab — Interactive Neural Network Lab for Students',
-        text: 'Live 3D white filaments and realtime coding for neural networks!',
+        title: 'SynapseLab — Interactive Neural Network Studio for Students',
+        text: 'Learn neural networks in 3D with luminous white filaments!',
         url: window.location.href
       };
       if (navigator.share) {
         try { await navigator.share(shareData); } catch (err) {}
-      } else {
-        try {
-          await navigator.clipboard.writeText(shareData.url);
-          alert('Link copied to clipboard!');
-        } catch (err) {}
+      } else if (btnShareCopy) {
+        btnShareCopy.click();
       }
     });
   }
 
   // ---------------------------------------------------------------------------
-  // INITIALIZATION
+  // 9. INITIALIZATION
   // ---------------------------------------------------------------------------
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
-  build3DNetwork([3, 8, 4, 1]); // Elegant, student-friendly starter network
-  renderLoop();
+  buildNetwork([3, 6, 2]); // Initial starting network for Guide Mode
+  animationLoop();
 });

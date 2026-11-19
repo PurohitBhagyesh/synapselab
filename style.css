@@ -1,52 +1,55 @@
 /* ==========================================================================
-   SynapseLab Design System — OpenLid Inspired (openlid.devs.li)
-   Locked White Filaments • 60 FPS Canvas 3D • Live Student Studio
+   SynapseLab Design System — OpenLid UI/UX (openlid.devs.li)
+   Strict Unslop: No purple gradients, high contrast, zero floating collisions
+   Modes: Guide Mode (Learn Neural Concepts) & Test Mode (Code Studio & Lab)
    ========================================================================== */
 
 :root, [data-theme="dark"] {
   --bg: #000000;
   --surface: #0b0b0d;
   --surface-alt: #151519;
+  --surface-hover: #1e1e24;
   --border: #232329;
   --border-strong: #3a3a44;
-  --glass-rim: rgba(255, 255, 255, 0.12);
-  
+  --glass-rim: rgba(255, 255, 255, 0.08);
+
   --text: #ffffff;
   --text-muted: #9a9aa6;
   --text-dim: #666672;
-  
+
   --accent: #ffffff;
   --accent-soft: #1a1a20;
-  --accent-brand: #38bdf8;
+  --accent-cyan: #38bdf8;
   --emerald: #34d399;
   --amber: #fbbf24;
-  
-  --code-bg: #0a0a0c;
-  --code-border: #202026;
-  --nav-bg: rgba(0, 0, 0, 0.92);
+
+  --code-bg: #09090b;
+  --code-border: #1e1e24;
+  --nav-bg: rgba(0, 0, 0, 0.94);
 }
 
 [data-theme="light"] {
   --bg: #f8f8fa;
   --surface: #ffffff;
   --surface-alt: #f2f2f5;
+  --surface-hover: #e8e8ed;
   --border: #e4e4e9;
   --border-strong: #c8c8d2;
   --glass-rim: rgba(255, 255, 255, 0.9);
-  
+
   --text: #09090b;
   --text-muted: #5a5a66;
   --text-dim: #8a8a96;
-  
+
   --accent: #09090b;
   --accent-soft: #ececf0;
-  --accent-brand: #0284c7;
+  --accent-cyan: #0284c7;
   --emerald: #10b981;
   --amber: #f59e0b;
-  
-  --code-bg: #f4f4f7;
+
+  --code-bg: #ffffff;
   --code-border: #e4e4e9;
-  --nav-bg: rgba(248, 248, 250, 0.92);
+  --nav-bg: rgba(248, 248, 250, 0.94);
 }
 
 * {
@@ -63,7 +66,7 @@ html, body {
   background-color: var(--bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", sans-serif;
-  font-size: 14.5px;
+  font-size: 13.5px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -73,24 +76,26 @@ body {
   flex-direction: column;
 }
 
-/* OpenLid Sticky Navigation */
+/* -------------------------------------------------------------------------
+   1. NAVIGATION BAR (OpenLid Sticky Style)
+   ------------------------------------------------------------------------- */
 .nav {
-  position: sticky;
-  top: 0;
+  height: 52px;
   background-color: var(--nav-bg);
   border-bottom: 1px solid var(--border);
-  z-index: 1000;
   backdrop-filter: blur(20px) saturate(140%);
   -webkit-backdrop-filter: blur(20px) saturate(140%);
+  z-index: 1000;
   flex-shrink: 0;
 }
 
 .nav-inner {
+  height: 100%;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 52px;
-  padding: 0 18px;
+  gap: 16px;
 }
 
 .brand {
@@ -117,27 +122,64 @@ body {
   border: 1px solid var(--border);
 }
 
-/* Nav Actions */
+/* Mode Switcher Segmented Control */
+.mode-segmented {
+  display: inline-flex;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.mode-tab {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.mode-tab:hover {
+  color: var(--text);
+}
+
+.mode-tab.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border-strong);
+}
+
 .nav-end {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-/* Theme Toggle */
+/* OpenLid Eye Theme Switcher */
 .theme-toggle {
   background: transparent;
   border: 1px solid var(--border);
   color: var(--text-muted);
   font-size: 12px;
   font-weight: 500;
-  padding: 6px 10px;
+  padding: 6px 11px;
   border-radius: 6px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   transition: all 0.15s ease;
+  font-family: inherit;
 }
 
 .theme-toggle:hover {
@@ -145,148 +187,164 @@ body {
   border-color: var(--border-strong);
 }
 
-/* OpenLid Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 7px 15px;
-  border-radius: 999px;
-  font-size: 13px;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  border: 1px solid transparent;
-  transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  transition: all 0.15s ease;
   font-family: inherit;
 }
 
-.btn:active {
-  transform: scale(0.97);
-}
-
-.btn-primary {
-  background: var(--text);
-  color: var(--bg);
-}
-
-.btn-primary:hover {
-  opacity: 0.9;
-}
-
-.btn-secondary {
-  background: var(--surface);
-  color: var(--text);
-  border-color: var(--border);
-}
-
-.btn-secondary:hover {
-  border-color: var(--border-strong);
+.btn:hover {
   background: var(--surface-alt);
+  border-color: var(--border-strong);
 }
 
-/* Student Interactive Guidance Banner */
-.guidance-banner {
+/* -------------------------------------------------------------------------
+   2. MAIN WORKSPACE LAYOUT
+   ------------------------------------------------------------------------- */
+main {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  padding: 10px 14px 10px;
+  gap: 12px;
+}
+
+/* Left Pane Switcher: Guide vs Test Code */
+.mode-sidebar {
+  width: 440px;
+  flex-shrink: 0;
   background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: inset 0 1px 0 var(--glass-rim);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mode-sidebar.active {
+  display: flex;
+}
+
+/* -------------------------------------------------------------------------
+   3. GUIDE MODE SIDEBAR
+   ------------------------------------------------------------------------- */
+.guide-header {
+  padding: 12px 16px;
+  background: var(--surface-alt);
   border-bottom: 1px solid var(--border);
-  padding: 9px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+}
+
+.guide-header h2 {
   font-size: 13px;
-  flex-shrink: 0;
-  z-index: 50;
-}
-
-.guidance-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.live-beacon {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--emerald);
-  box-shadow: 0 0 8px var(--emerald);
-  animation: pulse-live 1.8s infinite ease-in-out;
-}
-
-@keyframes pulse-live {
-  0%, 100% { opacity: 0.9; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
-}
-
-.guide-step-tag {
-  background: var(--surface-alt);
-  border: 1px solid var(--border-strong);
-  color: var(--text);
   font-weight: 700;
-  font-size: 11px;
-  padding: 2px 7px;
-  border-radius: 4px;
-  font-family: "SF Mono", Menlo, Consolas, monospace;
-}
-
-.guide-message {
-  color: var(--text-muted);
-}
-.guide-message strong {
   color: var(--text);
-}
-
-.guide-actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.btn-step {
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.15s ease;
-}
-.btn-step:hover {
-  border-color: var(--border-strong);
+.guide-badge {
+  font-size: 11px;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--accent-cyan);
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid rgba(56, 189, 248, 0.25);
 }
 
-/* Main Split Screen Workspace (OpenLid Monitor Style) */
-main {
+.lesson-list {
   flex: 1;
-  display: flex;
-  position: relative;
-  overflow: hidden;
-  padding: 10px 14px;
-  gap: 12px;
-}
-
-.monitor-pane {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: inset 0 1px 0 var(--glass-rim);
+  overflow-y: auto;
+  padding: 12px;
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
-/* Left Pane: Live Student Code */
-.code-pane {
-  width: 440px;
-  flex-shrink: 0;
-  z-index: 20;
+.lesson-card {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.pane-header {
+.lesson-card:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
+}
+
+.lesson-card.active {
+  border-color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.lesson-tag {
+  font-size: 10.5px;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  color: var(--accent-cyan);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.lesson-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+
+.lesson-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.lesson-action {
+  margin-top: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lesson-action:hover {
+  border-color: var(--border-strong);
+  background: var(--border);
+}
+
+/* -------------------------------------------------------------------------
+   4. TEST MODE CODE SIDEBAR (OpenLid Monitor Style)
+   ------------------------------------------------------------------------- */
+.code-header {
   height: 38px;
   padding: 0 14px;
   background: var(--surface-alt);
@@ -313,8 +371,25 @@ main {
 
 .code-title {
   font-family: "SF Mono", Menlo, Consolas, monospace;
-  font-weight: 500;
+  font-size: 12px;
   color: var(--text);
+}
+
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-family: "SF Mono", monospace;
+  color: var(--emerald);
+}
+
+.live-beacon {
+  width: 6px;
+  height: 6px;
+  background: var(--emerald);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--emerald);
 }
 
 .code-textarea {
@@ -323,61 +398,133 @@ main {
   background: var(--code-bg);
   color: #f1f5f9;
   border: none;
-  padding: 16px;
+  padding: 14px;
   font-family: "SF Mono", Menlo, Consolas, monospace;
-  font-size: 13.5px;
-  line-height: 1.65;
+  font-size: 13px;
+  line-height: 1.6;
   resize: none;
   outline: none;
   white-space: pre;
   overflow-y: auto;
 }
 
-.pane-footer {
-  padding: 9px 14px;
+[data-theme="light"] .code-textarea {
+  color: #09090b;
+}
+
+.code-footer {
+  padding: 8px 12px;
   border-top: 1px solid var(--border);
   background: var(--surface-alt);
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 11.5px;
-  color: var(--text-muted);
   font-family: "SF Mono", Menlo, Consolas, monospace;
 }
 
-.live-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--emerald);
-  font-weight: 600;
-}
-.live-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--emerald);
+.code-footer-left {
+  color: var(--text-muted);
 }
 
-/* Right Pane: 3D White Filaments Canvas */
+.code-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-code-action {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.btn-code-action:hover {
+  border-color: var(--border-strong);
+  background: var(--border);
+}
+
+.btn-code-action.primary {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+/* -------------------------------------------------------------------------
+   5. 3D VISUALIZER PANE (Rock-solid Canvas Layout)
+   ------------------------------------------------------------------------- */
 .vis-pane {
   flex: 1;
   position: relative;
   background: #000000;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: inset 0 1px 0 var(--glass-rim);
   overflow: hidden;
+  display: flex;
 }
 
-#canvas3d {
+.canvas-wrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.canvas-wrap canvas {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   display: block;
   cursor: grab;
   touch-action: none;
 }
-#canvas3d:active { cursor: grabbing; }
 
-/* 3D Rotate Symbol & Orbit Gizmo (Top Right) */
-.rotate-gizmo-box {
+.canvas-wrap canvas:active {
+  cursor: grabbing;
+}
+
+/* Floating HUD (Top Left) */
+.vis-hud-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(11, 11, 13, 0.88);
+  border: 1px solid var(--border-strong);
+  padding: 9px 13px;
+  border-radius: 8px;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 11.5px;
+  pointer-events: none;
+  z-index: 25;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.vis-hud-badge strong {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text);
+  margin-bottom: 2px;
+  letter-spacing: 0.3px;
+}
+
+.vis-hud-badge span {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* 3D Rotate Symbol & Orbit Controls (Top Right) */
+.vis-toolbar {
   position: absolute;
   top: 14px;
   right: 14px;
@@ -388,45 +535,46 @@ main {
   z-index: 30;
 }
 
-.rotate-symbol-btn {
+.rotate-toggle-btn {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(11, 11, 13, 0.88);
   border: 1px solid var(--border-strong);
   color: var(--text);
-  padding: 7px 12px;
-  border-radius: 999px;
-  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11.5px;
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: all 0.15s ease;
   font-family: inherit;
 }
 
-.rotate-symbol-btn:hover {
+.rotate-toggle-btn:hover {
   border-color: var(--accent);
   background: var(--surface-alt);
 }
 
-.rotate-symbol-btn.active {
+.rotate-toggle-btn.active {
   background: var(--text);
   color: var(--bg);
   border-color: var(--text);
 }
 
 .rotate-icon-svg {
-  animation: spin-slow 16s linear infinite;
-  display: inline-block;
+  animation: spin-orbit 14s linear infinite;
   transform-origin: center;
 }
-.rotate-symbol-btn:not(.active) .rotate-icon-svg {
+
+.rotate-toggle-btn:not(.active) .rotate-icon-svg {
   animation-play-state: paused;
 }
 
-@keyframes spin-slow {
+@keyframes spin-orbit {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
@@ -436,186 +584,182 @@ main {
   gap: 4px;
 }
 
-.zoom-btn {
-  width: 32px;
-  height: 32px;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid var(--border);
+.tool-btn {
+  width: 30px;
+  height: 30px;
+  background: rgba(11, 11, 13, 0.88);
+  border: 1px solid var(--border-strong);
   color: var(--text);
   border-radius: 6px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: all 0.15s ease;
   font-family: "SF Mono", monospace;
 }
 
-.zoom-btn:hover {
-  border-color: var(--border-strong);
+.tool-btn:hover {
+  border-color: var(--accent);
   color: var(--accent);
-}
-
-/* Floating HUD (Top Left) */
-.vis-hud {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid var(--border);
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-family: "SF Mono", Menlo, Consolas, monospace;
-  font-size: 11.5px;
-  pointer-events: none;
-  z-index: 25;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(12px);
-}
-
-.vis-hud strong {
-  display: block;
-  font-size: 12px;
-  color: var(--text);
-  margin-bottom: 2px;
-}
-
-.vis-hud span {
-  color: var(--text-muted);
 }
 
 /* 3D Guidance Pill (Bottom Center) */
 .guidance-pill-bottom {
   position: absolute;
-  bottom: 20px;
+  bottom: 14px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(11, 11, 13, 0.85);
+  background: rgba(11, 11, 13, 0.88);
   border: 1px solid var(--border-strong);
-  border-radius: 999px;
-  padding: 6px 16px;
-  font-size: 11.5px;
+  border-radius: 6px;
+  padding: 5px 14px;
+  font-size: 11px;
   color: var(--text-muted);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   pointer-events: none;
   z-index: 25;
   white-space: nowrap;
 }
 
-/* ==========================================================================
-   OpenLid Floating Widgets: Buy Me a Coffee & Share
-   ========================================================================== */
-.snack-widget {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  z-index: 9002;
-  font-family: inherit;
-}
-
-.snack-pill {
-  display: inline-flex;
+/* -------------------------------------------------------------------------
+   6. GLOBAL BOTTOM STATUS & LEGAL BAR
+   ------------------------------------------------------------------------- */
+.bottom-bar {
+  height: 36px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
   align-items: center;
-  gap: 8px;
-  background-color: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border-strong);
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-  transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.snack-pill:hover {
-  background-color: var(--surface-alt);
-  border-color: var(--accent);
-  transform: translateY(-1px);
-}
-
-.snack-icon {
-  color: var(--amber);
+  justify-content: space-between;
+  padding: 0 16px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  z-index: 90;
   flex-shrink: 0;
 }
 
-.snack-card {
-  position: absolute;
-  bottom: 48px;
-  left: 0;
-  width: 320px;
-  background-color: var(--surface);
+.bottom-left, .bottom-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.legal-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 11.5px;
+  transition: color 0.15s ease;
+}
+
+.legal-link:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.bottom-action-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-size: 11.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.bottom-action-btn:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+/* -------------------------------------------------------------------------
+   7. CENTERED MODALS (No Collisions!)
+   ------------------------------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 16px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-dialog {
+  width: 340px;
+  background: var(--surface);
   border: 1px solid var(--border-strong);
   border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
-  display: none;
+  padding: 18px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+  display: flex;
   flex-direction: column;
   gap: 12px;
-  animation: snackPop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-.snack-card.active { display: flex; }
-
-@keyframes snackPop {
-  from { opacity: 0; transform: translateY(8px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  animation: modalPop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.snack-card-header {
+.modal-dialog.wide-modal {
+  width: 540px;
+  max-width: 95vw;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--border);
   padding-bottom: 10px;
 }
 
-.snack-title {
-  font-size: 15px;
-  font-weight: 600;
+.modal-title {
+  font-size: 14px;
+  font-weight: 700;
   color: var(--text);
-  margin-bottom: 4px;
 }
 
-.snack-upi-copy {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background-color: var(--surface-alt);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 3px 8px;
-  font-size: 11px;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-family: "SF Mono", Menlo, Consolas, monospace;
-}
-
-.snack-close-btn {
+.modal-close-btn {
   background: none;
   border: none;
   font-size: 20px;
   line-height: 1;
   color: var(--text-muted);
   cursor: pointer;
+  padding: 2px 6px;
 }
 
-.snack-card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.modal-close-btn:hover {
+  color: var(--text);
 }
 
-.snack-qr-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
+/* Buy Me a Coffee QR & UPI Layout */
 .snack-qr-pad {
   background: #ffffff;
   border-radius: 8px;
@@ -625,39 +769,29 @@ main {
   justify-content: center;
   width: 140px;
   height: 140px;
+  margin: 0 auto;
 }
-
 .snack-qr-pad img {
-  display: block;
   max-width: 100%;
+  display: block;
 }
 
-.snack-input-wrap {
+.snack-upi-copy {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
   display: flex;
   align-items: center;
-  background-color: var(--surface-alt);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0 12px;
-  height: 38px;
-}
-
-.currency-symbol {
-  font-size: 15px;
-  color: var(--text-muted);
-  font-weight: 500;
-  margin-right: 6px;
-}
-
-#snackAmountInput {
-  flex: 1;
-  background: none;
-  border: none;
-  outline: none;
+  justify-content: space-between;
+  cursor: pointer;
+  font-family: "SF Mono", monospace;
+  font-size: 12px;
   color: var(--text);
-  font-size: 14px;
-  font-weight: 500;
-  width: 100%;
+}
+
+.snack-upi-copy:hover {
+  border-color: var(--border-strong);
 }
 
 .snack-presets {
@@ -667,27 +801,27 @@ main {
 }
 
 .preset-chip {
-  background-color: var(--surface-alt);
+  background: var(--surface-alt);
   border: 1px solid var(--border);
   color: var(--text-muted);
   padding: 6px 0;
-  font-size: 12px;
-  font-weight: 500;
-  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 5px;
   cursor: pointer;
   text-align: center;
-  transition: all 0.15s ease;
+  font-family: inherit;
 }
 
 .preset-chip.active {
-  background-color: var(--text);
+  background: var(--text);
   color: var(--bg);
   border-color: var(--text);
 }
 
 .upi-apps-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 6px;
 }
 
@@ -696,159 +830,103 @@ main {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 8px 4px;
+  padding: 6px 2px;
   background: var(--surface-alt);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 6px;
   color: var(--text);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
   cursor: pointer;
-}
-
-.upi-app-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 800;
-  color: #fff;
-}
-
-.fam-badge { background: #d97706; }
-.amz-badge { background: #232f3e; color: #ff9900; }
-.pe-badge { background: #5f259f; }
-.gpay-badge { background: #4285f4; }
-.paytm-badge { background: #00b9f5; }
-.wa-badge { background: #25d366; }
-
-/* Share Widget (Bottom-Right) */
-.share-widget {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 9002;
   font-family: inherit;
 }
 
-.share-pill {
+.upi-app-btn:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
+}
+
+.upi-app-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background-color: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border-strong);
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-  transition: all 0.15s ease;
+  justify-content: center;
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 800;
 }
+.fam-badge { background: #d97706; }
+.gpay-badge { background: #4285f4; }
+.pe-badge { background: #5f259f; }
+.paytm-badge { background: #00b9f5; }
 
-.share-pill:hover {
-  background-color: var(--surface-alt);
-  border-color: var(--border-strong);
-  transform: translateY(-1px);
-}
-
-.share-card {
-  position: absolute;
-  bottom: 48px;
-  right: 0;
-  width: 290px;
-  background-color: var(--surface);
-  border: 1px solid var(--border-strong);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
-  display: none;
-  flex-direction: column;
-  gap: 10px;
-}
-.share-card.active { display: flex; }
-
-.share-line-item {
+/* Share Modal Items */
+.share-action-btn {
   display: flex;
   align-items: center;
-  gap: 12px;
-  width: 100%;
+  gap: 10px;
+  padding: 10px 12px;
   background: var(--surface-alt);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 10px 12px;
   color: var(--text);
+  font-size: 12.5px;
+  font-weight: 500;
   cursor: pointer;
   text-align: left;
+  transition: all 0.15s ease;
+  font-family: inherit;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .snack-widget:hover .snack-card { display: flex; }
-  .share-widget:hover .share-card { display: flex; }
+.share-action-btn:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
 }
 
-/* Mobile Responsive Breakpoint (<= 768px) */
-.mobile-tab-switch { display: none; }
+/* Legal Modal Content */
+.legal-content {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-@media (max-width: 768px) {
-  .mobile-tab-switch {
-    display: inline-flex;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 2px;
-  }
-  
-  .mobile-tab-btn {
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  
-  .mobile-tab-btn.active {
-    background: var(--surface-alt);
-    color: var(--text);
-  }
+.legal-content h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 4px;
+}
 
+.legal-content p, .legal-content ul {
+  margin-bottom: 4px;
+}
+
+.legal-content ul {
+  padding-left: 20px;
+}
+
+/* -------------------------------------------------------------------------
+   8. MOBILE RESPONSIVENESS
+   ------------------------------------------------------------------------- */
+@media (max-width: 820px) {
   main {
     flex-direction: column;
     padding: 8px;
-    gap: 8px;
   }
-
-  .code-pane {
+  .mode-sidebar {
     width: 100%;
-    height: 100%;
-    display: flex;
+    height: 48%;
   }
-
   .vis-pane {
     width: 100%;
-    height: 100%;
+    height: 52%;
+  }
+  .guidance-pill-bottom {
     display: none;
-  }
-
-  main.show-vis .code-pane { display: none; }
-  main.show-vis .vis-pane { display: flex; }
-
-  .snack-widget {
-    left: 12px;
-    bottom: max(14px, env(safe-area-inset-bottom));
-  }
-  .share-widget {
-    right: 12px;
-    bottom: max(14px, env(safe-area-inset-bottom));
-  }
-  .snack-card, .share-card {
-    width: 290px;
   }
 }
