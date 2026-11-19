@@ -76,22 +76,15 @@
          LEFT PANE 1: GUIDE MODE (Student Interactive Classroom)
          --------------------------------------------------------------------- -->
     <aside class="mode-sidebar guide-sidebar active" id="paneGuide">
-      <!-- Guide Mode Header: Educational Read-Only Experience -->
+      <!-- Guide Mode Header -->
       <div class="guide-header">
-        <div class="guide-header-top">
-          <h2>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 16v-4M12 8h.01"/>
-            </svg>
-            <span>Interactive Student Guide</span>
-          </h2>
-          <span class="guide-mode-tag">Read-Only</span>
-        </div>
-        <div class="guide-notice-pill">
-          <span>Curriculum and visual mechanics. To write and execute custom Python code, switch to <strong>Test Mode</strong> above.</span>
-        </div>
-        <span class="guide-badge" id="hudGuideStats">3 Layers &bull; 11 Neurons &bull; 24 Synapses</span>
+        <h2>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 16v-4M12 8h.01"/>
+          </svg>
+          <span>Interactive Student Guide</span>
+        </h2>
       </div>
 
       <div class="lesson-list">
@@ -293,10 +286,10 @@ epochs = 300</textarea>
         <span>Back</span>
       </button>
 
-      <!-- Live Execution Telemetry Overlay (visible when running live) -->
-      <div class="vis-live-badge" id="visLiveBadge" role="status" aria-live="polite">
+      <!-- Live Execution Telemetry Overlay (activates dynamically when running code) -->
+      <div class="vis-live-badge" id="visLiveBadge" role="status" aria-live="polite" style="display:none;">
         <span class="live-dot-pulse"></span>
-        <span id="visLiveText">LIVE SIGNAL FLOW: 60 THREADS ACTIVE</span>
+        <span id="visLiveText"></span>
       </div>
 
       <!-- Modern Frosted Viewport Toolbar (Top Right) -->
@@ -352,7 +345,7 @@ epochs = 300</textarea>
       <span id="footerStats">SynapseLab &bull; 3D Visualization Simulator for Students</span>
       <button class="legal-link open-legal-trigger" id="btnOpenPrivacy" type="button">Privacy Policy</button>
       <button class="legal-link open-legal-trigger" id="btnOpenTerms" type="button">Terms</button>
-      <button class="legal-link open-legal-trigger" id="btnOpenCookies" type="button">Cookies & DPDP Act</button>
+      <button class="legal-link" id="btnOpenCookies" type="button">Cookies</button>
     </div>
 
     <div class="bottom-right">
@@ -484,7 +477,7 @@ epochs = 300</textarea>
             </div>
 
             <div class="settings-btn-row">
-              <button type="button" class="btn primary" id="btnSendIssueEmail">
+              <button type="button" class="btn btn-report-warning" id="btnSendIssueEmail">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                   <polyline points="22,6 12,13 2,6"/>
@@ -628,18 +621,46 @@ epochs = 300</textarea>
     </div>
   </div>
 
-  <!-- COOKIE & DPDP CONSENT BANNER -->
-  <aside class="cookie-banner" id="cookieConsentBanner" role="region" aria-label="Privacy and Cookie Notice">
-    <div class="cookie-banner-content">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"/>
-        <path d="M12 16v-4M12 8h.01"/>
-      </svg>
-      <span>We store simulator preferences locally on your device. Zero tracking cookies or third-party telemetry. DPDP Act 2023 compliant.</span>
+  <!-- AESTHETIC MODERN WEBSITE COOKIE & STORAGE PREFERENCES BANNER -->
+  <aside class="cookie-banner" id="cookieConsentBanner" role="region" aria-label="Cookie and Storage Preferences">
+    <div class="cookie-banner-header">
+      <div class="cookie-title-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 2a10 10 0 0 0-1.74 19.85A10 10 0 0 1 12 2z"/>
+          <path d="M8 9h.01M15 13h.01M10 15h.01"/>
+        </svg>
+        <strong>Cookie &amp; Storage Preferences</strong>
+      </div>
+      <p class="cookie-desc">
+        We use essential local storage to run WebGL simulation graphics and save your workspace state. No tracking or marketing scripts are used.
+      </p>
     </div>
+
+    <!-- Toggle Options (OFF and ON) -->
+    <div class="cookie-toggles-grid">
+      <div class="cookie-toggle-item">
+        <div class="cookie-toggle-info">
+          <span class="cookie-toggle-name">Essential Graphics &amp; WebGL State</span>
+          <span class="cookie-toggle-sub">Required for 3D coordinate transformations and forward pass execution.</span>
+        </div>
+        <span class="cookie-locked-pill">Always Active</span>
+      </div>
+
+      <div class="cookie-toggle-item">
+        <div class="cookie-toggle-info">
+          <span class="cookie-toggle-name">Preference Persistence &amp; Cosmic Starfield</span>
+          <span class="cookie-toggle-sub">Remembers camera orbit sensitivity and 3D starfield animation.</span>
+        </div>
+        <div class="toggle-switch active" id="toggleCookieStorage" role="switch" aria-checked="true" tabindex="0">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="cookie-banner-actions">
-      <button class="cookie-btn-link open-legal-trigger" id="btnCookieLearnMore" type="button">Privacy Policy</button>
-      <button class="cookie-btn-accept" id="btnAcceptCookies" type="button">Acknowledge</button>
+      <button class="btn" id="btnRejectCookies" type="button">Reject Non-Essential</button>
+      <button class="btn primary" id="btnAcceptCookies" type="button">Accept All</button>
     </div>
   </aside>
 

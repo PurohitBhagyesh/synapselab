@@ -175,11 +175,9 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Update Telemetry Displays (in VS Code status bar and Guide header)
-    const hudGuideStats = document.getElementById('hudGuideStats');
+    // Update Telemetry Displays (in VS Code status bar)
     const liveThreadCount = document.getElementById('liveThreadCount');
     const statsText = `${layerSizes.length} Layers • ${nodes.length} Neurons • ${threads.length} Synapses`;
-    if (hudGuideStats) hudGuideStats.textContent = statsText;
     if (liveThreadCount) liveThreadCount.textContent = statsText;
   }
 
@@ -530,8 +528,11 @@ document.addEventListener('DOMContentLoaded', () => {
       </svg><span>Running...</span>`;
     }
 
-    if (visLiveBadge && visLiveText) {
+    if (visLiveBadge) {
+      visLiveBadge.style.display = 'inline-flex';
       visLiveBadge.style.borderColor = '#ffffff';
+    }
+    if (visLiveText) {
       visLiveText.textContent = `FORWARD PASS: INITIALIZING LAYER 0 INPUTS (${layerSizes[0]} FEATURES)...`;
     }
   }
@@ -837,6 +838,11 @@ document.addEventListener('DOMContentLoaded', () => {
           visLiveBadge.style.borderColor = '#ffffff';
           const outStr = endpointPredictionOutputs.map(v => v.toFixed(3)).join(', ');
           visLiveText.textContent = `ENDPOINT PREDICTION: [${outStr}] • LOSS: ${calculatedLoss} • 100% SYNCED`;
+          setTimeout(() => {
+            if (visLiveBadge && !isForwardPassRunning && !isTrainingSimulation) {
+              visLiveBadge.style.display = 'none';
+            }
+          }, 3200);
         }
         const liveThreadCount = document.getElementById('liveThreadCount');
         if (liveThreadCount) {
@@ -1122,6 +1128,7 @@ epochs = 300`;
 
       const originalHtml = btnTrainLive.innerHTML;
       btnTrainLive.classList.add('running');
+      if (visLiveBadge) visLiveBadge.style.display = 'inline-flex';
 
       const steps = [
         { ep: 1, loss: (0.7243).toFixed(4), msg: `TRAINING EPOCH 1/${totalEp} • LOSS: 0.7243 • BACKPROPAGATING ERROR FROM ENDPOINT` },
@@ -1144,7 +1151,10 @@ epochs = 300`;
           setTimeout(() => {
             btnTrainLive.classList.remove('running');
             btnTrainLive.innerHTML = originalHtml;
-          }, 2400);
+            if (visLiveBadge && !isForwardPassRunning && !isTrainingSimulation) {
+              visLiveBadge.style.display = 'none';
+            }
+          }, 2600);
         }
       }
 
@@ -1445,27 +1455,53 @@ epochs = 300`;
   }
 
   // ---------------------------------------------------------------------------
-  // 10. COOKIE & DPDP CONSENT BANNER
+  // 10. AESTHETIC WEBSITE COOKIE & STORAGE PREFERENCES
   // ---------------------------------------------------------------------------
   const cookieConsentBanner = document.getElementById('cookieConsentBanner');
   const btnAcceptCookies = document.getElementById('btnAcceptCookies');
-  const btnCookieLearnMore = document.getElementById('btnCookieLearnMore');
+  const btnRejectCookies = document.getElementById('btnRejectCookies');
+  const toggleCookieStorage = document.getElementById('toggleCookieStorage');
+  const btnOpenCookies = document.getElementById('btnOpenCookies');
 
-  if (localStorage.getItem('synapselab_cookie_consent') === 'true') {
+  const savedConsent = localStorage.getItem('synapselab_cookie_consent');
+  if (savedConsent) {
     if (cookieConsentBanner) cookieConsentBanner.classList.add('hidden');
+    if (savedConsent === 'rejected') {
+      settings.enableStarfield = false;
+      if (toggleCookieStorage) toggleCookieStorage.classList.remove('active');
+    }
+  }
+
+  if (toggleCookieStorage) {
+    toggleCookieStorage.addEventListener('click', () => {
+      const isActive = toggleCookieStorage.classList.toggle('active');
+      toggleCookieStorage.setAttribute('aria-checked', isActive ? 'true' : 'false');
+    });
   }
 
   if (btnAcceptCookies && cookieConsentBanner) {
     btnAcceptCookies.addEventListener('click', () => {
-      localStorage.setItem('synapselab_cookie_consent', 'true');
+      localStorage.setItem('synapselab_cookie_consent', 'accepted');
+      localStorage.setItem('synapselab_cookie_pref_storage', 'true');
+      settings.enableStarfield = true;
+      saveSettings();
       cookieConsentBanner.classList.add('hidden');
     });
   }
 
-  if (btnCookieLearnMore) {
-    btnCookieLearnMore.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (legalModal) legalModal.classList.add('active');
+  if (btnRejectCookies && cookieConsentBanner) {
+    btnRejectCookies.addEventListener('click', () => {
+      localStorage.setItem('synapselab_cookie_consent', 'rejected');
+      localStorage.setItem('synapselab_cookie_pref_storage', 'false');
+      settings.enableStarfield = false;
+      saveSettings();
+      cookieConsentBanner.classList.add('hidden');
+    });
+  }
+
+  if (btnOpenCookies && cookieConsentBanner) {
+    btnOpenCookies.addEventListener('click', () => {
+      cookieConsentBanner.classList.remove('hidden');
     });
   }
 
