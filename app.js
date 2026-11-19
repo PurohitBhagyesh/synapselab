@@ -1208,28 +1208,17 @@ epochs = ${config.epochs || 300}`;
         targetCamDist = 700;
         triggerLiveForwardPass();
       } else if (lessonIdx === 4) {
-        // Lesson 5: Training & Gradient Descent (Backpropagation Simulation Cascade)
+        // Lesson 5: Training & Gradient Descent (Consistent with Lessons 1-4)
         activeGuideConfig = { layers: [3, 6, 4, 2], activation: 'relu', learningRate: 0.05, epochs: 300 };
         buildNetwork([3, 6, 4, 2]);
         targetCamDist = 680;
-        triggerBackpropAnimation();
+        triggerLiveForwardPass();
       } else if (lessonIdx === 5) {
         // Lesson 6: Transition directly into Test Mode Code Lab
         switchMode('test');
       }
     });
   });
-
-  const btnLesson5Animate = document.getElementById('btnLesson5Animate');
-  if (btnLesson5Animate) {
-    attachTap(btnLesson5Animate, (e) => {
-      e.stopPropagation();
-      activeGuideConfig = { layers: [3, 6, 4, 2], activation: 'relu', learningRate: 0.05, epochs: 300 };
-      buildNetwork([3, 6, 4, 2]);
-      targetCamDist = 680;
-      triggerBackpropAnimation();
-    });
-  }
 
   // ---------------------------------------------------------------------------
   // 6b. TEST MODE ARCHITECTURE EXAMPLES & PRESETS
