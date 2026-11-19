@@ -215,10 +215,10 @@ epochs = ${config.epochs || 300}`;
   let cy = 225;
 
   // Camera State with Smooth Inertial Lerping & Velocity Damping
-  let targetYaw = -0.38;
-  let targetPitch = 0.22;
-  let currentYaw = -0.38;
-  let currentPitch = 0.22;
+  let targetYaw = -0.52;
+  let targetPitch = 0.20;
+  let currentYaw = -0.52;
+  let currentPitch = 0.20;
   let camDist = 650;
   let targetCamDist = 650;
   let fov = 480;
@@ -263,11 +263,14 @@ epochs = ${config.epochs || 300}`;
     }
 
     const numLayers = layerSizes.length;
-    const totalDepth = 480;
+    const totalDepth = 620;
     const zStep = totalDepth / (numLayers - 1 || 1);
 
     layerSizes.forEach((count, lIdx) => {
-      const z = -totalDepth / 2 + lIdx * zStep;
+      let z = -totalDepth / 2 + lIdx * zStep;
+      if (lIdx === numLayers - 1 && numLayers > 2) {
+        z += 35; // Elongate output layer so it projects forward cleanly
+      }
       const totalH = Math.min(340, count * 44);
       const startY = -totalH / 2;
       const stepY = count > 1 ? totalH / (count - 1) : 0;
@@ -901,8 +904,11 @@ epochs = ${config.epochs || 300}`;
     // 4. Floating Layer Headers (Monochrome Glass Cards with Dynamic Text Fitting)
     if (showLabels) {
       layerSizes.forEach((count, lIdx) => {
-        const totalDepth = 480;
-        const z = -totalDepth / 2 + lIdx * (totalDepth / (layerSizes.length - 1 || 1));
+        const totalDepth = 620;
+        let z = -totalDepth / 2 + lIdx * (totalDepth / (layerSizes.length - 1 || 1));
+        if (lIdx === layerSizes.length - 1 && layerSizes.length > 2) {
+          z += 35;
+        }
         const pTop = project3D(0, -180, z, cx, cy);
         if (!pTop) return;
 
@@ -1385,16 +1391,18 @@ epochs = ${config.epochs || 300}`;
   const legalModal = document.getElementById('legalModal');
 
   const btnOpenCoffee = document.getElementById('btnOpenCoffee');
+  const btnOpenCoffeeNav = document.getElementById('btnOpenCoffeeNav');
   const btnCloseCoffee = document.getElementById('btnCloseCoffee');
   const btnCloseShare = document.getElementById('btnCloseShare');
   const btnCloseLegal = document.getElementById('btnCloseLegal');
 
-  if (btnOpenCoffee) {
-    btnOpenCoffee.addEventListener('click', () => {
-      updateCoffeeQr(snackAmountInput ? snackAmountInput.value : 50);
-      if (coffeeModal) coffeeModal.classList.add('active');
-    });
+  function openCoffeeModal() {
+    updateCoffeeQr(snackAmountInput ? snackAmountInput.value : 50);
+    if (coffeeModal) coffeeModal.classList.add('active');
   }
+
+  if (btnOpenCoffee) attachTap(btnOpenCoffee, openCoffeeModal);
+  if (btnOpenCoffeeNav) attachTap(btnOpenCoffeeNav, openCoffeeModal);
   if (btnCloseCoffee) btnCloseCoffee.addEventListener('click', () => coffeeModal.classList.remove('active'));
 
   if (btnCloseShare) btnCloseShare.addEventListener('click', () => shareModal.classList.remove('active'));

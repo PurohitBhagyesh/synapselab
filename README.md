@@ -63,7 +63,10 @@ SynapseLab provides two distinct working environments tailored for learning:
 ## Core Features
 
 * **Hardware-Accelerated 3D Filaments**: Native cubic Bezier spline evaluation rendered in real-time perspective (`60-120 FPS`), with depth-sorted neurons, radiant halos, and an orientation floor grid.
-* **macOS-Inspired Capsule Mode Switcher**: Centered in header on desktop and floating at bottom on mobile devices (`border-radius: 9999px`) with hardware-accelerated sliding white pill indicator.
+* **macOS-Inspired Capsule Mode Switcher**: Placed cleanly in a dedicated strip between the header and body at the top on all devices (`border-radius: 9999px`) with a hardware-accelerated sliding white pill indicator.
+* **Capsule Pill Aesthetics Across All Triggers**: All action buttons, navigation triggers, viewport tools, preset chips, and modal actions follow a cohesive, modern capsule pill aesthetic (`border-radius: 9999px`).
+* **Elongated 3D Output & Expansive Perspective**: Increased depth separation between layers and expansive 3D canvas allocation on mobile and desktop so layer cards never collide and the output layer projects forward cleanly.
+* **Prominent Support Developer Access**: Instant access to the Buy me a Coffee modal with live UPI QR code (`Purohit2009@fam`) directly from the top header navigation bar and footer on all devices.
 * **Touchscreen Gestures**: One-finger swipe to rotate with inertial deceleration, and two-finger pinch to zoom in and zoom out smoothly.
 * **Interactive Light-Up Guides**: Touching any curriculum lesson loads that architecture immediately and illuminates the 3D network with forward pass or backpropagation cascades.
 * **Compact Viewport Controls**: Sleek, non-intrusive floating control bar on mobile with essential tools (Auto-Orbit, Center View, Labels Toggle, Snapshot, Fullscreen) that never obstruct network layers.
