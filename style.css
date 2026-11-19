@@ -720,13 +720,12 @@ main {
 /* Live Signal Flow Overlay Badge */
 .vis-live-badge {
   position: absolute;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 14px;
+  left: 14px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(12, 12, 15, 0.88);
+  background: rgba(12, 12, 15, 0.92);
   border: 1px solid var(--border-strong);
   padding: 5px 12px;
   border-radius: 6px;
@@ -741,6 +740,7 @@ main {
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
   transition: opacity 0.2s ease, border-color 0.2s ease;
+  max-width: calc(100% - 28px);
 }
 
 .live-dot-pulse {
@@ -1340,51 +1340,60 @@ main {
 }
 
 /* -------------------------------------------------------------------------
-   8. MOBILE RESPONSIVENESS (< 820px and < 560px)
+   8. MOBILE RESPONSIVENESS & COMPREHENSIVE DEVICE REDESIGN
    ------------------------------------------------------------------------- */
-@media (max-width: 820px) {
+
+/* General Mobile & Tablet Rule: < 960px or Landscape Phones */
+@media (max-width: 960px), (max-height: 520px) {
   html, body {
     height: 100%;
     overflow: hidden;
-  }
-
-  main {
-    flex-direction: column;
-    padding: 6px;
-    height: calc(100dvh - 52px - 36px);
-    height: calc(100vh - 52px - 36px);
-    gap: 6px;
-  }
-
-  .mode-sidebar {
-    width: 100%;
-    height: 48%;
-  }
-
-  .vis-pane {
-    width: 100%;
-    height: 52%;
-  }
-
-  .nav-inner {
-    padding: 0 10px;
-    gap: 8px;
+    -webkit-text-size-adjust: 100%;
   }
 
   .brand-sub {
     display: none;
   }
 
-  .mode-segmented {
-    height: 34px;
+  .modal-dialog {
+    padding: 14px;
+    width: 95vw;
+    max-height: 90vh;
+  }
+}
+
+/* 1. Mobile Portrait (< 960px and portrait, or <= 768px) */
+@media (max-width: 960px) and (orientation: portrait), (max-width: 768px) and (orientation: portrait) {
+  main {
+    flex-direction: column;
+    padding: 6px;
+    height: calc(100dvh - 50px - 34px);
+    gap: 6px;
   }
 
-  .mode-tab {
-    padding: 4px 10px;
-    font-size: 11.5px;
+  .mode-sidebar {
+    width: 100%;
+    height: 48%;
+    border-radius: 8px;
+  }
+
+  .vis-pane {
+    width: 100%;
+    height: 52%;
+    border-radius: 8px;
+  }
+
+  .vis-live-badge {
+    top: auto;
+    bottom: 8px;
+    left: 8px;
+    max-width: calc(100% - 16px);
+    font-size: 9.5px;
+    padding: 3px 8px;
   }
 
   .bottom-bar {
+    height: 34px;
     padding: 0 10px;
     font-size: 11px;
   }
@@ -1392,23 +1401,158 @@ main {
   .bottom-left #footerStats {
     display: none;
   }
+}
 
-  .modal-dialog {
-    padding: 14px;
-    width: 95vw;
+/* 2. Mobile Landscape Redesign (< 520px height) */
+@media (max-height: 520px) and (orientation: landscape) {
+  .nav {
+    height: 38px;
+  }
+
+  .nav-inner {
+    height: 38px;
+    padding: 0 10px;
+    gap: 8px;
+  }
+
+  .brand-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .brand-title {
+    font-size: 13px;
+  }
+
+  .mode-segmented {
+    height: 28px;
+    padding: 2px;
+  }
+
+  .mode-tab {
+    padding: 2px 8px;
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .mode-tab svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .nav-end .btn span,
+  .nav-end .nav-icon-btn span {
+    display: none;
+  }
+
+  .nav-end .btn,
+  .nav-end .nav-icon-btn {
+    padding: 3px 7px;
+  }
+
+  main {
+    flex-direction: row;
+    height: calc(100dvh - 38px);
+    padding: 4px;
+    gap: 6px;
+  }
+
+  .mode-sidebar {
+    width: 44%;
+    height: 100%;
+    border-radius: 8px;
+  }
+
+  .vis-pane {
+    width: 56%;
+    height: 100%;
+    border-radius: 8px;
+  }
+
+  .bottom-bar {
+    display: none !important; /* Hide footer in landscape to maximize vertical space */
+  }
+
+  .vscode-tabs-bar {
+    height: 30px;
+    padding: 0 4px;
+  }
+
+  .vscode-tab {
+    font-size: 11px;
+    padding: 0 8px;
+    gap: 4px;
+  }
+
+  .vscode-action-btn {
+    padding: 2px 6px;
+    font-size: 10.5px;
+    gap: 3px;
+  }
+
+  .vscode-breadcrumbs {
+    display: none; /* Hide breadcrumbs in landscape to gain 22px of editor space */
+  }
+
+  .vscode-editor-body {
+    font-size: 11px;
+  }
+
+  .vscode-gutter {
+    width: 30px;
+    padding: 6px 0;
+    font-size: 10.5px;
+  }
+
+  .gutter-line {
+    height: 17.5px;
+  }
+
+  .vscode-textarea {
+    font-size: 11px;
+    line-height: 1.6;
+    padding: 6px 8px;
+  }
+
+  .vscode-status-bar {
+    height: 20px;
+    font-size: 9.5px;
+  }
+
+  .status-left span:nth-child(4),
+  .status-left span:nth-child(5),
+  .status-left span:nth-child(6) {
+    display: none;
+  }
+
+  .viewport-toolbar {
+    top: 6px;
+    right: 6px;
+    padding: 2px;
+  }
+
+  .vp-btn {
+    width: 24px;
+    height: 24px;
+  }
+
+  .vis-live-badge {
+    top: auto;
+    bottom: 8px;
+    left: 8px;
+    max-width: 210px;
+    font-size: 9px;
+    padding: 2px 6px;
   }
 }
 
+/* 3. Small Mobile Width (< 560px) */
 @media (max-width: 560px) {
   .nav-inner .btn span {
     display: none;
   }
 
   .nav-inner .nav-icon-btn span {
-    display: none;
-  }
-
-  .vscode-tab-actions .vscode-action-btn:nth-child(2) {
     display: none;
   }
 
@@ -1425,9 +1569,10 @@ main {
   }
 }
 
+/* 4. Extra Small Mobile (< 480px) */
 @media (max-width: 480px) {
   .navbar {
-    height: 46px;
+    height: 44px;
   }
 
   .nav-inner {
@@ -1473,9 +1618,10 @@ main {
   }
 
   .vis-live-badge {
-    top: 8px;
+    top: auto;
+    bottom: 8px;
     left: 8px;
-    max-width: calc(100% - 145px);
+    max-width: calc(100% - 16px);
     font-size: 9.5px;
     padding: 3px 8px;
     white-space: nowrap;
@@ -1495,16 +1641,16 @@ main {
   }
 
   .vscode-editor-body {
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .vscode-gutter {
     width: 36px;
-    font-size: 11.5px;
+    font-size: 12px;
   }
 
   .vscode-textarea {
-    font-size: 12px;
+    font-size: 13px;
     padding: 10px 10px;
   }
 
@@ -1520,6 +1666,7 @@ main {
   }
 }
 
+/* 5. Micro Mobile (< 380px) */
 @media (max-width: 380px) {
   .brand-title {
     font-size: 11.5px;

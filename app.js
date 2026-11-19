@@ -31,32 +31,143 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------------------------------------------------------------------------
-  // 2. MODE SWITCHER: GUIDE MODE vs TEST MODE
+  // 2. MODE SWITCHER & WORKSPACE PANES
   // ---------------------------------------------------------------------------
   const tabGuide = document.getElementById('tabGuide');
   const tabTest = document.getElementById('tabTest');
   const paneGuide = document.getElementById('paneGuide');
   const paneTest = document.getElementById('paneTest');
+
+  const studentCode = document.getElementById('studentCode');
+  const lineNumbers = document.getElementById('lineNumbers');
+  const cursorPos = document.getElementById('cursorPos');
+  const btnRunCode = document.getElementById('btnRunCode');
+  const btnTrainLive = document.getElementById('btnTrainLive');
+  const btnResetCode = document.getElementById('btnResetCode');
+
+  const defaultStarterCode = `layers = [3, 8, 4, 1]
+activation = "relu"
+learning_rate = 0.05
+epochs = 300`;
+
+  let activeBreakpoints = new Set();
+  let currentModelParams = {
+    activation: 'relu',
+    learningRate: 0.05,
+    epochs: 300,
+    layers: [3, 8, 4, 1]
+  };
+
+  function attachTap(el, fn) {
+    if (!el) return;
+    let lastTap = 0;
+    const handler = (e) => {
+      const now = Date.now();
+      if (now - lastTap < 250) return;
+      lastTap = now;
+      fn(e);
+    };
+    el.addEventListener('click', handler);
+    el.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      handler(e);
+    }, { passive: false });
+  }
+
+  function updateLineNumbers() {
+    if (!studentCode || !lineNumbers) return;
+    const lines = studentCode.value.split('\n');
+    const count = lines.length || 1;
+    let html = '';
+    for (let i = 1; i <= count; i++) {
+      const isBp = activeBreakpoints.has(i);
+      html += `<div class="gutter-line ${isBp ? 'has-bp' : ''}" data-line="${i}" title="${isBp ? 'Breakpoint active (click to remove)' : 'Click to toggle breakpoint'}"><span class="bp-dot"></span><span class="gutter-num">${i}</span></div>`;
+    }
+    lineNumbers.innerHTML = html;
+  }
+
+  function updateCursorPosition() {
+    if (!studentCode || !cursorPos) return;
+    const text = studentCode.value.substring(0, studentCode.selectionStart);
+    const lines = text.split('\n');
+    const ln = lines.length;
+    const col = lines[lines.length - 1].length + 1;
+    cursorPos.textContent = `Ln ${ln}, Col ${col}`;
+  }
+
+  function syncCodeToNetwork() {
+    if (!studentCode) return;
+    const code = studentCode.value;
+
+    const layersMatch = code.match(/layers\s*=\s*\[([\s\S]*?)\]/);
+    if (layersMatch && layersMatch[1]) {
+      const cleanLayersStr = layersMatch[1].replace(/#.*$/gm, '');
+      const parsed = cleanLayersStr.split(',')
+        .map(n => parseInt(n.trim(), 10))
+        .filter(n => !isNaN(n) && n > 0 && n <= 24);
+
+      if (parsed.length >= 2) {
+        currentModelParams.layers = parsed;
+        buildNetwork(parsed);
+      }
+    }
+
+    const actMatch = code.match(/activation\s*=\s*["']([a-zA-Z0-9_\-]+)["']/i);
+    if (actMatch && actMatch[1]) {
+      currentModelParams.activation = actMatch[1].toLowerCase();
+    }
+
+    const lrMatch = code.match(/learning_rate\s*=\s*([0-9]*\.?[0-9]+)/i);
+    if (lrMatch && lrMatch[1]) {
+      currentModelParams.learningRate = parseFloat(lrMatch[1]);
+    }
+
+    const epMatch = code.match(/epochs\s*=\s*(\d+)/i);
+    if (epMatch && epMatch[1]) {
+      currentModelParams.epochs = parseInt(epMatch[1], 10);
+    }
+
+    const paramStats = document.getElementById('paramStats');
+    if (paramStats) {
+      const actDisplay = currentModelParams.activation.toUpperCase();
+      paramStats.textContent = `${actDisplay} • lr: ${currentModelParams.learningRate} • ${currentModelParams.epochs} ep`;
+    }
+  }
+
   function switchMode(mode) {
     currentMode = mode;
     if (mode === 'guide') {
-      tabGuide.classList.add('active');
-      tabTest.classList.remove('active');
-      paneGuide.classList.add('active');
-      paneTest.classList.remove('active');
+      if (tabGuide) {
+        tabGuide.classList.add('active');
+        tabGuide.setAttribute('aria-selected', 'true');
+      }
+      if (tabTest) {
+        tabTest.classList.remove('active');
+        tabTest.setAttribute('aria-selected', 'false');
+      }
+      if (paneGuide) paneGuide.classList.add('active');
+      if (paneTest) paneTest.classList.remove('active');
       buildNetwork([3, 6, 2]);
     } else {
-      tabTest.classList.add('active');
-      tabGuide.classList.remove('active');
-      paneTest.classList.add('active');
-      paneGuide.classList.remove('active');
+      if (tabTest) {
+        tabTest.classList.add('active');
+        tabTest.setAttribute('aria-selected', 'true');
+      }
+      if (tabGuide) {
+        tabGuide.classList.remove('active');
+        tabGuide.setAttribute('aria-selected', 'false');
+      }
+      if (paneTest) paneTest.classList.add('active');
+      if (paneGuide) paneGuide.classList.remove('active');
+      updateLineNumbers();
+      updateCursorPosition();
       syncCodeToNetwork();
     }
     setTimeout(resizeCanvas, 40);
   }
 
-  if (tabGuide) tabGuide.addEventListener('click', () => switchMode('guide'));
-  if (tabTest) tabTest.addEventListener('click', () => switchMode('test'));
+  attachTap(tabGuide, () => switchMode('guide'));
+  attachTap(tabTest, () => switchMode('test'));
 
   // ---------------------------------------------------------------------------
   // 3. PERSISTENT 3D VISUALIZER ENGINE (CACHED SIZING & HIGH PERFORMANCE)
@@ -333,7 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnExitFullscreen = document.getElementById('btnExitFullscreen');
   const visPane = document.querySelector('.vis-pane');
 
-  function toggleFullscreen(forceState) {
+  async function toggleFullscreen(forceState) {
     if (!visPane) return;
     const isFullscreen = visPane.classList.contains('fullscreen-active');
     const targetState = (forceState !== undefined) ? forceState : !isFullscreen;
@@ -350,8 +461,19 @@ document.addEventListener('DOMContentLoaded', () => {
         </svg>`;
       }
       try {
-        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
-          document.documentElement.requestFullscreen().catch(() => {});
+        if (!document.fullscreenElement) {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen().catch(() => {});
+          } else if (document.documentElement.webkitRequestFullscreen) {
+            await document.documentElement.webkitRequestFullscreen().catch(() => {});
+          }
+        }
+      } catch (err) {}
+
+      // Automatically lock or request landscape orientation on mobile
+      try {
+        if (screen.orientation && screen.orientation.lock) {
+          await screen.orientation.lock('landscape').catch(() => {});
         }
       } catch (err) {}
     } else {
@@ -363,8 +485,17 @@ document.addEventListener('DOMContentLoaded', () => {
         </svg>`;
       }
       try {
-        if (document.fullscreenElement && document.exitFullscreen) {
-          document.exitFullscreen().catch(() => {});
+        if (screen.orientation && screen.orientation.unlock) {
+          screen.orientation.unlock();
+        }
+      } catch (err) {}
+      try {
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          if (document.exitFullscreen) {
+            await document.exitFullscreen().catch(() => {});
+          } else if (document.webkitExitFullscreen) {
+            await document.webkitExitFullscreen().catch(() => {});
+          }
         }
       } catch (err) {}
     }
@@ -372,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       resizeCanvas();
       drawPerspectiveScene();
-    }, 40);
+    }, 60);
   }
 
   if (btnFullscreen) {
@@ -944,38 +1075,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------------------------------------------------------------------------
   // 7. TEST MODE LIVE CODING & SIMULATION (VS CODE INTERACTIVE EXPERIENCE)
   // ---------------------------------------------------------------------------
-  const studentCode = document.getElementById('studentCode');
-  const lineNumbers = document.getElementById('lineNumbers');
-  const cursorPos = document.getElementById('cursorPos');
-  const btnRunCode = document.getElementById('btnRunCode');
-  const btnTrainLive = document.getElementById('btnTrainLive');
-  const btnResetCode = document.getElementById('btnResetCode');
-
-  const defaultStarterCode = `layers = [3, 8, 4, 1]
-activation = "relu"
-learning_rate = 0.05
-epochs = 300`;
-
-  let activeBreakpoints = new Set();
-  let currentModelParams = {
-    activation: 'relu',
-    learningRate: 0.05,
-    epochs: 300,
-    layers: [3, 8, 4, 1]
-  };
-
-  function updateLineNumbers() {
-    if (!studentCode || !lineNumbers) return;
-    const lines = studentCode.value.split('\n');
-    const count = lines.length || 1;
-    let html = '';
-    for (let i = 1; i <= count; i++) {
-      const isBp = activeBreakpoints.has(i);
-      html += `<div class="gutter-line ${isBp ? 'has-bp' : ''}" data-line="${i}" title="${isBp ? 'Breakpoint active (click to remove)' : 'Click to toggle breakpoint'}"><span class="bp-dot"></span><span class="gutter-num">${i}</span></div>`;
-    }
-    lineNumbers.innerHTML = html;
-  }
-
   if (lineNumbers) {
     lineNumbers.addEventListener('click', (e) => {
       const lineRow = e.target.closest('.gutter-line');
@@ -996,59 +1095,6 @@ epochs = 300`;
         }
       }
     });
-  }
-
-  function updateCursorPosition() {
-    if (!studentCode || !cursorPos) return;
-    const text = studentCode.value.substring(0, studentCode.selectionStart);
-    const lines = text.split('\n');
-    const ln = lines.length;
-    const col = lines[lines.length - 1].length + 1;
-    cursorPos.textContent = `Ln ${ln}, Col ${col}`;
-  }
-
-  function syncCodeToNetwork() {
-    if (!studentCode) return;
-    const code = studentCode.value;
-
-    // Multiline & inline comment safe regex for layers array
-    const layersMatch = code.match(/layers\s*=\s*\[([\s\S]*?)\]/);
-    if (layersMatch && layersMatch[1]) {
-      const cleanLayersStr = layersMatch[1].replace(/#.*$/gm, '');
-      const parsed = cleanLayersStr.split(',')
-        .map(n => parseInt(n.trim(), 10))
-        .filter(n => !isNaN(n) && n > 0 && n <= 24);
-
-      if (parsed.length >= 2) {
-        currentModelParams.layers = parsed;
-        buildNetwork(parsed);
-      }
-    }
-
-    // Extract activation function
-    const actMatch = code.match(/activation\s*=\s*["']([a-zA-Z0-9_\-]+)["']/i);
-    if (actMatch && actMatch[1]) {
-      currentModelParams.activation = actMatch[1].toLowerCase();
-    }
-
-    // Extract learning rate
-    const lrMatch = code.match(/learning_rate\s*=\s*([0-9]*\.?[0-9]+)/i);
-    if (lrMatch && lrMatch[1]) {
-      currentModelParams.learningRate = parseFloat(lrMatch[1]);
-    }
-
-    // Extract epochs
-    const epMatch = code.match(/epochs\s*=\s*(\d+)/i);
-    if (epMatch && epMatch[1]) {
-      currentModelParams.epochs = parseInt(epMatch[1], 10);
-    }
-
-    // Update param telemetry pill in status bar
-    const paramStats = document.getElementById('paramStats');
-    if (paramStats) {
-      const actDisplay = currentModelParams.activation.toUpperCase();
-      paramStats.textContent = `${actDisplay} • lr: ${currentModelParams.learningRate} • ${currentModelParams.epochs} ep`;
-    }
   }
 
   if (studentCode) {
@@ -1098,13 +1144,13 @@ epochs = 300`;
   }
 
   if (btnRunCode) {
-    btnRunCode.addEventListener('click', () => {
+    attachTap(btnRunCode, () => {
       triggerLiveForwardPass();
     });
   }
 
   if (btnResetCode) {
-    btnResetCode.addEventListener('click', () => {
+    attachTap(btnResetCode, () => {
       if (studentCode) {
         studentCode.value = defaultStarterCode;
         activeBreakpoints.clear();
@@ -1119,7 +1165,7 @@ epochs = 300`;
   let trainStep = 0;
 
   if (btnTrainLive) {
-    btnTrainLive.addEventListener('click', () => {
+    attachTap(btnTrainLive, () => {
       if (isTrainingSimulation) return;
       isTrainingSimulation = true;
       trainStep = 0;
