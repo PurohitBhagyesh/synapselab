@@ -73,7 +73,7 @@ SynapseLab provides two distinct working environments tailored for learning:
 * **Instant Hover Tooltips**: Instant dark-mode hover labels on all viewport controls (Auto Orbit, Reset, Toggle Labels, Save Image, Fullscreen).
 * **Live Forward Pass & Signal Cascade**: Clicking **Run** (or pressing `Cmd/Ctrl + Enter`) triggers a multi-stage signal pulse across all layers, illuminating neurons sequentially from input to output.
 * **Automatic Mobile Landscape on Fullscreen**: Entering Fullscreen on smartphones automatically locks orientation to landscape for maximum visual immersion.
-* **Streamlined Settings**: Single-purpose feedback modal with direct email composition (`Purohitunofficialbhagyesh@gmail.com`).
+* **Streamlined Settings Modal**: Orbit, zoom, auto-orbit speed, and thread luminosity sliders, moving starfield toggle, reset to defaults, direct link share copy, and privacy policy & terms.
 * **Support Developer Modal**: Live UPI QR code generator (`Purohit2009@fam`) with instant payment links for FamApp, Google Pay, PhonePe, and Paytm.
 * **Zero Cookies Architecture**: 100% cookie-free execution, zero tracking pixels or analytics scripts.
 * **Pure Monochrome Design**: Built adhering strictly to modern standards: zero emojis, zero em dashes, zero purple gradients, high-contrast black and white styling (`#000000`, `#ffffff`).
